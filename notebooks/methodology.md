@@ -217,22 +217,42 @@ Procedure: split pre-period into three sub-periods (early, middle, late thirds).
 
 Pass criterion: no donor's distance correlation with Brent shifts by more than 0.20 between sub-periods. If shifts exceed that threshold for multiple donors, the factor structure is unstable and the SCM projection is regime-dependent (flag in results).
 
-### 5d. Donor SUTVA / cleanliness battery (per donor × event)
+### 5d. Donor SUTVA / cleanliness battery
 
-The donor catalog ([donor_catalog.md](donor_catalog.md)) gives a *qualitative* SUTVA argument — physical routing, supply-chain reasoning, factor exposure. This section gives the **statistical counterpart**. For each donor in the candidate pool and each event:
+The donor catalog ([donor_catalog.md](donor_catalog.md)) gives a *qualitative* SUTVA argument — physical routing, supply-chain reasoning, factor exposure. This section gives the **statistical counterpart**. The cleanliness battery is split into **model-agnostic** tests (run in [01.5_Donor_Cleanliness.ipynb](01.5_Donor_Cleanliness.ipynb) *before* any model is fit) and a **model-native** test (run in [04_Inference.ipynb](04_Inference.ipynb) after each ensemble model is fit).
 
-| Test | Null hypothesis | Variant for nonlinear models | Source |
+#### 5d (i). Model-agnostic tests (in 01.5_Donor_Cleanliness)
+
+Three tests on each donor's own time-series — none depend on any SCM model:
+
+| Test | Null hypothesis | Used in combined flag? | Source |
 |---|---|---|---|
-| **In-space placebo (RMSPE ratio)** | Donor $j$'s post/pre RMSPE ratio is in the bulk of the placebo distribution | Use the *same model* used for estimation (XGBoost placebos for XGBoost estimation, etc.) | Abadie 2010 §3.3 |
-| **Structural break test** | No structural break in donor $j$'s log-return process at $T_0$ | Bootstrap variant — model-free, no DGP assumption | Andrews 1993; Hansen 2000 |
-| **Event-window return test** | Donor $j$'s mean return in $[-5d, +20d]$ window equals its mean in a clean control window | Wilcoxon two-sample test — nonparametric | Brown & Warner 1985; Wilcoxon |
-| **Correlation-structure invariance** | Joint distribution of donors is the same pre-$T_0$ vs post-$T_0$ | **Distance correlation** instead of Pearson — captures nonlinear dependence | Székely & Rizzo 2007 |
+| **Bootstrap structural break** at $T_0$ | Donor's log-returns have no mean shift at $T_0$ | **Yes** | Andrews 1993; Hansen 2000 |
+| **Wilcoxon event-window** | Mean return in $[-5d, +20d]$ equals mean in a 60-day pre-window control | **Yes** | Brown & Warner 1985; Wilcoxon |
+| **Kolmogorov-Smirnov distribution shift** | Pre-event and post-event return distributions are equal | **No — informational only** | Two-sample KS |
 
-**Rule for exclusion:** a donor failing **≥ 2 of 4** tests for a given event is flagged for exclusion from that event's SCM pool. Failing 0-1 tests means the donor is "statistically clean" against that event.
+**Combined flag rule:** donor flagged as *potentially treated* if **either** of the two SUTVA-specific tests (break OR event-window) rejects after **Benjamini-Hochberg FDR correction at $\alpha = 0.10$**.
 
-**Multiple-testing correction:** with 21 donors × 4 tests × 2 events = 168 hypotheses, false discoveries are inevitable without correction. Apply **Benjamini-Hochberg FDR control at $\alpha = 0.10$** within each event. Bonferroni would be over-conservative; B-H is the standard for high-dimensional multiple testing.
+**Why KS is reported but excluded from the flag rule.** At large pre-period sample sizes (Russia: ~420 pre obs + ~150 post), KS has very high power to detect *any* distributional difference — including differences driven by **concurrent macroeconomic regime shifts** unrelated to the focal event. For Russia 2022, the pre-period (COVID recovery + low rates) and the post-period (Fed +75bp × 3 + inflation acceleration + dollar surge) are two structurally different macro regimes regardless of the invasion. KS therefore flags ~21 of 33 donors for Russia — far more than the audit's 12 — but the over-rejection is driven by the broad regime shift, not by Russia-treatment of individual donors. We retain KS as a *regime-shift diagnostic* but exclude it from the per-donor SUTVA flag.
 
-**Honest power limitations.** ~415 obs per pre-period is low for detecting small contamination — tests can produce false negatives (failing to detect real contamination). Hormuz's post-event window is especially short (~3 months) → very low power. The qualitative SUTVA defense in [donor_catalog.md](donor_catalog.md) is the primary defense for Hormuz, with Russia 2022 providing the bulk of the statistical evidence.
+**Empirical findings from 01.5:**
+
+- **Hormuz 2026: perfect agreement** between the audit and the tests (0 of 33 flagged on both sides). The audit's qualitative "no Persian-Gulf routing for any donor" call is empirically confirmed.
+- **Russia 2022: partial disagreement** (19 of 33 agree, 14 disagree):
+  - *Audit flags, tests miss* (12 cases): the audit's H/M tier (Wheat, Corn, Palladium, EUR, DXY, BTC + the 6 M-tier donors) captures *causal channels* the model-agnostic tests cannot reproduce. The tests see "wheat moved" but the move isn't extreme enough to register after FDR with $N = 33$.
+  - *Tests flag, audit clean* (2 cases — JPY, CNY): the tests detect mean shifts (Fed/BoJ policy divergence, China zero-COVID) that are **concurrent macro events, not Russia-treatment**.
+
+**Interpretation.** The hand-curated audit remains the primary SUTVA defense; the model-agnostic tests **confirm** the audit on Hormuz and **supplement** it on Russia (highlighting JPY/CNY as flagged-but-not-audit-relevant — informative for the discussion section but not a reason to revise the audit). Tests and audit are *complementary*, not substitutes: audit captures causal-channel reasoning; tests capture event-localized empirical shifts (excluding KS, which captures the broader regime change).
+
+#### 5d (ii). Model-native test (in 04_Inference, §5e (i))
+
+The **in-space placebo for each donor** — refit the *chosen SCM model* treating each donor as treated, rank Brent's post/pre RMSPE ratio against the placebo distribution (Abadie 2010 §3.3). This test is documented in §5e (i) below because the same procedure also serves as the inferential validation for the treated unit (Brent).
+
+**Why split this off:** different SCM models produce different placebo distributions, so a donor's cleanliness verdict under in-space placebo is model-dependent. By contrast, the three tests in §5d (i) yield a single shared result per donor that applies to all five ensemble models.
+
+#### Honest power limitations
+
+~415 obs per pre-period is low for detecting small contamination — tests can produce false negatives (failing to detect real contamination, as we see for the Russia H/M tier). Hormuz's post-event window is especially short (~60 obs) → very low power; perfect agreement there is partly because both audit and tests are too conservative at that sample size to call anything treated. The qualitative SUTVA defense in [donor_catalog.md](donor_catalog.md) is the **primary** defense; the statistical tests are **secondary** empirical confirmation.
 
 ### 5e. Inferential validation on the treated unit
 

@@ -228,6 +228,30 @@ def event_window_return_test(series, event_date, pre_days=EVENT_WINDOW_PRE_DAYS,
     }
 
 
+def ks_distribution_shift(series, break_date):
+    """Two-sample Kolmogorov-Smirnov on log-returns pre vs post break_date.
+
+    Null: the pre-event and post-event return distributions are equal.
+    A rejection signals a *distribution-level* shift in the donor — broader than
+    a mean shift (which the structural-break test detects) or a window anomaly
+    (which the event-window test detects).
+
+    Returns dict with ks_stat, p, n_pre, n_post.
+    """
+    from scipy.stats import ks_2samp
+    s = series.dropna()
+    if len(s) < 30:
+        return {'p': np.nan, 'error': 'insufficient data'}
+    ret = np.log(s).diff().dropna()
+    pre = ret[ret.index < break_date]
+    post = ret[ret.index >= break_date]
+    if len(pre) < 10 or len(post) < 10:
+        return {'p': np.nan, 'error': 'too few obs in one side'}
+    stat, p = ks_2samp(pre.values, post.values)
+    return {'ks_stat': float(stat), 'p': float(p),
+            'n_pre': int(len(pre)), 'n_post': int(len(post))}
+
+
 def chow_break_test_bootstrap(series, break_date, n_boot=500, seed=0):
     """Bootstrap structural break test on log-returns.
 
