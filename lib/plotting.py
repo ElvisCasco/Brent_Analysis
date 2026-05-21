@@ -1,8 +1,29 @@
 """Shared plotly helpers for SCM fits."""
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+
+
+def save_html(fig, name, dir_=None, include_plotlyjs='cdn'):
+    """Save a plotly figure to {dir_}/{name}.html and return the figure (chainable).
+
+    Args:
+        fig: plotly figure
+        name: filename stem (no .html); the directory is created if missing
+        dir_: directory to save into; if None, no save happens (figure is returned as-is)
+        include_plotlyjs: 'cdn' (small file, requires internet) | 'inline' (~3MB self-contained)
+
+    Returns:
+        The figure unchanged — so you can chain: `save_html(plot_paths(...), name, dir_).show()`
+    """
+    if dir_ is not None:
+        d = Path(dir_)
+        d.mkdir(parents=True, exist_ok=True)
+        fig.write_html(d / f'{name}.html', include_plotlyjs=include_plotlyjs)
+    return fig
 
 
 PALETTE = {

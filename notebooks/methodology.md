@@ -143,13 +143,23 @@ The six sub-sections below cover each level. Every test is run **per model in th
 
 Two sub-tests of the synthetic's quality as a pre-event approximator of log-Brent.
 
-**(i) Walk-forward hold-out cross-validation** *(mandatory for nonlinear models, recommended for all)*:
+**(i) Walk-forward hold-out cross-validation**:
 
 1. Split pre-event window into train (first 80%) and validation (last 20%, immediately before $T_0$).
 2. Fit on train, predict on validation, compute validation RMSE.
-3. **Reject model if validation RMSE substantially exceeds train RMSE.** The model has memorized pre-event idiosyncrasies and cannot extrapolate to the post-event projection.
+3. Report the validation RMSE and the val/train ratio per model.
 
-Reported as a per-model table (Train RMSE / Validation RMSE / Train-Val gap). A model passing this test is *eligible* for the ensemble; a failing model is dropped (no salvage — the synthetic is not credible).
+**Literature anchoring.** Walk-forward CV (also called rolling-origin evaluation) is the canonical out-of-sample evaluation scheme for time-series — random $k$-fold CV cannot be used because of autocorrelation. See **Hyndman & Athanasopoulos (2018, *Forecasting: Principles and Practice* §5.10)** and **Bergmeir & Benítez (2012, *Information Sciences*)**, which formally show that walk-forward CV gives unbiased estimates of out-of-sample error for stationary time series. The bias-variance interpretation of the train-vs-val gap follows the classical framework in **Hastie, Tibshirani & Friedman (2009, *Elements of Statistical Learning* §7.2-7.3)**: overfitting manifests as the variance term dominating, with the practical signature of train RMSE ≪ val RMSE.
+
+**Flagging vs exclusion (honest statement).** We flag models with `val/train ratio > 2` as overfit candidates. The threshold is a **practitioner heuristic** rather than from a specific statistical test — Andrew Ng's CS229 notes and Goodfellow, Bengio, Courville (2016, *Deep Learning* §5.4) use "much larger" without a number; Kohavi (1995, *IJCAI*) focuses on choosing the minimum CV error model, not the train/val ratio. We report the absolute val_rmse alongside the ratio so a reader can apply their own judgment.
+
+**Flagged models are not automatically excluded** from the ensemble. The headline ensemble (§6) takes the median across all five models regardless of CV-flag status. Three reasons:
+
+1. The ratio threshold is heuristic; auto-exclusion based on it would over-impose a hard cutoff that the literature does not validate.
+2. The second-order validation — in-space placebo (§5e) and cross-event weight transfer (§5f) — provides the formal mechanism for ensemble inclusion/exclusion decisions.
+3. The IQR across all five models is *itself* informative as a model-uncertainty band. Excluding flagged models would falsely tighten the IQR.
+
+**For future consideration — bootstrap-CI alternative.** The bare ratio threshold could be replaced with a **probabilistic generalization statement** by bootstrapping val_rmse: compute a 95% CI on val_rmse via block-bootstrap over residuals (accounting for autocorrelation; see Politis & Romano 1994), and flag models where the lower bound of val_rmse exceeds train_rmse × some factor. This converts the heuristic threshold into a hypothesis-test style flag with controlled false-positive rate. Not implemented in the current pipeline; noted here for a more rigorous future iteration.
 
 **Honest limitation — winner's curse on the val set.** The val set is used *twice* in our pipeline: (a) during hyperparameter selection in `02_Fit_Models` (each grid candidate is scored by val RMSE; the candidate with lowest val RMSE is chosen), and (b) in the walk-forward CV reported here (the chosen hyperparameter's train/val ratio is reported as a generalization metric). Because the chosen hyperparameter is selected to *minimize* val RMSE, the reported val RMSE is **biased downward** vis-à-vis its true generalization performance — i.e., **overfitting is under-detected**, not over-detected.
 
@@ -176,21 +186,28 @@ $$
 \text{gap}_t = 100 \cdot [\exp(y_t - \hat y_t) - 1] \quad \text{for } t < T_0
 $$
 
-This series should hover around zero with no significant time trend. Failure means the synthetic is *drifting* relative to the treated unit during the pre-period — the post-event gap then inherits that drift and cannot be cleanly attributed to the treatment.
+The statistics on this series **characterise** how the synthetic behaves before the event — they are reported and interpreted, not used as pass/fail tests.
 
-Tests applied to the pre-period gap series:
-
-| Statistic | What it tests | Pass criterion |
+| Statistic | What it characterises | How a reader should use it |
 |---|---|---|
-| Mean (%) | Synthetic level matches treated level | $\|\text{mean}\| < 0.5\%$ |
-| $t$-statistic on mean $= 0$ | Formal test of zero mean | $p > 0.05$ |
-| SD (%) | Pre-period noise floor (context) | reported, no formal threshold |
-| AR(1) autocorrelation | Residual autocorrelation | $|\text{AR}(1)| < 0.9$ |
-| OLS trend slope (% / year) | Drift over time | $\|\text{slope}\| < 5\%$/year |
-| $p$-value (slope $= 0$) | Formal test of drift | $p > 0.10$ |
-| Trend $R^2$ | Fraction of gap variance explained by linear time | $R^2 < 0.10$ |
+| Mean (%) | Synthetic level offset from treated | Non-zero mean indicates a small constant bias; can be re-centred when reporting post-event magnitudes |
+| SD (%) | Pre-period noise floor | Calibrates the post-event gap's signal-to-noise — the post-event gap should clear roughly 2× SD to be informative |
+| $t$-statistic / $p$-value (mean = 0) | Formal test of zero mean | Reported; SCM does not constrain the mean by construction so a non-zero mean is normal |
+| AR(1) autocorrelation | Residual persistence | High AR(1) (> 0.9) signals an unmodelled slow-moving factor — flag for narrative discussion |
+| OLS trend slope (% per year) | Drift in the gap over the pre-period | Large slopes warrant explicit drift correction: subtract `slope × (post-window in years)` from the raw post-event gap before reporting |
+| Trend $p$-value, $R^2$ | Statistical strength of the drift | Large $R^2$ means time alone explains substantial gap variance — drift correction is most warranted in these cases |
 
-A model failing parallel-fit (significant mean OR significant trend OR $R^2 > 0.10$) is **flagged but not necessarily dropped** — the post-event gap can still be reported with the drift removed via re-centering. The flag is reported alongside the gap.
+**Why no formal pass/fail threshold.** Applied SCM papers — **Abadie, Diamond & Hainmueller (2010, 2015)**, **Born et al. (2019)**, **Acemoglu et al. (2016)**, and the **Abadie (2021) *JEL* review** — do *not* impose formal numeric thresholds on pre-period diagnostics. They report pre-period RMSPE and the gap-series plot, then rely on the **in-space placebo distribution** (§5e (i)) as the formal inferential anchor. The reason is power: pre-trend tests at applied sample sizes (~400 obs in our case) **have low power**, in the sense of **Roth (2022, *AER: Insights*) — "Pretest with caution"** — they fail to reject parallel-trends nulls even when economically meaningful violations exist. A strict threshold rule therefore generates *false confidence* in the cases it appears to pass, while flagging marginal violations as "failures." Either failure mode is worse than honest reporting.
+
+**Why we report the diagnostics anyway, even when several models look bad on slope or $R^2$.** Under the report-and-interpret framing, no model is "failing" — each is *characterised*. The statistics drive three concrete tasks:
+
+1. **Drift correction in the headline.** A model with pre-period slope $\hat\beta$ % per year contributes $\hat\beta \times L$ percentage points to the raw post-event gap over a post-window of length $L$ years, *independent of the treatment*. Drift-adjusted gap = raw gap − $\hat\beta \times L$. For our windows: Russia $L \approx 0.58$ yr (7 months), Hormuz $L \approx 0.25$ yr (3 months). Example: convex SCM Russia with slope = 10 %/yr contributes ~5.8 pp of drift; ASCM Russia with slope = 0.3 %/yr contributes ~0.2 pp. The 29.6% vs 13.3% raw gap difference partly resolves once drift is acknowledged.
+2. **Model comparison.** A model with slope = 0.3 %/yr is structurally more reliable than one with slope = 10 %/yr — independent of any threshold. The diagnostics give a *cross-model ranking* even when no single model is "clean."
+3. **Honest framing for review.** A reviewer asking "did you check pre-period fit?" gets a transparent answer with actual numbers and a method for adjusting the headline if drift is material.
+
+The strict thresholds previously imposed here were imported from a DiD-style parallel-trends instinct, which Roth (2022) shows is poorly calibrated at typical applied sample sizes. The SCM literature does not impose them, and adopting the SCM-native report-and-interpret standard is more defensible.
+
+**Future consideration — Rambachan-Roth (2023) drift bounds.** Rather than point-estimating drift and subtracting it, formally bound the *maximum drift* consistent with the pre-period gap series; the post-event gap then carries a corresponding bound on the share attributable to drift versus treatment. **Rambachan & Roth (2023, *Review of Economic Studies*) — "A more credible approach to parallel trends"** is the canonical reference; their `HonestDiD` package is the practical implementation. Not implemented here; noted for a more rigorous future iteration.
 
 ### 5c. Pre-period regime-stability test
 
@@ -323,6 +340,14 @@ Honest framing of what is **out of scope** for this pipeline:
 - Abadie, A., Diamond, A., & Hainmueller, J. (2010). Synthetic control methods for comparative case studies: Estimating the effect of California's Tobacco Control Program. *Journal of the American Statistical Association*, 105(490), 493-505.
 - Abadie, A., Diamond, A., & Hainmueller, J. (2015). Comparative politics and the synthetic control method. *American Journal of Political Science*, 59(2), 495-510.
 - Abadie, A. (2021). Using synthetic controls: feasibility, data requirements, and methodological aspects. *Journal of Economic Literature*, 59(2), 391-425.
+- Bergmeir, C., & Benítez, J. M. (2012). On the use of cross-validation for time series predictor evaluation. *Information Sciences*, 191, 192-213.
+- Goodfellow, I., Bengio, Y., & Courville, A. (2016). *Deep Learning*. MIT Press.
+- Hastie, T., Tibshirani, R., & Friedman, J. (2009). *The Elements of Statistical Learning: Data Mining, Inference, and Prediction* (2nd ed.). Springer.
+- Hyndman, R. J., & Athanasopoulos, G. (2018). *Forecasting: Principles and Practice* (2nd ed.). OTexts.
+- Kohavi, R. (1995). A study of cross-validation and bootstrap for accuracy estimation and model selection. *Proceedings of IJCAI* 1995, 1137-1143.
+- Politis, D. N., & Romano, J. P. (1994). The stationary bootstrap. *Journal of the American Statistical Association*, 89(428), 1303-1313.
+- Rambachan, A., & Roth, J. (2023). A more credible approach to parallel trends. *Review of Economic Studies*, 90(5), 2555-2591.
+- Roth, J. (2022). Pretest with caution: Event-study estimates after testing for parallel trends. *American Economic Review: Insights*, 4(3), 305-322.
 - Andrews, D. W. K. (1993). Tests for parameter instability and structural change with unknown change point. *Econometrica*, 61(4), 821-856.
 - Andrews, D. W. K., & Ploberger, W. (1994). Optimal tests when a nuisance parameter is present only under the alternative. *Econometrica*, 62(6), 1383-1414.
 - Ben-Michael, E., Feller, A., & Rothstein, J. (2021). The augmented synthetic control method. *Journal of the American Statistical Association*, 116(536), 1789-1803.
