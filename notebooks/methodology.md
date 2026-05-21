@@ -211,11 +211,17 @@ The strict thresholds previously imposed here were imported from a DiD-style par
 
 ### 5c. Pre-period regime-stability test
 
-Distinct from the parallel-fit defence: parallel-fit tests whether the *synthetic tracks the treated*; regime-stability tests whether the *donor-treated factor structure itself* is stable within the pre-period.
+Distinct from the parallel-fit defence: parallel-fit tests whether the *synthetic tracks the treated*; regime-stability tests whether the *donor-Brent factor structure itself* is stable within the pre-period.
 
-Procedure: split pre-period into three sub-periods (early, middle, late thirds). For each Brent-donor pair, compute **distance correlation** (Székely & Rizzo 2007 *Annals of Statistics*) in each sub-period.
+This test is **model-agnostic** (uses only donor and Brent return series, no SCM model). It is therefore implemented in [01.5_Donor_Cleanliness.ipynb](01.5_Donor_Cleanliness.ipynb) under **Battery B**, alongside the model-agnostic SUTVA cleanliness tests, so that all pre-modeling data diagnostics live in one place.
 
-Pass criterion: no donor's distance correlation with Brent shifts by more than 0.20 between sub-periods. If shifts exceed that threshold for multiple donors, the factor structure is unstable and the SCM projection is regime-dependent (flag in results).
+**Procedure:** split pre-period into three sub-periods (early, middle, late thirds). For each Brent-donor pair, compute **distance correlation** (Székely & Rizzo 2007 *Annals of Statistics*) in each sub-period; report `max_shift = max − min` across the three sub-periods.
+
+**No literature-mandated threshold.** Following the SCM-literature convention of *report and interpret* (cf. §5b above), we report the raw distance correlations + max shifts and discuss the largest shifts narratively. This test is **borrowed from the time-varying-parameter and structural-break literatures** (Stock & Watson 1996, 2002; Bai 2003; Bai & Perron 2003) and applied here in an ad-hoc fashion — distance correlation is a well-established dependence measure, but using sub-period thirds with a pass/fail interpretation has **no canonical SCM precedent**.
+
+**Honest framing.** Large within-pre-period shifts in donor-Brent distance correlation signal either factor-structure drift or sampling noise at the ~140-obs sub-period scale (the two are confounded). Small shifts (e.g., max_shift < 0.15) are uninformative given estimator variance. Large shifts (max_shift > 0.30) are *narrative flags* warranting discussion, not automatic donor exclusion.
+
+**Future consideration.** A more rigorous alternative is a formal structural-break test on the rolling Brent-donor correlation: Bai-Perron (2003) *J. Applied Econometrics* with bootstrap critical values, or Andrews-Ploberger (1994) sup-Wald. Not implemented in the current pipeline; noted for a future iteration.
 
 ### 5d. Donor SUTVA / cleanliness battery
 
