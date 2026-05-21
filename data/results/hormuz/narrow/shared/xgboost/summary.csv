@@ -1,0 +1,11 @@
+event,hormuz
+window,narrow
+variant,shared
+model,xgboost
+rmspe_pre_log,0.04476062924578072
+rmspe_pre_pct,4.577750139640457
+t0,2026-02-01 00:00:00
+t_pre_start,2025-01-01 00:00:00
+n_pre,274
+n_post,59
+n_donors_active,5

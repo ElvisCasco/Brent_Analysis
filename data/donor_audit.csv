@@ -1,0 +1,34 @@
+donor,Russia_2022,Hormuz_2026,reason
+Copper,M,C,Russia ~4% world copper supply
+IronOre,M,C,Russia ~5% world iron ore exports
+Silver,C,C,
+Platinum,C,C,S.Africa-dominated; no Russia exposure
+Palladium,H,C,Russia ~40% world supply; price spiked 2022
+Gold,C,C,safe-haven channel = intended SCM co-movement
+Soybeans,M,C,cross-elasticity with wheat / Ukrainian sunflower oil
+Wheat,H,C,Russia+Ukraine ~30% world exports; ZW=F +80% Mar2022
+Corn,H,C,Ukraine ~13% world corn exports
+Coffee,C,C,Brazil/Vietnam concentrated
+Sugar,C,C,Brazil/India; clean
+Cotton,C,C,US/China/India; clean
+LiveCattle,C,C,N.America domestic; clean
+SP500,C,C,risk-premium channel = intended SCM co-movement
+WorldEq,C,C,same
+Nikkei,C,C,Japan equity; clean
+EM_Eq,M,C,broad EM ETF; some Russia weight pre-exclusion
+EUR,H,C,European energy-import crisis hit EUR specifically
+GBP,M,C,UK gas-market exposure to Russia crisis
+AUD,C,C,Australia commodity exporter; clean of Russia
+JPY,C,C,safe-haven FX; clean
+CHF,C,C,Swiss neutrality + safe-haven; clean
+CNY,C,C,China managed currency; stayed out of Russia sanctions
+INR,C,C,India EM FX; no direct Russia channel
+KRW,C,C,Korea manufacturing FX; clean
+ZAR,C,C,S.Africa EM FX; clean
+MXN,C,C,Mexico EM FX; clean of Russia
+DXY,H,C,dollar appreciation on European crisis = treated via EUR weight in basket
+US10Y,M,C,inflation-expectations channel via European HICP
+TLT,C,C,long-duration US Treasuries; clean
+HYG,C,C,US high-yield credit; clean
+VIX,C,C,risk-premium channel = intended SCM co-movement
+BTC,H,C,sanctions-evasion narrative drove abnormal flow Mar2022

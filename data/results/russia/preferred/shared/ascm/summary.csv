@@ -1,0 +1,11 @@
+event,russia
+window,preferred
+variant,shared
+model,ascm
+rmspe_pre_log,0.10641255114976395
+rmspe_pre_pct,11.228065452820957
+t0,2022-02-24 00:00:00
+t_pre_start,2020-07-01 00:00:00
+n_pre,421
+n_post,151
+n_donors_active,21

@@ -1,0 +1,108 @@
+"""Configuration for the SCM analysis. Edit values here to change parameters globally.
+
+After editing, re-run the affected notebooks (see methodology.md "How do I change X?" matrix).
+"""
+from pathlib import Path
+import pandas as pd
+
+# ===== Project paths =====
+ROOT = Path(__file__).resolve().parent.parent
+DATA = ROOT / 'data'
+RESULTS = DATA / 'results'           # 02 writes here; 03-06 read
+VALIDATION = DATA / 'validation'      # 03-05 write here; 06 reads
+
+
+# ===== Focal events =====
+T0 = {
+    'russia': pd.Timestamp('2022-02-24'),
+    'hormuz': pd.Timestamp('2026-02-01'),
+}
+
+# Fake T_0 for in-time placebo (§5e (ii) — 6 months before real T_0)
+T0_FAKE = {
+    'russia': pd.Timestamp('2021-08-24'),
+    'hormuz': pd.Timestamp('2025-08-01'),
+}
+
+
+# ===== Pre-event windows (preferred, extended, narrow) =====
+PRE_WINDOWS = {
+    'russia': {
+        'preferred': (pd.Timestamp('2020-07-01'), pd.Timestamp('2022-02-23')),
+        'extended':  (pd.Timestamp('2020-01-01'), pd.Timestamp('2022-02-23')),
+        'narrow':    (pd.Timestamp('2021-01-01'), pd.Timestamp('2022-02-23')),
+    },
+    'hormuz': {
+        'preferred': (pd.Timestamp('2024-06-01'), pd.Timestamp('2026-01-31')),
+        'extended':  (pd.Timestamp('2023-12-01'), pd.Timestamp('2026-01-31')),
+        'narrow':    (pd.Timestamp('2025-01-01'), pd.Timestamp('2026-01-31')),
+    },
+}
+
+# Post-event projection end date (when to stop the counterfactual).
+#
+# Russia: truncated to 2022-09-30 — last business day before OPEC+'s 2022-10-05
+# announcement of a 2 mb/d production cut (effective November 2022). The cut was
+# a Brent-specific supply-policy response that confounds the post-invasion premium
+# estimate. The earlier symbolic 100kbd cut on 2022-09-05 had minimal market impact
+# and is inside the kept window. See methodology.md §2.
+#
+# Hormuz: extends to latest data available (~3 months post-event).
+POST_END = {
+    'russia': pd.Timestamp('2022-09-30'),   # before OPEC+ October 2022 cut
+    'hormuz': pd.Timestamp('2026-05-01'),   # latest data
+}
+
+
+# ===== Donor pool variants =====
+# 'shared'        = 21-donor Russia strict-clean ∩ Hormuz clean (PREFERRED for both events; see methodology §3)
+# 'strict_clean'  = Russia: 21 / Hormuz: 33 (per-event strict)
+# 'permissive'    = Russia: 27 / Hormuz: 33  (drops H only)
+# 'full'          = Russia: 33 / Hormuz: 33  (no exclusions — contamination diagnostic)
+DONOR_POOL_VARIANT = 'shared'
+
+
+# ===== Model ensemble (Option B from methodology §4) =====
+MODELS = ['convex_scm', 'ascm', 'elastic_net', 'xgboost', 'bsts']
+
+MODEL_HPARAMS = {
+    'convex_scm': {
+        'n_random_v': 120,
+        'seed': 0,
+    },
+    'ascm': {
+        'n_random_v': 120,
+        'seed': 0,
+        'ridge_lambda': 1.0,
+    },
+    'elastic_net': {
+        'alpha': 0.01,
+        'l1_ratio': 0.5,
+        'max_iter': 10000,
+    },
+    'xgboost': {
+        'max_depth': 4,
+        'n_estimators': 200,
+        'learning_rate': 0.05,
+        'gamma': 0.1,
+        'reg_lambda': 1.0,
+        'random_state': 0,
+        'verbosity': 0,
+    },
+    'bsts': {
+        # Bayesian Ridge as a sample-efficient BSTS proxy.
+        # TODO: swap in full BSTS via tfp.sts for explicit trend + seasonal decomposition.
+        'alpha_1': 1e-6,
+        'alpha_2': 1e-6,
+        'lambda_1': 1e-6,
+        'lambda_2': 1e-6,
+    },
+}
+
+
+# ===== Validation settings =====
+WALK_FORWARD_SPLIT = 0.8         # 80% train, 20% validation (§5a)
+FDR_ALPHA = 0.10                 # Benjamini-Hochberg FDR threshold (§5d)
+EVENT_WINDOW_PRE_DAYS = 5        # Event-window return test pre-window (§5d)
+EVENT_WINDOW_POST_DAYS = 20      # Event-window return test post-window (§5d)
+LOO_MIN_WEIGHT = 0.05            # Leave-one-out threshold (§5e (iii))

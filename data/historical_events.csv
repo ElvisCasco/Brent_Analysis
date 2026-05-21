@@ -1,0 +1,23 @@
+date,label,category,description
+2001-09-11,9/11,demand,"Terrorist attacks; global risk-off, demand collapse"
+2003-03-20,Iraq War,geopolitics,US-led invasion of Iraq; Middle East supply premium
+2005-08-29,Hurricane Katrina,supply,Gulf-of-Mexico production and refining outages
+2008-07-11,Brent peak $147,demand,Pre-crisis demand peak; speculative top
+2008-09-15,Lehman / GFC,demand,Global financial crisis; demand and risk collapse
+2010-12-17,Arab Spring begins,geopolitics,Tunisian self-immolation; MENA political unrest cascade
+2011-02-15,Libyan civil war,supply,Libyan crude offline; ~1.6 mb/d disruption
+2012-07-01,EU Iran embargo,policy,EU embargo on Iranian crude imports takes effect
+2014-11-27,OPEC declines to cut,policy,Saudi Arabia signals defence of market share; oil glut begins
+2016-02-11,Brent trough ~$28,policy,Bottom of the OPEC price war / shale-glut cycle
+2016-11-30,OPEC+ deal,policy,First OPEC+ production-cut agreement with Russia
+2018-05-08,US exits JCPOA,policy,Iran sanctions reimposed; export reductions begin
+2019-09-14,Abqaiq attack,supply,Drone strike on Saudi Abqaiq facility; 5.7 mb/d offline briefly
+2020-03-08,Saudi-Russia price war,policy,"OPEC+ collapses; Saudi raises output, prices crash"
+2020-03-11,COVID-19 pandemic,demand,WHO declares pandemic; global demand collapse
+2020-04-20,WTI negative,supply,Cushing storage saturates; WTI front-month settles -$37 (Brent stayed positive)
+2021-10-01,Energy-cycle reflation,demand,Post-COVID demand recovery; commodity supercycle narrative
+2022-02-24,Russia invades Ukraine,geopolitics,War; Russian oil sanctions; Brent spikes to ~$130
+2022-12-05,Russia oil price cap,policy,G7+EU $60/bbl price cap on Russian seaborne crude
+2023-10-07,Israel-Hamas war,geopolitics,Hamas attack on Israel; MENA risk premium reactivated
+2023-11-19,Red Sea diversion,supply,Galaxy Leader hijack; Bab-el-Mandeb container diversion begins
+2026-02-01,Hormuz crisis,supply,Strait of Hormuz disruption; main thesis subject

@@ -1,0 +1,11 @@
+event,hormuz
+window,narrow
+variant,shared
+model,ascm
+rmspe_pre_log,0.05441350648652683
+rmspe_pre_pct,5.592114213433663
+t0,2026-02-01 00:00:00
+t_pre_start,2025-01-01 00:00:00
+n_pre,274
+n_post,59
+n_donors_active,18
