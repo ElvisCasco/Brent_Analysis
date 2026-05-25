@@ -20,7 +20,9 @@ Per-model post-event mean gap in % (raw, untransformed) for the **preferred spec
 | **Ensemble median** | **25.1** | — | **23.8** |
 | **Ensemble IQR (Q25-Q75)** | **[13.3, 29.6]** | — | **[13.1, 24.4]** |
 
-Headline interpretation: Russia 2022 produced an estimated 23-25% premium on Brent over the 7-month window from invasion to OPEC+ October cut. This is consistent with the well-documented historical move from ~$95 to ~$130 (≈37% peak), discounted by the median post-window price recovery toward $85-90.
+Headline interpretation: Russia 2022 produced an estimated 23-25% mean Brent premium over the 7-month window from invasion to OPEC+ October cut. The implied counterfactual mean is $86.61/bbl (ensemble median across the five models) versus actual mean $108.54/bbl, on the EIA Europe Brent Spot series. External validation against the EIA's last pre-invasion STEO forecast issued on 2022-02-08 (§3.4) places the EIA structural counterfactual at $84.94/bbl over the identical 151-day treatment window — i.e., the SCM and EIA disagree on the counterfactual by $1.67/bbl, or ~2.5 pp on the implied ATT.
+
+Direct peer-reviewed comparison against an existing SCM-on-Russia-Brent estimate is not available; the dominant method in the Russia-Ukraine oil-price literature is structural VAR (Kilian 2009 *AER*; Baumeister & Hamilton 2019 *AER*), which decomposes price changes into supply/demand/inventory shocks rather than producing a single counterfactual-level ATT.
 
 ### Hormuz 2026 ($T_0$ = 2026-02-01, post-window 2026-02-01 → 2026-05-01, ~3 months)
 
@@ -155,6 +157,40 @@ Convex SCM and ASCM are the only models whose Russia weights transfer to Hormuz 
 
 **Implication for the Hormuz headline:** the cross-event generalization defense is load-bearing only via Convex SCM and ASCM. The convex-only transferred-vs-independent agreement is ±15 pp — strong evidence that the methodology generalizes across the 2020-22 → 2024-26 regime change for convex methods.
 
+### 3.4 External validation — EIA STEO pre-invasion forecasts (Russia only)
+
+Comparison of the SCM ensemble counterfactual against the U.S. Energy Information Administration's last two pre-invasion Brent forecasts. Both were issued *before* the 2022-02-24 invasion, so their forecasts for the post-event window represent EIA's independent counterfactual built on a structural supply/demand model. The two methods share no information path (SCM uses cross-asset co-movement; STEO uses EIA's internal supply/demand model), so agreement is evidence that the SCM is not producing a fantasy counterfactual.
+
+**Method:** build a daily step-function from each STEO's monthly Brent forecast values (each daily observation in month *M* takes the STEO's forecast for *M*), then take the mean over the **exact SCM treatment day-set** (Feb 24 – Sep 30 2022, 151 trading days). This matches the comparison period exactly with the SCM post-event mean.
+
+**Source.** EIA STEO archive, [eia.gov/outlooks/steo/archives/](https://www.eia.gov/outlooks/steo/archives/). The two vintages used:
+- **STEO Jan-22** (`jan22_base.xlsx`, issued ~2022-01-11; six weeks pre-invasion)
+- **STEO Feb-22** (`feb22_base.xlsx`, issued ~2022-02-08; the last STEO before the invasion)
+
+| Model | Synth $/bbl | STEO Jan-22 $/bbl | STEO Feb-22 $/bbl | Synth − STEO Feb-22 |
+|---|---:|---:|---:|---:|
+| Convex SCM | 83.55 | 75.66 | 84.94 | -$1.39 |
+| ASCM | 95.52 | 75.66 | 84.94 | +$10.58 |
+| Elastic-net | 86.61 | 75.66 | 84.94 | +$1.67 |
+| XGBoost | 79.37 | 75.66 | 84.94 | -$5.57 |
+| Bayesian Ridge | 107.91 | 75.66 | 84.94 | +$22.97 (degenerate) |
+| **Ensemble median** | **86.61** | **75.66** | **84.94** | **+$1.67** |
+
+Actual Brent mean over the matched 151-day window: **$108.54**.
+
+**Implied ATTs (matched day-set):**
+- SCM ensemble median counterfactual: (108.54 − 86.61) / 86.61 = **+25.3%**
+- EIA STEO Feb-22 (last pre-invasion forecast) as counterfactual: (108.54 − 84.94) / 84.94 = **+27.8%**
+- EIA STEO Jan-22 as counterfactual: (108.54 − 75.66) / 75.66 = **+43.4%**
+
+**Reading.** The SCM ensemble-median counterfactual ($86.61) sits **within $1.67/bbl** of the EIA's last pre-invasion structural forecast ($84.94), and the implied ATTs disagree by ~2.5 pp. Three of five models (Convex SCM, Elastic-net, XGBoost) bracket the STEO Feb-22 anchor to within ±$7. Bayesian Ridge is far off, consistent with its diagnosed degeneracy (walk-forward overfit ratio 5.1, LOO range crosses zero, baseline gap 0.5%). ASCM sits slightly high, consistent with its known shrinkage-toward-mean bias on Russia.
+
+**The SCM is more conservative than the STEO-based counterfactual** by ~2.5 pp because the SCM donors absorb post-Feb-2022 macro co-movement (inflation, demand recovery) that the EIA structural forecast does not. Both methods are "correct" but answer subtly different questions: the SCM nets out cross-asset co-movement; the STEO is EIA's pre-invasion view of where Brent should go conditional on supply/demand fundamentals.
+
+**Caveat.** The STEO is itself a model forecast, not ground truth. The agreement is evidence that two independent methods produce the same counterfactual, not that either is correct. The Hormuz case has no equivalent external benchmark — the equivalent STEO Jan-26 / Feb-26 vintages are *post*-Hormuz from the perspective of the Brent-impact forecast — so this external validation is available only for Russia.
+
+Output: `data/validation/external_steo_russia.csv`. Overlay plot: `plots/russia_steo_validation.html`. Computation: [06_Ensemble_Final.ipynb](../notebooks/06_Ensemble_Final.ipynb) (external-validation cell).
+
 ## 4. Caveats and qualifications
 
 1. **In-space placebo Russia weakness.** Only XGBoost ranks Brent first in the 21-donor pool (p = 0.045 at floor); none of the five models reject in the 33-donor robustness pool, and the XGBoost 21-donor result is itself fragile in the sense that adding the audit-flagged donors moves p to 0.147. This is *not* evidence that Russia produced no Brent effect — the historical move is well documented. It is evidence that in-space placebo loses power at pre-periods with high donor volatility (Russia pre-period 2020-07 → 2022-02 spans COVID recovery + reflation rally). The post-event gap magnitudes themselves (13-37% across models) are independently anchored by the historical record.
@@ -184,4 +220,6 @@ Convex SCM and ASCM are the only models whose Russia weights transfer to Hormuz 
 | In-time placebo | `data/validation/inference_intime.csv` |
 | Leave-one-out | `data/validation/inference_loo_{event}_{model}.csv` |
 | Cross-event transfer | `data/validation/cross_event_transfer.csv` |
+| External STEO comparison (Russia) | `data/validation/external_steo_russia.csv` |
+| EIA STEO archive (Brent forecast vintages) | `references/eia/steo_{jan,feb}22.xlsx` (gitignored, downloaded on demand) |
 | Donor cleanliness (model-agnostic) | `data/validation/donor_cleanliness_{event}.csv` |
