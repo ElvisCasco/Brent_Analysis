@@ -8,7 +8,8 @@ import pandas as pd
 from scipy import stats
 import statsmodels.api as sm
 
-from .config import WALK_FORWARD_SPLIT, EVENT_WINDOW_PRE_DAYS, EVENT_WINDOW_POST_DAYS, LOO_MIN_WEIGHT
+from .config import (WALK_FORWARD_N_FOLDS, WALK_FORWARD_HORIZON, WALK_FORWARD_MIN_TRAIN_FRAC,
+                     EVENT_WINDOW_PRE_DAYS, EVENT_WINDOW_POST_DAYS, LOO_MIN_WEIGHT)
 from .models import fit_model
 from .data import load_fit
 
@@ -24,43 +25,124 @@ def get_tuned_hparams(model, event, window='preferred', variant='shared'):
     return dict(fit.get('_extra', {}).get('tuned_hparams', {}) or {})
 
 
-# ===== §5a (i) Walk-forward hold-out cross-validation =====
+# ===== §5a (i) Walk-forward cross-validation (expanding window) =====
 
 def walk_forward_cv(model_name, panel, treated, donors, t0, t_pre_start,
-                    split=WALK_FORWARD_SPLIT, **kwargs):
-    """Fit on first `split` of pre-period, evaluate on last (1-split).
+                    n_folds=WALK_FORWARD_N_FOLDS,
+                    horizon=WALK_FORWARD_HORIZON,
+                    min_train_frac=WALK_FORWARD_MIN_TRAIN_FRAC,
+                    **kwargs):
+    """Expanding-window walk-forward CV.
 
-    Returns dict with train_rmse, val_rmse, ratio, n_train, n_val.
+    Splits the pre-event window into n_folds expanding-window forecast periods.
+    Fold i fits on [t_pre_start, tau_i) and projects on [tau_i, tau_i + horizon).
+    The training set grows with i; the val window has fixed length `horizon`.
+
+    Headline val_rmse is the Hyndman pooled RMSE over the concatenated fold val
+    residuals (val windows are non-overlapping, so this is unbiased). Headline
+    train_rmse is the cross-fold mean of per-fold train_rmse — training sets
+    overlap across folds (fold k's train is a superset of fold k-1's), so
+    pooling train residuals would over-weight early observations. Per-fold RMSE
+    and cross-fold std are also returned so fold-to-fold variability is visible.
+
+    For XGBoost / models that consume `eval_t0_end`, the eval window for early
+    stopping is set per-fold to the fold's val span. Median best_iteration
+    across folds is returned for use in the final train+val refit.
+
+    Args:
+        n_folds: number of expanding-window folds (default from config, 5).
+        horizon: business-day length of each fold's val window (default from config, 20).
+        min_train_frac: smallest fold's training set size, as fraction of pre-period.
+
+    Returns:
+        dict with headline keys `train_rmse` (cross-fold mean), `val_rmse`
+        (pooled non-overlapping), `val_train_ratio`, plus `folds` (per-fold
+        DataFrame), `val_rmse_mean_of_folds`, `val_rmse_std_of_folds`,
+        `median_best_iteration`.
     """
     pre = panel.loc[(panel.index >= t_pre_start) & (panel.index < t0)]
     n = len(pre)
-    n_train = int(n * split)
-    if n_train < 30 or (n - n_train) < 10:
-        return {'error': 'pre-period too short for walk-forward CV',
-                'n': n, 'n_train': n_train}
+    min_train = int(n * min_train_frac)
+    if min_train < 30 or n_folds < 1 or horizon < 1:
+        return {'error': 'invalid CV configuration', 'n': n,
+                'min_train': min_train, 'n_folds': n_folds, 'horizon': horizon}
 
-    t_train_end = pre.index[n_train]
+    available = n - min_train - horizon
+    if available < 0:
+        return {'error': 'pre-period too short for walk-forward CV at this horizon',
+                'n': n, 'min_train': min_train, 'horizon': horizon}
 
-    # Fit using only the training portion of the pre-period
-    result = fit_model(model_name, panel, treated, donors,
-                       t0=t_train_end, t_pre_start=t_pre_start, **kwargs)
+    step = available // (n_folds - 1) if n_folds > 1 else 0
 
-    train_resid = result['gap'].loc[result['gap'].index < t_train_end]
-    val_resid = result['gap'].loc[(result['gap'].index >= t_train_end) &
-                                  (result['gap'].index < t0)]
+    fold_results = []
+    all_val_resid = []
 
-    train_rmse = float(np.sqrt(np.mean(train_resid.values ** 2)))
-    val_rmse = float(np.sqrt(np.mean(val_resid.values ** 2))) if len(val_resid) > 0 else np.nan
-    ratio = val_rmse / train_rmse if train_rmse > 0 else np.nan
+    for i in range(n_folds):
+        cut_idx = min(min_train + i * step, n - horizon)
+        tau_i = pre.index[cut_idx]
+        end_idx = min(cut_idx + horizon - 1, n - 1)
+        tau_end = pre.index[end_idx]
+
+        # Per-fold kwargs: replace `eval_t0_end` (XGB early stopping anchor) with this fold's val end
+        fold_kwargs = dict(kwargs)
+        if 'eval_t0_end' in fold_kwargs:
+            fold_kwargs['eval_t0_end'] = tau_end + pd.Timedelta(days=1)
+
+        # Fit on [t_pre_start, tau_i) — model treats tau_i as if it were T_0
+        result_i = fit_model(model_name, panel, treated, donors,
+                             t0=tau_i, t_pre_start=t_pre_start, **fold_kwargs)
+        gap = result_i['gap']
+
+        train_resid_i = gap.loc[gap.index < tau_i].values
+        val_resid_i = gap.loc[(gap.index >= tau_i) & (gap.index <= tau_end)].values
+
+        train_rmse_i = float(np.sqrt(np.mean(train_resid_i ** 2))) if len(train_resid_i) > 0 else np.nan
+        val_rmse_i = float(np.sqrt(np.mean(val_resid_i ** 2))) if len(val_resid_i) > 0 else np.nan
+        ratio_i = val_rmse_i / train_rmse_i if train_rmse_i and train_rmse_i > 0 else np.nan
+
+        fold_results.append({
+            'fold': i,
+            'tau': tau_i, 'tau_end': tau_end,
+            'n_train': len(train_resid_i), 'n_val': len(val_resid_i),
+            'train_rmse': train_rmse_i, 'val_rmse': val_rmse_i,
+            'val_train_ratio': ratio_i,
+            'best_iteration': result_i.get('_extra', {}).get('best_iteration'),
+        })
+        all_val_resid.append(val_resid_i)
+
+    folds = pd.DataFrame(fold_results)
+    # Pooled val_rmse: concat fold val residuals (Hyndman convention). Val windows are
+    # non-overlapping by construction, so this is unbiased.
+    pooled_val_rmse = float(np.sqrt(np.mean(np.concatenate(all_val_resid) ** 2)))
+    # Train RMSE: mean of per-fold train_rmse. Training sets overlap across folds
+    # (fold k's train is a superset of fold k-1's), so pooling train residuals would
+    # over-weight early observations. The cross-fold mean is the unbiased summary.
+    mean_train_rmse = float(folds['train_rmse'].mean())
+    headline_ratio = pooled_val_rmse / mean_train_rmse if mean_train_rmse > 0 else np.nan
+
+    best_iters = folds['best_iteration'].dropna()
+    median_best_iter = int(best_iters.median()) if len(best_iters) > 0 else None
 
     return {
         'model': model_name,
-        'train_rmse': train_rmse,
-        'val_rmse': val_rmse,
-        'val_train_ratio': ratio,
-        'n_train': len(train_resid),
-        'n_val': len(val_resid),
-        'passes': bool(ratio is not np.nan and ratio < 2.0),  # heuristic
+        'folds': folds,
+        # Headline numbers: pooled val_rmse (non-overlapping) over mean train_rmse (per-fold avg)
+        'train_rmse': mean_train_rmse,
+        'val_rmse': pooled_val_rmse,
+        'val_train_ratio': headline_ratio,
+        # Variance across folds (multi-fold-only signal)
+        'val_rmse_mean_of_folds': float(folds['val_rmse'].mean()),
+        'val_rmse_std_of_folds': float(folds['val_rmse'].std()) if len(folds) > 1 else 0.0,
+        # Totals + meta
+        'n_train': int(folds['n_train'].sum()),
+        'n_val': int(folds['n_val'].sum()),
+        'n_folds': n_folds,
+        'horizon': horizon,
+        'min_train_frac': min_train_frac,
+        # XGB-specific (None otherwise)
+        'median_best_iteration': median_best_iter,
+        # Heuristic one-sided overfit flag
+        'passes': bool(not np.isnan(headline_ratio) and headline_ratio < 2.0),
     }
 
 

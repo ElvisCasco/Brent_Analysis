@@ -14,13 +14,13 @@ Per-model post-event mean gap in % (raw, untransformed) for the **preferred spec
 |---|---:|---:|---:|
 | Convex SCM | 29.6 | +5.8 | 23.8 |
 | ASCM | 13.3 | +0.2 | 13.1 |
-| Elastic-net | 25.1 | +0.7 | 24.4 |
-| XGBoost | 36.6 | +2.0 | 34.6 |
+| Elastic-net | 21.7 | +0.5 | 21.2 |
+| XGBoost | 36.8 | +1.9 | 34.9 |
 | Bayesian Ridge | 0.5 | +0.1 | 0.4 |
-| **Ensemble median** | **25.1** | — | **23.8** |
-| **Ensemble IQR (Q25-Q75)** | **[13.3, 29.6]** | — | **[13.1, 24.4]** |
+| **Ensemble median** | **21.7** | — | **21.2** |
+| **Ensemble IQR (Q25-Q75)** | **[13.3, 29.6]** | — | **[13.1, 23.8]** |
 
-Headline interpretation: Russia 2022 produced an estimated 23-25% mean Brent premium over the 7-month window from invasion to OPEC+ October cut. The implied counterfactual mean is $86.61/bbl (ensemble median across the five models) versus actual mean $108.54/bbl, on the EIA Europe Brent Spot series. External validation against the EIA's last pre-invasion STEO forecast issued on 2022-02-08 (§3.4) places the EIA structural counterfactual at $84.94/bbl over the identical 151-day treatment window — i.e., the SCM and EIA disagree on the counterfactual by $1.67/bbl, or ~2.5 pp on the implied ATT.
+Headline interpretation: Russia 2022 produced an estimated 21-22% mean Brent premium over the 7-month window from invasion to OPEC+ October cut. The implied counterfactual mean is $88.92/bbl (ensemble median across the five models) versus actual mean $108.54/bbl, on the EIA Europe Brent Spot series. External validation against the EIA's last pre-invasion STEO forecast issued on 2022-02-08 (§3.4) places the EIA structural counterfactual at $84.94/bbl over the identical 151-day treatment window — i.e., the SCM and EIA disagree on the counterfactual by $3.98/bbl, or ~5.7 pp on the implied ATT.
 
 Direct peer-reviewed comparison against an existing SCM-on-Russia-Brent estimate is not available; the dominant method in the Russia-Ukraine oil-price literature is structural VAR (Kilian 2009 *AER*; Baumeister & Hamilton 2019 *AER*), which decomposes price changes into supply/demand/inventory shocks rather than producing a single counterfactual-level ATT.
 
@@ -29,37 +29,38 @@ Direct peer-reviewed comparison against an existing SCM-on-Russia-Brent estimate
 | Model | Raw gap (%) | Drift contribution (pp) | Drift-adjusted gap (%) |
 |---|---:|---:|---:|
 | Convex SCM | 38.6 | -1.8 | 40.3 |
-| ASCM | 42.9 | -0.0 | 43.0 |
-| Elastic-net | 47.8 | -0.1 | 47.9 |
+| ASCM | 43.7 | -0.5 | 44.2 |
+| Elastic-net | 49.8 | -0.3 | 50.1 |
 | XGBoost | 36.8 | -1.2 | 38.0 |
 | Bayesian Ridge | 43.6 | -0.0 | 43.6 |
-| **Ensemble median** | **42.9** | — | **43.0** |
-| **Ensemble IQR (Q25-Q75)** | **[38.6, 43.6]** | — | **[40.3, 43.6]** |
+| **Ensemble median** | **43.6** | — | **43.6** |
+| **Ensemble IQR (Q25-Q75)** | **[38.6, 43.7]** | — | **[40.3, 44.2]** |
 
-Headline interpretation: the Strait of Hormuz crisis produced an estimated 41-44% chokepoint premium on Brent over the 3-month observation window. Note tighter IQR than Russia — donors are more stable in the Hormuz pre-period (~6 pp across models versus ~16 pp for Russia).
+Headline interpretation: the Strait of Hormuz crisis produced an estimated 43-44% chokepoint premium on Brent over the 3-month observation window. Note tighter IQR than Russia — donors are more stable in the Hormuz pre-period (~6 pp across models versus ~14 pp for Russia).
 
 ## 2. Minimum load-bearing validation
 
 ### 2.1 Model fit — Walk-forward CV (§5a i)
 
-`val/train` RMSE ratio per (event, model). The conventional `> 2` flag is heuristic; absolute `val_rmse` reported alongside per [validation.md §5a](validation.md) "Flagging vs exclusion" caveat.
+5-fold expanding-window walk-forward CV per [validation.md §5a](validation.md). Headline `val_rmse` is the Hyndman pooled RMSE over the five non-overlapping fold val residuals; headline `train_rmse` is the cross-fold mean of per-fold train RMSEs (training sets overlap across folds, so pooling them would over-weight early observations). Per-fold breakdown saved separately to `data/validation/walk_forward_cv_folds.csv`. The conventional `> 2` flag is heuristic.
 
 | Event | Model | train RMSE | val RMSE | val/train | Flag |
 |---|---|---:|---:|---:|---|
-| Russia | Convex SCM | 0.111 | 0.086 | 0.77 | OK |
-| Russia | ASCM | 0.046 | 0.087 | 1.91 | OK |
-| Russia | Elastic-net | 0.055 | 0.094 | 1.70 | OK |
-| Russia | XGBoost | 0.039 | 0.135 | **3.49** | overfit |
-| Russia | Bayesian Ridge | 0.034 | 0.171 | **5.10** | overfit |
-| Hormuz | Convex SCM | 0.059 | 0.129 | **2.18** | overfit |
-| Hormuz | ASCM | 0.035 | 0.087 | **2.50** | overfit |
-| Hormuz | Elastic-net | 0.043 | 0.049 | 1.13 | OK |
-| Hormuz | XGBoost | 0.045 | 0.089 | 1.98 | OK |
-| Hormuz | Bayesian Ridge | 0.033 | 0.093 | **2.87** | overfit |
+| Russia | Convex SCM | 0.109 | 0.127 | 1.16 | OK |
+| Russia | ASCM | 0.043 | 0.088 | **2.04** | overfit |
+| Russia | Elastic-net | 0.049 | 0.089 | 1.83 | OK |
+| Russia | XGBoost | 0.039 | 0.117 | **3.00** | overfit |
+| Russia | Bayesian Ridge | 0.031 | 0.096 | **3.07** | overfit |
+| Hormuz | Convex SCM | 0.059 | 0.075 | 1.26 | OK |
+| Hormuz | ASCM | 0.047 | 0.064 | 1.35 | OK |
+| Hormuz | Elastic-net | 0.045 | 0.070 | 1.55 | OK |
+| Hormuz | XGBoost | 0.044 | 0.076 | 1.72 | OK |
+| Hormuz | Bayesian Ridge | 0.031 | 0.066 | **2.10** | overfit |
 
 Interpretation:
-- Russia: 3 of 5 models clean. XGBoost and Bayesian Ridge show the doc-anticipated overfit signature (val/train ≈ 3.5 and 5.1).
-- Hormuz: Elastic-net and XGBoost are clean. The other three models (Convex SCM, ASCM, Bayesian Ridge) show val/train ratios in the 2-3 range — consistent with the shorter effective Hormuz pre-window after the 80/20 split. XGBoost Hormuz fell just below the 2× threshold after the tightened defaults (`max_depth=2, reg_lambda=5, learning_rate=0.02`), down from the wider pre-tightening grid.
+- Russia: 2 of 5 models clean (Convex SCM, Elastic-net). ASCM is at the boundary (2.04); XGBoost and Bayesian Ridge fail the heuristic.
+- Hormuz: 4 of 5 models clean (Convex SCM, ASCM, Elastic-net, XGBoost). Only Bayesian Ridge is flagged.
+- Comparison to the previous single 80/20 hold-out: the 5-fold scheme is **less harsh** overall because the pooled val RMSE averages performance across five forecast horizons rather than concentrating all val mass on the last 20% of pre-period. Hormuz Convex SCM (2.18 → 1.26) and Hormuz ASCM (2.50 → 1.35) flipped from overfit to OK; Russia ASCM (1.91 → 2.04) and Russia Bayesian Ridge (5.10 → 3.07) shifted in opposing directions.
 
 Per [validation.md §5a](validation.md), flagged models are **not auto-excluded** from the ensemble; the ratio threshold is heuristic and the IQR across all five is itself the model-uncertainty band.
 
@@ -82,18 +83,18 @@ Permutation floor: $1/(N+1) = 1/22 \approx 0.0455$ for the 21-donor pool, $1/34 
 |---|---|---:|---:|---:|
 | Russia | Convex SCM | 0.545 | 0.500 | 2.59 |
 | Russia | ASCM | 0.682 | 0.471 | 3.58 |
-| Russia | Elastic-net | 0.364 | 0.412 | 4.21 |
+| Russia | Elastic-net | 0.409 | 0.412 | 4.07 |
 | Russia | XGBoost | **0.045** (floor) | 0.147 | 9.62 |
 | Russia | Bayesian Ridge | 0.636 | 0.529 | 3.88 |
 | Hormuz | Convex SCM | **0.045** (floor) | **0.029** (floor) | 6.01 |
-| Hormuz | ASCM | **0.045** (floor) | **0.029** (floor) | 11.56 |
-| Hormuz | Elastic-net | **0.045** (floor) | **0.029** (floor) | 10.09 |
+| Hormuz | ASCM | **0.045** (floor) | **0.029** (floor) | 7.92 |
+| Hormuz | Elastic-net | **0.045** (floor) | **0.029** (floor) | 9.66 |
 | Hormuz | XGBoost | **0.045** (floor) | **0.029** (floor) | 9.01 |
 | Hormuz | Bayesian Ridge | **0.045** (floor) | **0.029** (floor) | 12.46 |
 
 **Hormuz inference reading.** Brent ranks **first** in the placebo distribution under *every* model and *both* pools — i.e., Brent's post/pre RMSPE ratio is larger than every one of the 21 or 33 placebo units. With ratios in the 6-13 range and a floor p-value, this is the strongest possible permutation signal: rejecting H₀ at the strictest attainable level under the Abadie convention.
 
-**Russia inference reading.** Russia XGBoost ranks first in the 21-donor pool (p = 0.045 at floor, post/pre ratio = 9.6) but slips to p = 0.147 in the 33-donor robustness pool — i.e., adding the 12 audit-flagged donors (some of which experienced co-incident Russia/sanctions exposure) inflates the placebo tail enough that Brent's ratio is no longer rank-1. The four other models do not reject in either pool. Mechanically: Russia's *pre-period* (2020-07 → 2022-02) is itself volatile — COVID recovery, 2021 reflation rally — so donors had large pre-period RMSPE too. This widens the placebo distribution and prevents Brent's post-period ratio (~2.6-4.2 for SCM/ASCM/Elastic-net/Bayesian Ridge, 9.6 for XGBoost) from sitting in the tail. The post-event gap magnitudes (13-37%) are independently corroborated by the historical record ($95 → $130+); the inferential weakness here is a known limitation of in-space placebo at pre-periods with high donor volatility, not evidence that Russia's effect was small.
+**Russia inference reading.** Russia XGBoost ranks first in the 21-donor pool (p = 0.045 at floor, post/pre ratio = 9.6) but slips to p = 0.147 in the 33-donor robustness pool — i.e., adding the 12 audit-flagged donors (some of which experienced co-incident Russia/sanctions exposure) inflates the placebo tail enough that Brent's ratio is no longer rank-1. The four other models do not reject in either pool. Mechanically: Russia's *pre-period* (2020-07 → 2022-02) is itself volatile — COVID recovery, 2021 reflation rally — so donors had large pre-period RMSPE too. This widens the placebo distribution and prevents Brent's post-period ratio (~2.6-4.1 for SCM/ASCM/Elastic-net/Bayesian Ridge, 9.6 for XGBoost) from sitting in the tail. The post-event gap magnitudes (13-37%) are independently corroborated by the historical record ($95 → $130+); the inferential weakness here is a known limitation of in-space placebo at pre-periods with high donor volatility, not evidence that Russia's effect was small.
 
 For Russia, defensive depth in the form of (a) larger gap magnitudes relative to drift contributions, (b) the audit-supported SUTVA defense, and (c) the cross-event weight transfer of §5f (next section) substitutes for the unconvincing single-event placebo p-value.
 
@@ -128,18 +129,18 @@ Range of post-event gap estimates when each high-weight donor is dropped. A tigh
 |---|---|---:|---|---|
 | Russia | Convex SCM | 29.3 | 27.1 - 33.7 | Tight; robust |
 | Russia | ASCM | 13.4 | 6.2 - 19.7 | Moderate; some Platinum sensitivity |
-| Russia | Elastic-net | 25.1 | 16.0 - 35.5 | Moderate; Platinum + TLT sensitivity |
-| Russia | XGBoost | 42.2 | 35.7 - 40.6 | Tight; robust (LOO baseline higher than headline 36.6 — separate fit, see note) |
+| Russia | Elastic-net | 21.7 | 14.9 - 30.5 | Moderate; Platinum + TLT sensitivity |
+| Russia | XGBoost | 42.2 | 35.7 - 40.6 | Tight; robust (LOO baseline higher than headline 36.8 — separate fit, see note) |
 | Russia | Bayesian Ridge | 0.5 | -12.8 to +12.0 | Wide; baseline near zero → unstable signal |
 | Hormuz | Convex SCM | 39.3 | 30.3 - 39.7 | Tight; some Sugar sensitivity |
-| Hormuz | ASCM | 43.0 | 39.1 - 49.6 | Tight; robust |
-| Hormuz | Elastic-net | 47.8 | 43.7 - 52.0 | Tight; robust |
+| Hormuz | ASCM | 44.4 | 38.7 - 47.5 | Tight; robust |
+| Hormuz | Elastic-net | 49.8 | 42.3 - 53.4 | Tight; robust |
 | Hormuz | XGBoost | 37.3 | 36.3 - 41.0 | Tight; robust |
 | Hormuz | Bayesian Ridge | 43.6 | 40.0 - 53.0 | Moderate; some Cotton/CHF sensitivity |
 
-Russia Bayesian Ridge LOO range crosses zero — combined with its 5.1 walk-forward ratio, Bayesian Ridge Russia is the least reliable single fit in the ensemble. The ensemble median is robust to this (median across the 5 models is dominated by Convex/ASCM/Elastic-net/XGBoost which agree more closely on a 13-37% range).
+Russia Bayesian Ridge LOO range crosses zero — combined with its 3.07 walk-forward ratio, Bayesian Ridge Russia is the least reliable single fit in the ensemble. The ensemble median is robust to this (median across the 5 models is dominated by Convex/ASCM/Elastic-net/XGBoost which agree more closely on a 13-37% range).
 
-Note on the Russia XGBoost LOO baseline (42.2) vs headline (36.6) mismatch: the LOO function and the headline fit are independent invocations and the XGBoost stochastic components (`subsample=0.7`, `colsample_bytree=0.7`) with `random_state=0` interact slightly differently when the panel is re-built. The qualitative reading (tight LOO range, no single donor drives the result) is unchanged.
+Note on the Russia XGBoost LOO baseline (42.2) vs headline (36.8) mismatch: the LOO function and the headline fit are independent invocations and the XGBoost stochastic components (`subsample=0.7`, `colsample_bytree=0.7`) with `random_state=0` interact slightly differently when the panel is re-built. The qualitative reading (tight LOO range, no single donor drives the result) is unchanged.
 
 ### 3.3 Cross-event weight transfer (§5f)
 
@@ -148,14 +149,16 @@ Russia-fitted weights applied to the Hormuz panel. Tight match between independe
 | Model | Independent Hormuz gap (%) | Transferred (Russia weights) gap (%) | Δ (pp) | Transferred pre-RMSPE |
 |---|---:|---:|---:|---:|
 | Convex SCM | 38.6 | 47.0 | +8.4 | 0.109 |
-| ASCM | 42.9 | 27.3 | -15.6 | 0.144 |
-| Elastic-net | 47.8 | 92.5 | **+44.7** | **0.540** |
-| XGBoost | 36.8 | -58.1 | **-94.9** | **1.063** |
-| Bayesian Ridge | 43.6 | -100.0 | **-143.6** | **13.706** |
+| ASCM | 43.7 | 27.3 | -16.4 | 0.144 |
+| Elastic-net | 49.8 | 23.2 | -26.6 | 0.185 |
+| XGBoost | 36.8 | -58.2 | **-95.0** | **1.065** |
+| Bayesian Ridge | 43.6 | -100.0 | **-143.6** | **13.707** |
 
-Convex SCM and ASCM are the only models whose Russia weights transfer to Hormuz with a plausible pre-period fit (transferred pre-RMSPE within ~2× independent). The three non-convex models (Elastic-net, XGBoost, Bayesian Ridge) produce catastrophically misspecified transferred counterfactuals — transferred pre-RMSPE is 10-300× the independent fit. This is consistent with the [validation.md §5f](validation.md) caveat: convex weights are sparse and pin to factor-stable donors, while regression and tree-based models use the full donor set with regime-specific coefficient mass that does not transfer.
+Convex SCM, ASCM, and Elastic-net transfer with a plausible pre-period fit (transferred pre-RMSPE within ~4× independent). XGBoost and Bayesian Ridge produce catastrophically misspecified transferred counterfactuals — transferred pre-RMSPE is 22-300× the independent fit. This is consistent with the [validation.md §5f](validation.md) caveat: convex and sparse-regression weights pin to factor-stable donors, while tree-based and prior-dominated models use the full donor set with regime-specific coefficient mass that does not transfer.
 
-**Implication for the Hormuz headline:** the cross-event generalization defense is load-bearing only via Convex SCM and ASCM. The convex-only transferred-vs-independent agreement is ±15 pp — strong evidence that the methodology generalizes across the 2020-22 → 2024-26 regime change for convex methods.
+**Change vs the prior single-hold-out CV:** Elastic-net moved from "catastrophic" (transferred 92.5%, RMSPE 0.540 under `l1_ratio=0.5`) to "plausibly transferable" (transferred 23.2%, RMSPE 0.185 under the new `l1_ratio=0.8` chosen by 5-fold CV). The sparser elastic-net solution pins to fewer donors that are more factor-stable.
+
+**Implication for the Hormuz headline:** the cross-event generalization defense is load-bearing via Convex SCM, ASCM, and Elastic-net (three of five models transfer with degraded but non-pathological pre-RMSPE). The convex-only transferred-vs-independent agreement is ±16 pp; including elastic-net widens the envelope to ±27 pp — still consistent with regime-stable factor structure for the methods that produce sparse, transferable weights.
 
 ### 3.4 External validation — EIA STEO pre-invasion forecasts (Russia only)
 
@@ -171,21 +174,21 @@ Comparison of the SCM ensemble counterfactual against the U.S. Energy Informatio
 |---|---:|---:|---:|---:|
 | Convex SCM | 83.55 | 75.66 | 84.94 | -$1.39 |
 | ASCM | 95.52 | 75.66 | 84.94 | +$10.58 |
-| Elastic-net | 86.61 | 75.66 | 84.94 | +$1.67 |
-| XGBoost | 79.37 | 75.66 | 84.94 | -$5.57 |
+| Elastic-net | 88.92 | 75.66 | 84.94 | +$3.98 |
+| XGBoost | 79.28 | 75.66 | 84.94 | -$5.66 |
 | Bayesian Ridge | 107.91 | 75.66 | 84.94 | +$22.97 (degenerate) |
-| **Ensemble median** | **86.61** | **75.66** | **84.94** | **+$1.67** |
+| **Ensemble median** | **88.92** | **75.66** | **84.94** | **+$3.98** |
 
 Actual Brent mean over the matched 151-day window: **$108.54**.
 
 **Implied ATTs (matched day-set):**
-- SCM ensemble median counterfactual: (108.54 − 86.61) / 86.61 = **+25.3%**
+- SCM ensemble median counterfactual: (108.54 − 88.92) / 88.92 = **+22.1%**
 - EIA STEO Feb-22 (last pre-invasion forecast) as counterfactual: (108.54 − 84.94) / 84.94 = **+27.8%**
 - EIA STEO Jan-22 as counterfactual: (108.54 − 75.66) / 75.66 = **+43.4%**
 
-**Reading.** The SCM ensemble-median counterfactual ($86.61) sits **within $1.67/bbl** of the EIA's last pre-invasion structural forecast ($84.94), and the implied ATTs disagree by ~2.5 pp. Three of five models (Convex SCM, Elastic-net, XGBoost) bracket the STEO Feb-22 anchor to within ±$7. Bayesian Ridge is far off, consistent with its diagnosed degeneracy (walk-forward overfit ratio 5.1, LOO range crosses zero, baseline gap 0.5%). ASCM sits slightly high, consistent with its known shrinkage-toward-mean bias on Russia.
+**Reading.** The SCM ensemble-median counterfactual ($88.92) sits **within $3.98/bbl** of the EIA's last pre-invasion structural forecast ($84.94), and the implied ATTs disagree by ~5.7 pp. Three of five models (Convex SCM, Elastic-net, XGBoost) bracket the STEO Feb-22 anchor to within ±$6. Bayesian Ridge is far off, consistent with its diagnosed degeneracy (walk-forward overfit ratio 3.07, LOO range crosses zero, baseline gap 0.5%). ASCM sits slightly high, consistent with its known shrinkage-toward-mean bias on Russia.
 
-**The SCM is more conservative than the STEO-based counterfactual** by ~2.5 pp because the SCM donors absorb post-Feb-2022 macro co-movement (inflation, demand recovery) that the EIA structural forecast does not. Both methods are "correct" but answer subtly different questions: the SCM nets out cross-asset co-movement; the STEO is EIA's pre-invasion view of where Brent should go conditional on supply/demand fundamentals.
+**The SCM is more conservative than the STEO-based counterfactual** by ~5.7 pp because the SCM donors absorb post-Feb-2022 macro co-movement (inflation, demand recovery) that the EIA structural forecast does not. Both methods are "correct" but answer subtly different questions: the SCM nets out cross-asset co-movement; the STEO is EIA's pre-invasion view of where Brent should go conditional on supply/demand fundamentals.
 
 **Caveat.** The STEO is itself a model forecast, not ground truth. The agreement is evidence that two independent methods produce the same counterfactual, not that either is correct. The Hormuz case has no equivalent external benchmark — the equivalent STEO Jan-26 / Feb-26 vintages are *post*-Hormuz from the perspective of the Brent-impact forecast — so this external validation is available only for Russia.
 
@@ -197,7 +200,7 @@ Output: `data/validation/external_steo_russia.csv`. Overlay plot: `plots/russia_
 
 2. **Hormuz post-window length.** With ~60 post-event observations, every inference test is under-powered. The §5e (i) in-space placebo p-values hit the permutation floor in *both* pools (0.045 / 0.029) because Brent ranks first under every model — strong signal but no further resolution. The cross-event weight transfer (§5f) substitutes inferential depth.
 
-3. **Bayesian Ridge Russia instability.** Walk-forward ratio 5.1 (severe overfit signal), LOO range crosses zero, baseline gap 0.5%. Bayesian Ridge Russia is the single least reliable fit; the ensemble median is robust to it.
+3. **Bayesian Ridge Russia instability.** Walk-forward ratio 3.07 (overfit signal, less severe than the prior 5.1 under single-hold-out CV), LOO range crosses zero, baseline gap 0.5%. Bayesian Ridge Russia remains the single least reliable fit; the ensemble median is robust to it.
 
 4. **Hormuz convex SCM moment-matching SD mismatch.** From [03_Validate.ipynb](../notebooks/03_Validate.ipynb) `moment-match`: Hormuz convex SCM synthetic SD is materially below the treated SD (Brent's volatility is outside the 21-donor convex hull). ASCM corrects this via ridge augmentation. For the Hormuz headline, treat convex SCM and ASCM as the relevant fit pair; convex alone under-represents Brent variance.
 
@@ -211,7 +214,8 @@ Output: `data/validation/external_steo_russia.csv`. Overlay plot: `plots/russia_
 
 | Source | Location |
 |---|---|
-| Walk-forward CV | `data/validation/walk_forward_cv.csv` |
+| Walk-forward CV (headline pooled, 5-fold) | `data/validation/walk_forward_cv.csv` |
+| Walk-forward CV (per-fold breakdown) | `data/validation/walk_forward_cv_folds.csv` |
 | Parallel-fit + drift | `data/validation/parallel_fit_defence.csv`, `data/validation/validation_summary.csv` |
 | Moment matching | `data/validation/moments_{event}_{model}.csv` |
 | In-space placebo (21-donor) | `data/validation/inference_inspace_{event}_{model}.csv` |

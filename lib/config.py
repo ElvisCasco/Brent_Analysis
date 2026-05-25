@@ -113,7 +113,12 @@ MODEL_HPARAMS = {
 
 
 # ===== Validation settings =====
-WALK_FORWARD_SPLIT = 0.8         # 80% train, 20% validation (docs/validation.md §5a)
+# Walk-forward CV (expanding window): fold i fits on [t_pre_start, tau_i),
+# projects on [tau_i, tau_i + WALK_FORWARD_HORIZON). The smallest fold's training set is
+# WALK_FORWARD_MIN_TRAIN_FRAC of the pre-event window; subsequent folds expand it.
+WALK_FORWARD_N_FOLDS = 5                  # number of expanding-window folds
+WALK_FORWARD_HORIZON = 20                 # business days per fold's val window (~1 month)
+WALK_FORWARD_MIN_TRAIN_FRAC = 0.5         # smallest fold's training fraction
 FDR_ALPHA = 0.10                 # Benjamini-Hochberg FDR threshold (docs/validation.md §5d)
 EVENT_WINDOW_PRE_DAYS = 5        # Event-window return test pre-window (docs/validation.md §5d)
 EVENT_WINDOW_POST_DAYS = 20      # Event-window return test post-window (docs/validation.md §5d)
