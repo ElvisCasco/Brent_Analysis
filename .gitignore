@@ -20,8 +20,8 @@ synthetic_*.qmd
 Thumbs.db
 
 # Generated standalone HTML plots from 02_Fit_Models (interactive plots also live in
-# notebook outputs; the standalone copies in plots/ are regenerated each run)
-plots/
+# notebook outputs; the standalone copies in plots/ are regenerated each run).
+# Plot files are gitignored by default — see explicit allowlist further below.
 
 # Local copies of cited papers / external PDFs for personal reading
 references/
@@ -31,5 +31,11 @@ presentation/*
 !presentation/**/*.tex
 !presentation/*.pdf
 !presentation/*.tex
+
+# Ignore plots/ except the milestone2 subfolder (un-ignore the directory itself first,
+# then its contents — gitignore won't re-include files inside an excluded directory).
+plots/*
+!plots/milestone2/
+!plots/milestone2/*
 
 
