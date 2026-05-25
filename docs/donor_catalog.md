@@ -8,10 +8,22 @@ The SCM analysis estimates the chokepoint / geopolitical-risk premium on Brent f
 
 | Event | $T_0$ | Pre-window | Methodological role |
 |---|---|---|---|
-| **Russia invades Ukraine** | 2022-02-24 | 2020-01-01 → 2022-02-23 | *Magnitude validation* — historically large, well-documented Brent disruption ($95 → $130+); cross-validates the SCM design before applying it to Hormuz |
+| **Russia invades Ukraine** | 2022-02-24 | 2020-07-01 → 2022-02-23 | *Magnitude validation* — historically large, well-documented Brent disruption ($95 → $130+); cross-validates the SCM design before applying it to Hormuz |
 | **Strait of Hormuz crisis** | 2026-02-01 | 2024-06-01 → 2026-01-31 | *Main thesis* — out-of-sample estimate of the chokepoint premium |
 
 **Why Red Sea is not a focal event.** The 2023-11-19 Bab-el-Mandeb / Galaxy Leader hijack diverted container shipping (Cape rerouting) but crude tankers retained Suez access through 2024 — Brent did not visibly disrupt. An earlier iteration of this analysis used Red Sea as a *null* validation case ("does SCM correctly produce no effect when none should exist?"). That is a weaker form of validation than *magnitude* validation, which is what Russia 2022 provides. Red Sea remains in the historical events table for the EDA timeline but does not get its own SCM estimate.
+
+## Summary — conclusions on donor selection
+
+**Pool.** 33 donors selected across metals, agriculturals, equities, FX, rates / credit, volatility, and crypto. Categorical exclusions: the energy complex and petro-currencies (CAD, NOK, BRL, COP, MYR — SUTVA violation on any oil-supply shock); unstable / idiosyncratic FX (TRY, ARS, EGP); thin or contract-discontinuous commodities (cocoa, orange juice, lean hogs, lumber); Russia-supplied industrial metals (aluminium, nickel) for the Russia case.
+
+**Preferred specification.** A **21-donor strict-clean intersection** used for both events. Drops the Russia H-tier (Wheat, Corn, Palladium, EUR, DXY, BTC — direct exposure to the focal event) and the Russia M-tier (Copper, Iron Ore, Soybeans, EM_Eq, GBP, US10Y — secondary or terms-of-trade exposure). Hormuz audits to all-C on the full 33, but the same 21-donor pool is used to enable the cross-event weight-transfer validation in [validation.md §5f](validation.md). The 27-donor permissive pool and 33-donor full pool are reported as appendix robustness.
+
+**Focal-event audit (SUTVA on $T_0$).** Russia 2022: **12 of 33 donors flagged** (6 H + 6 M) through identifiable causal channels — Russia / Ukraine agricultural exports, palladium supply concentration, EU energy-crisis pass-through to EUR / DXY, sanctions-evasion narrative for BTC. Hormuz 2026: **0 of 33 donors flagged** — the no-Persian-Gulf-routing criterion makes the audit empty by construction, and the empirical SUTVA tests in [validation.md §5d](validation.md) confirm it.
+
+**Pre-window audit (events inside the fitting window).** Russia pre-window (2020-07 → 2022-02) contains one curated event — the **2021-10 energy-cycle reflation** — which is a common oil-cycle factor; every donor-specific channel through which it could contaminate the SCM weights is already absorbed by the M-tier downgrade. Hormuz pre-window (2024-06 → 2026-01) contains **no curated events**. The pre-window is therefore event-clean for the donor pool under both specifications.
+
+**Empirical support.** The qualitative audits above are confirmed (Hormuz) or supplemented (Russia: 2 additional flags on JPY / CNY, attributable to concurrent macro events rather than Russia-treatment) by the model-agnostic SUTVA battery in [validation.md §5d](validation.md) and the regime-stability test in §5c. The qualitative audit remains the primary defence; the tests are secondary empirical confirmation.
 
 ## Selection criteria
 
@@ -117,6 +129,46 @@ Direction conventions are mixed because that is how Yahoo publishes them — the
 | Full pool (no exclusions) | 33 donors | 33 donors | Both events appendix robustness |
 
 Russia 2022 excludes for the strict-clean pool: **Wheat, Corn, Palladium, EUR, DXY, BTC** (H) **+ Copper, IronOre, Soybeans, EM_Eq, GBP, US10Y** (M). Hormuz 2026 uses the same 21-donor intersection as preferred specification (sacrificing 12 Hormuz-clean donors to enable cross-event weight-transfer validation); see [methodology.md §3](methodology.md) for the rationale and [validation.md §5f](validation.md) for the validation test that requires the shared pool.
+
+---
+
+## Pre-treatment event audit
+
+The C / M / H columns above audit donors against the **focal event** (the disruption SCM is attributing). A separate identification concern is whether **other events inside the pre-window** contaminate donors. The two checks are conceptually distinct:
+
+- *Focal-event contamination* biases the treatment-effect **estimate** (the donor's post-event move includes the very thing we are trying to measure).
+- *Pre-window contamination* biases the synthetic-control **fit**, which then propagates into the estimate (the donor's pre-period co-movement with Brent reflects a transient shock rather than the stable factor structure SCM relies on).
+
+### What counts as pre-window contamination
+
+A pre-window event contaminates the SCM only if it acts as a **donor-specific** shock — i.e., moves a donor through a channel *not shared* with Brent or with the rest of the pool. **Common shocks** (global demand, global liquidity, global risk-off, common oil-cycle moves) are *absorbed* by the donor weights via the factor structure of SCM (Abadie, Diamond & Hainmueller 2010 §2.3; Abadie 2021 §2.2). They are not contamination; they are exactly what the donor pool is for. A pre-window event is a problem only when it (i) hits a donor through a non-shared channel and (ii) is large enough that the convex-weight or regression fit absorbs it into the donor's coefficient. The §5c regime-stability test and the §5d Andrews-Hansen bootstrap break ([validation.md](validation.md)) are the *empirical* counterparts to the narrative below.
+
+### Scope of this audit
+
+The audit covers only events listed in the curated Brent event timeline ([data/historical_events.csv](../data/historical_events.csv)) that fall **inside** each pre-window. The pre-window start dates are chosen precisely to exclude prior shocks from the fit — the Russia pre-window deliberately starts **after** the COVID-19 demand collapse, the Saudi–Russia price war, and the WTI-negative episode (all Q1–Q2 2020), so none of these contaminate the SCM weights. Macro events not on the curated list (Fed cycles, election repricing) are not enumerated here: the curated list is the set of episodes already validated as having moved Brent meaningfully, and anything below that threshold is by construction either too small to contaminate or too broad to do so non-uniformly across the donor pool.
+
+### Russia pre-window (2020-07-01 → 2022-02-23)
+
+One curated event falls inside this window:
+
+| Event | Date | Common factor or donor-specific? | Implication for donor pool |
+|---|---|---|---|
+| Energy-cycle reflation | 2021-10-01 | **Common (oil cycle)** — post-COVID global demand recovery and commodity-supercycle narrative; moved Brent, industrial metals, EM equities, and growth-sensitive currencies together | Donors sharing this channel are already flagged **M** on the Russia audit (Copper, Iron Ore, Soybeans, EM_Eq, GBP, US10Y) and excluded from the *strict-clean* preferred pool. The remaining 21 donors load on the reflation only through generic global-growth co-movement, which the synthetic absorbs by construction (Abadie 2021 §2.2). |
+
+**Donors with pre-window contamination beyond what the focal-event audit captures: none.** The reflation is a common factor on the energy complex and on growth-sensitive donors; every channel through which it could plausibly contaminate a donor (industrial-metals demand, EM growth, commodity-export terms-of-trade) is precisely what the M-tier downgrade already addresses.
+
+### Hormuz pre-window (2024-06-01 → 2026-01-31)
+
+**No curated events fall inside this window.** The two most recent entries on the timeline before $T_0$ — Israel–Hamas war (2023-10-07) and Red Sea diversion (2023-11-19) — both predate the pre-window start, and Red Sea was specifically considered and rejected as a focal event because Brent did not visibly disrupt (see "Why Red Sea is not a focal event" above).
+
+The implication for the donor audit is that, in the curated-event sense, the Hormuz pre-window is event-clean. This is structurally consistent with the all-C audit for Hormuz: there is no qualifying pre-window event for the audit to flag against, and the empirical SUTVA tests in §5d return no significant donor flags either ([validation.md §5d](validation.md), "Hormuz 2026: perfect agreement").
+
+### Where this argument can fail
+
+Two boundary conditions the reader should know:
+
+1. **The curated event list is the binding constraint.** The audit above only addresses events on the curated Brent timeline. Any Brent-moving episode not on that list — whether by selection criteria or by oversight — is also not addressed here. The list's construction and inclusion thresholds are documented in [notebooks/01_EDA.ipynb](../notebooks/01_EDA.ipynb).
+2. **Regime change in factor loadings is not an event.** The common-factor absorption argument requires donor coefficients to be *stable* across the pre-window. The §5c distance-correlation test (split-thirds within each pre-window) is the empirical check on this; that test is independent of which events appear on the curated list and would flag drift even in an event-clean window.
 
 ---
 
