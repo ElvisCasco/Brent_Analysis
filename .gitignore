@@ -22,3 +22,6 @@ Thumbs.db
 # Generated standalone HTML plots from 02_Fit_Models (interactive plots also live in
 # notebook outputs; the standalone copies in plots/ are regenerated each run)
 plots/
+
+# Local copies of cited papers / external PDFs for personal reading
+references/

@@ -104,6 +104,8 @@ Full details: [donor_catalog.md](donor_catalog.md). Three pool variants per even
 
 **Selection methodology.** Hand-curated based on SUTVA reasoning + factor coverage (see [donor_catalog.md](donor_catalog.md)); the same 21 donors are fed to *all five models* in the ensemble (model-agnostic candidate pool). Each model assigns its own internal donor importance via convex weights, regression coefficients, permutation importance, or posterior inclusion probability — but the candidate pool is shared, preserving cross-model and cross-event comparability of gap estimates.
 
+**Alternative considered but not pursued — Di Stefano & Mellace's inclusive SCM (iSCM).** A recent alternative to a priori donor exclusion is the **inclusive Synthetic Control Method (iSCM)** of Di Stefano & Mellace (2024, *arXiv* 2403.17624). iSCM retains "potentially affected" donors in the pool and algebraically removes their post-intervention spillover contribution: fit one SCM per potentially-affected donor (treating each in turn as if treated), obtain a system of $m$ equations in $m$ unknowns (the main treatment effect plus $m-1$ spillover effects), and solve via Cramer's rule. For Russia 2022 with 12 audit-flagged donors, iSCM would require solving a 12-equation system per post-event observation. We do not pursue iSCM for three reasons: (i) the cross-event weight-transfer design ([validation.md §5f](validation.md)) requires both events to use the same shared donor pool, which iSCM-Russia (33 donors with spillover correction) and standard-Hormuz (33 donors clean) would not preserve in a like-for-like way; (ii) the system inversion adds estimator variance that the small post-event windows (~7 months Russia, ~3 months Hormuz) can ill afford; (iii) iSCM is an arXiv working paper without peer-reviewed validation. The a priori exclusion of the 12 Russia-contaminated donors remains the more defensible choice for this thesis; iSCM could be added as an appendix robustness specification in a future iteration.
+
 ## 4. Model ensemble
 
 Five models, each with a distinct inductive bias. The bias diversity is the point: if the gap estimate survives across models with different biases, it is more likely to reflect a real effect than a single-model artefact.
@@ -190,6 +192,7 @@ Honest framing of what is **out of scope** for this pipeline:
 - Ben-Michael, E., Feller, A., & Rothstein, J. (2021). The augmented synthetic control method. *Journal of the American Statistical Association*, 116(536), 1789-1803.
 - Brodersen, K. H., Gallusser, F., Koehler, J., Remy, N., & Scott, S. L. (2015). Inferring causal impact using Bayesian structural time-series models. *Annals of Applied Statistics*, 9(1), 247-274.
 - Chen, T., & Guestrin, C. (2016). XGBoost: A scalable tree boosting system. In *Proceedings of the 22nd ACM SIGKDD*, 785-794.
+- Di Stefano, R., & Mellace, G. (2024). The inclusive Synthetic Control Method. *arXiv preprint* arXiv:2403.17624. https://arxiv.org/abs/2403.17624
 - Doudchenko, N., & Imbens, G. W. (2016). Balancing, regression, difference-in-differences and synthetic control methods: A synthesis. *NBER Working Paper* No. 22791.
 - Friedman, J. H. (2001). Greedy function approximation: a gradient boosting machine. *Annals of Statistics*, 29(5), 1189-1232.
 

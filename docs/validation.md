@@ -18,12 +18,11 @@ The six sub-sections below cover each level. Every test is run **per model in th
 | 5a (ii) | Moment matching (mean, SD, min, max, AR(1)) | Pre-period distributional coverage | Abadie 2010 | Hard threshold on mean ($\|\Delta\| < 0.01$ log); softer on SD / extrema / AR(1). |
 | 5b | Pre-period parallel-fit (gap-series mean / SD / AR(1) / OLS slope) | Parallel-trends analog | Abadie 2010, 2015, 2021; Roth 2022 | No formal threshold (SCM-literature convention); drift-correction recipe in text. |
 | 5c | Pre-period regime-stability (distance correlation across thirds) | Donor-Brent factor stability | Székely & Rizzo 2007; Stock & Watson 1996, 2002 | Model-agnostic; no canonical SCM precedent; `max_shift > 0.30` is a narrative flag, not exclusion. |
-| 5d (i) | Bootstrap structural break at $T_0$ | Donor SUTVA (model-agnostic) | Andrews 1993; Hansen 2000 | Enters BH-FDR ($\alpha = 0.10$) combined flag. |
-| 5d (i) | Wilcoxon event-window | Donor SUTVA (model-agnostic) | Brown & Warner 1985 | Enters BH-FDR combined flag. |
-| 5d (i) | KS distribution shift | Regime-shift diagnostic | Two-sample KS | Reported only; **excluded** from flag rule (over-rejects under regime shift). |
-| 5d (ii) | In-space placebo, donor-flag use | Donor SUTVA (model-native) | Abadie 2010 §3.3; Chen & Yan 2023; Di Stefano & Mellace 2024 | Model-dependent; non-canonical use — supplementary evidence, not the primary exclusion mechanism. |
+| 5d | Bootstrap structural break at $T_0$ | Donor SUTVA (model-agnostic) | Andrews 1993; Hansen 2000 | Enters BH-FDR ($\alpha = 0.10$) combined flag. |
+| 5d | Wilcoxon event-window | Donor SUTVA (model-agnostic) | Brown & Warner 1985 | Enters BH-FDR combined flag. |
+| 5d | KS distribution shift | Regime-shift diagnostic | Two-sample KS | Reported only; **excluded** from flag rule (over-rejects under regime shift). |
 | 5e (i) | In-space placebo, inferential | Treated-unit inference | Abadie 2010 §3.3 | Min permutation $p \approx 1/N$: 0.048 (21-donor) vs 0.030 (33-donor) — **reported under both pools**. |
-| 5e (ii) | In-time placebo | Spurious-effect check on the treated unit | Abadie, Diamond & Hainmueller 2015 | Pre-window shrinks under refit (XGBoost low-power); fake post-period is audited for event-cleanliness before interpretation. |
+| 5e (ii) | In-time placebo (with mixed-placebo p-value) | Spurious-effect check on the treated unit | Abadie, Diamond & Hainmueller 2015; Chen & Yan 2023 | Mixed-placebo p-value computed per model. Formal inferential validity rests on the Hahn & Shi (2017) normality / symmetry assumption — strongest for convex SCM/ASCM, informative-rank only for nonlinear models. Pre-window shrinks under refit (XGBoost low-power); fake post-period audited for event-cleanliness. |
 | 5e (iii) | Leave-one-donor-out | Donor-fragility robustness | Abadie, Diamond & Hainmueller 2015 | Importance metric is model-specific: convex weight (SCM, ASCM), regression coefficient (Elastic-net), SHAP (XGBoost), posterior inclusion probability (BSTS). |
 | 5f | Cross-event weight transfer | Cross-event methodology generalization | No canonical reference (designed for this analysis) | Requires the shared 21-donor pool ([methodology.md §3](methodology.md)); strongest single test of methodology generalization. |
 
@@ -113,9 +112,7 @@ This test is **model-agnostic** (uses only donor and Brent return series, no SCM
 
 ## 5d. Donor SUTVA / cleanliness battery
 
-The donor catalog ([donor_catalog.md](donor_catalog.md)) gives a *qualitative* SUTVA argument — physical routing, supply-chain reasoning, factor exposure. This section gives the **statistical counterpart**. The cleanliness battery is split into **model-agnostic** tests (run in [01.5_Donor_Cleanliness.ipynb](../notebooks/01.5_Donor_Cleanliness.ipynb) *before* any model is fit) and a **model-native** test (run in [04_Inference.ipynb](../notebooks/04_Inference.ipynb) after each ensemble model is fit).
-
-### 5d (i). Model-agnostic tests (in 01.5_Donor_Cleanliness)
+The donor catalog ([donor_catalog.md](donor_catalog.md)) gives a *qualitative* SUTVA argument — physical routing, supply-chain reasoning, factor exposure. This section gives the **statistical counterpart**: a model-agnostic battery run in [01.5_Donor_Cleanliness.ipynb](../notebooks/01.5_Donor_Cleanliness.ipynb) *before* any model is fit.
 
 Three tests on each donor's own time-series — none depend on any SCM model:
 
@@ -137,14 +134,6 @@ Three tests on each donor's own time-series — none depend on any SCM model:
   - *Tests flag, audit clean* (2 cases — JPY, CNY): the tests detect mean shifts (Fed/BoJ policy divergence, China zero-COVID) that are **concurrent macro events, not Russia-treatment**.
 
 **Interpretation.** The hand-curated audit remains the primary SUTVA defense; the model-agnostic tests **confirm** the audit on Hormuz and **supplement** it on Russia (highlighting JPY/CNY as flagged-but-not-audit-relevant — informative for the discussion section but not a reason to revise the audit). Tests and audit are *complementary*, not substitutes: audit captures causal-channel reasoning; tests capture event-localized empirical shifts (excluding KS, which captures the broader regime change).
-
-### 5d (ii). Model-native test (in 04_Inference, §5e (i))
-
-The **in-space placebo for each donor** — refit the *chosen SCM model* treating each donor as treated, rank Brent's post/pre RMSPE ratio against the placebo distribution (Abadie 2010 §3.3). This test is documented in §5e (i) below because the same procedure also serves as the inferential validation for the treated unit (Brent).
-
-**Why split this off:** different SCM models produce different placebo distributions, so a donor's cleanliness verdict under in-space placebo is model-dependent. By contrast, the three tests in §5d (i) yield a single shared result per donor that applies to all five ensemble models.
-
-**Non-standard use — explicit framing.** Using in-space placebo to *flag individual donors as treated* (tail position → SUTVA violation → candidate for exclusion) is not part of the canonical Abadie playbook. The standard SCM practice (Abadie, Diamond & Hainmueller 2010, 2015; Abadie 2021 *JEL* §3.1) is to exclude potentially-contaminated donors **a priori on substantive grounds** and reserve in-space placebo for *inference on the treated unit only* (the §5e (i) use). Recent methodological extensions — **Chen & Yan (2023, *Economics Letters*) "A mixed placebo test"** and **Di Stefano & Mellace (2024, arXiv:2403.17624) "The inclusive Synthetic Control Method"** — formalize placebo-based detection of spillover-contaminated donors and are the closest precedent for the diagnostic use here. The primary SUTVA defense remains the qualitative audit in [donor_catalog.md](donor_catalog.md), confirmed by the model-agnostic battery in §5d (i); §5d (ii) is reported as supplementary empirical evidence, not as a per-donor exclusion mechanism.
 
 ### Honest power limitations
 
@@ -180,6 +169,20 @@ Set a fake treatment date $T^{\text{fake}}_0$ several months *before* the real $
 4. Compute the gap in the fake post-period.
 
 A *small* fake-period gap (in the same ballpark as the pre-period absolute gap) means the SCM does not produce spurious effects when nothing happened. A *large* fake-period gap reveals the model finds illusory effects in unrelated regimes — interpreting the real post-period gap then becomes much more cautious.
+
+**Formal p-value via the mixed placebo test (Chen & Yan 2023).** Abadie's original in-time placebo produces only a graph; significance is judged by visual inspection. **Chen & Yan (2023, *Economics Letters*) "A mixed placebo test for synthetic control method"** formalize this by running the *in-space* placebo at the fake $T_0^{\text{fake}}$ — for each donor, treat that donor as the placebo unit, refit, and compute the post/pre MSPE ratio over $[T_0^{\text{fake}}, T_0]$. Brent's rank in the resulting distribution gives a permutation p-value (Chen & Yan Eqs. 2-5). Pointwise p-values (two-sided / right / left per period) and an MSPE-based p-value over the fake post-period are both computable. We report the MSPE-based version per model.
+
+**Cross-model validity caveat.** Chen & Yan (Section 4) anchor the inferential validity of the mixed placebo test in the same symmetry assumption (Canay et al. 2017; Lehmann & Romano 2005 Theorem 15.2.1) that underlies Abadie's in-space placebo: the placebo and treated-unit effects must be identically distributed. **Hahn & Shi (2017)** show this requires Gaussian errors *for convex SCM*. For nonlinear estimators in our ensemble the assumption is weaker still. The table below maps Chen & Yan's caveat onto our 5-model ensemble:
+
+| Model | Symmetry-assumption status | How to read the mixed-placebo p-value |
+|---|---|---|
+| Convex SCM | Chen & Yan-justified under Gaussian errors | Formal-but-restrictive p-value |
+| ASCM | Same justification, plus ridge correction | Formal-but-restrictive p-value |
+| Elastic-net | Weaker (unconstrained coefficients) | Informative rank statistic |
+| XGBoost | Materially violated (tree-structured residuals) | Rank statistic; do not over-interpret |
+| BSTS | Materially violated; native posterior CI is preferable | Rank statistic; rely on Bayesian CI for inference |
+
+Chen & Yan themselves caveat (Section 4): *"applied researchers are advised to exercise care when interpreting 'p-values' from the in-space or mixed placebo tests, as they may not be p-values in a formal statistical sense despite carrying useful information."* This caveat applies more strongly to the nonlinear models. We therefore treat the convex SCM and ASCM mixed-placebo p-values as the formal inferential anchor for the in-time placebo, and the Elastic-net / XGBoost / BSTS p-values as supporting rank evidence.
 
 **Event-cleanliness audit of the fake post-period.** The in-time placebo only has interpretive force if the fake post-period is free of Brent-specific shocks. A non-zero fake-period gap should not be read as "the SCM produces spurious effects" if a real (smaller, unrelated) shock occurred inside the fake window. Each fake post-period is therefore audited against the EDA event timeline before the test is interpreted:
 
@@ -229,13 +232,15 @@ This is a single test that can be run per model in the ensemble (5 transfers tot
 - Andrews, D. W. K., & Ploberger, W. (1994). Optimal tests when a nuisance parameter is present only under the alternative. *Econometrica*, 62(6), 1383-1414.
 - Bergmeir, C., & Benítez, J. M. (2012). On the use of cross-validation for time series predictor evaluation. *Information Sciences*, 191, 192-213.
 - Brown, S. J., & Warner, J. B. (1985). Using daily stock returns: The case of event studies. *Journal of Financial Economics*, 14(1), 3-31.
+- Canay, I. A., Romano, J. P., & Shaikh, A. M. (2017). Randomization tests under an approximate symmetry assumption. *Econometrica*, 85(3), 1013-1030.
 - Chen, Q., & Yan, G. (2023). A mixed placebo test for synthetic control method. *Economics Letters*, 224, 111004. https://doi.org/10.1016/j.econlet.2023.111004
-- Di Stefano, R., & Mellace, G. (2024). The inclusive Synthetic Control Method. *arXiv preprint* arXiv:2403.17624. https://arxiv.org/abs/2403.17624
 - Goodfellow, I., Bengio, Y., & Courville, A. (2016). *Deep Learning*. MIT Press.
+- Hahn, J., & Shi, R. (2017). Synthetic control and inference. *Econometrics*, 5(4), 52.
 - Hansen, B. E. (2000). Testing for structural change in conditional models. *Journal of Econometrics*, 97(1), 93-115.
 - Hastie, T., Tibshirani, R., & Friedman, J. (2009). *The Elements of Statistical Learning: Data Mining, Inference, and Prediction* (2nd ed.). Springer.
 - Hyndman, R. J., & Athanasopoulos, G. (2018). *Forecasting: Principles and Practice* (2nd ed.). OTexts.
 - Kohavi, R. (1995). A study of cross-validation and bootstrap for accuracy estimation and model selection. *Proceedings of IJCAI* 1995, 1137-1143.
+- Lehmann, E. L., & Romano, J. P. (2005). *Testing Statistical Hypotheses* (3rd ed.). Springer.
 - Politis, D. N., & Romano, J. P. (1994). The stationary bootstrap. *Journal of the American Statistical Association*, 89(428), 1303-1313.
 - Rambachan, A., & Roth, J. (2023). A more credible approach to parallel trends. *Review of Economic Studies*, 90(5), 2555-2591.
 - Roth, J. (2022). Pretest with caution: Event-study estimates after testing for parallel trends. *American Economic Review: Insights*, 4(3), 305-322.
