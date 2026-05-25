@@ -23,7 +23,7 @@ The six sub-sections below cover each level. Every test is run **per model in th
 | 5d | KS distribution shift | Regime-shift diagnostic | Two-sample KS | Reported only; **excluded** from flag rule (over-rejects under regime shift). |
 | 5e (i) | In-space placebo, inferential | Treated-unit inference | Abadie 2010 §3.3 | Min permutation $p \approx 1/N$: 0.048 (21-donor) vs 0.030 (33-donor) — **reported under both pools**. |
 | 5e (ii) | In-time placebo (with mixed-placebo p-value) | Spurious-effect check on the treated unit | Abadie, Diamond & Hainmueller 2015; Chen & Yan 2023 | Mixed-placebo p-value computed per model. Formal inferential validity rests on the Hahn & Shi (2017) normality / symmetry assumption — strongest for convex SCM/ASCM, informative-rank only for nonlinear models. Pre-window shrinks under refit (XGBoost low-power); fake post-period audited for event-cleanliness. |
-| 5e (iii) | Leave-one-donor-out | Donor-fragility robustness | Abadie, Diamond & Hainmueller 2015 | Importance metric is model-specific: convex weight (SCM, ASCM), regression coefficient (Elastic-net), SHAP (XGBoost), posterior inclusion probability (BSTS). |
+| 5e (iii) | Leave-one-donor-out | Donor-fragility robustness | Abadie, Diamond & Hainmueller 2015 | Importance metric is model-specific: convex weight (SCM, ASCM), regression coefficient (Elastic-net), SHAP (XGBoost), standardised-coefficient magnitude $|\hat\beta_j|/\sigma_{\hat\beta_j}$ (Bayesian Ridge — PIP proxy, not true PIP). |
 | 5f | Cross-event weight transfer | Cross-event methodology generalization | No canonical reference (designed for this analysis) | Requires the shared 21-donor pool ([methodology.md §3](methodology.md)); strongest single test of methodology generalization. |
 
 ### 5.0a Minimum load-bearing tests
@@ -32,7 +32,7 @@ The twelve tests above span model fit, donor identification, and inference. The 
 
 | Level | Irreducible test | Where it lives in this pipeline | Why it's the minimum |
 |---|---|---|---|
-| **Model fit** | §5a (i) Walk-forward CV | [03_Validate.ipynb](../notebooks/03_Validate.ipynb) `wf-cv` cell | Only out-of-sample signal in §5; works for all 5 models; reveals XGBoost/BSTS overfitting (val/train > 3 on Russia) |
+| **Model fit** | §5a (i) Walk-forward CV | [03_Validate.ipynb](../notebooks/03_Validate.ipynb) `wf-cv` cell | Only out-of-sample signal in §5; works for all 5 models; reveals XGBoost/Bayesian Ridge overfitting (val/train > 3 on Russia) |
 | **Donor identification** | Qualitative audit in [donor_catalog.md](donor_catalog.md), confirmed by §5d Andrews-Hansen bootstrap break | [01.5_Donor_Cleanliness.ipynb](../notebooks/01.5_Donor_Cleanliness.ipynb) | Per Abadie 2021 §3.1, donor exclusion is a-priori on substantive grounds; the bootstrap break test asks the literal SUTVA question (mean shift at $T_0$) |
 | **Inference** | §5e (i) in-space placebo run under **both** the 21-donor and the 33-donor pool | [04_Inference.ipynb](../notebooks/04_Inference.ipynb) `iso` cells | Canonical Abadie 2010 §3.3 test. The 21-donor permutation floor is $1/22 \approx 0.045$; without the 33-donor rerun (floor $1/34 \approx 0.029$) Hormuz p-values cannot be distinguished from the saturation value. |
 
@@ -66,7 +66,7 @@ Two sub-tests of the synthetic's quality as a pre-event approximator of log-Bren
 
 A formal fix would require a 3-way split (train / val / test_inner) with test_inner held out from hyperparameter selection. We choose not to implement this because the pre-event window is sample-size-constrained (~420 obs / ~100-130 effective independent obs after AR(1) correction): splitting off a third partition shrinks the training set from ~336 to ~252 obs (25% reduction), which would degrade hyperparameter selection quality more than the bias correction is worth. Standard SCM papers (Abadie 2010, Born et al. 2019) similarly do not do nested CV.
 
-**The qualitative classifications are robust to this bias:** XGBoost and BSTS-proxy show val/train ratios of 3-5× on Russia even under the biased measurement, so under a clean measurement they would only look *more* overfit, not less. The borderline pass/fail status of ASCM and Elastic-net should be read with the bias in mind. The in-time placebo (§5e ii) provides a partial second generalization signal on a different held-out window (last 6 months of pre-event), though it shares some overlap with the val set.
+**The qualitative classifications are robust to this bias:** XGBoost and Bayesian Ridge show val/train ratios of 3-5× on Russia even under the biased measurement, so under a clean measurement they would only look *more* overfit, not less. The borderline pass/fail status of ASCM and Elastic-net should be read with the bias in mind. The in-time placebo (§5e ii) provides a partial second generalization signal on a different held-out window (last 6 months of pre-event), though it shares some overlap with the val set.
 
 **(ii) Moment matching of treated vs synthetic.** Pre-period summary statistics of log-Brent vs log-synthetic.
 
@@ -173,6 +173,12 @@ For reference, Abadie 2010 (California tobacco) has 38 placebo states; Abadie, D
 
 **(ii) In-time placebo (Abadie, Diamond & Hainmueller 2015).**
 
+**Hyperparameter choice — defaults, not tuned.** The in-time placebo refit uses the literature-defensible defaults in `lib/config.py:MODEL_HPARAMS`, *not* the val-tuned hyperparameters stored by [02_Fit_Models.ipynb](../notebooks/02_Fit_Models.ipynb). This is an intentional asymmetry between the headline fit (tuned hparams) and the placebo (defaults).
+
+The reason is the second-order leakage path: tuned hparams were selected by $\arg\min$ val_RMSE on the last 20% of the pre-event window, and the in-time fake post-period $[T_0^{\text{fake}}, T_0]$ overlaps with that val window (~85 of the ~127-129 fake-post observations sit inside the original val window for both events). If the placebo refit inherited the tuned hparams, the model would be using hyperparameters deliberately optimized to fit Brent well in a window that overlaps the placebo's evaluation region — a deck-stacking that biases the fake-period gap toward zero. Using defaults breaks this path: the placebo evaluates the model class without selection bias, not a tuned instance whose selection set leaks into the test set.
+
+This is the standard preference in held-out evaluation (Cawley & Talbot 2010 *JMLR* §3): never evaluate a tuned model on data the tuning saw, even partially. The cost is that the placebo isn't literally testing the same instance as the headline — it's testing the model class as configured by its prior beliefs about hyperparameters (i.e., the `MODEL_HPARAMS` defaults). The benefit is no leakage. For Convex SCM, which has no tunable hyperparameters, headline and placebo configurations are identical, so the asymmetry is moot. For ASCM, Elastic-net, XGBoost, and Bayesian Ridge, defaults differ from tuned (see [methodology.md §4 Hyperparameter choices](methodology.md)) and the placebo is consequently a more honest — and somewhat more pessimistic — test of model-class behaviour.
+
 Set a fake treatment date $T^{\text{fake}}_0$ several months *before* the real $T_0$. We use:
 - Russia in-time placebo: $T^{\text{fake}}_0$ = 2021-08-24 (6 months before real $T_0$)
 - Hormuz in-time placebo: $T^{\text{fake}}_0$ = 2025-08-01 (6 months before real $T_0$)
@@ -194,16 +200,16 @@ A *small* fake-period gap (in the same ballpark as the pre-period absolute gap) 
 | ASCM | Same justification, plus ridge correction | Formal-but-restrictive p-value |
 | Elastic-net | Weaker (unconstrained coefficients) | Informative rank statistic |
 | XGBoost | Materially violated (tree-structured residuals) | Rank statistic; do not over-interpret |
-| BSTS | Materially violated; native posterior CI is preferable | Rank statistic; rely on Bayesian CI for inference |
+| Bayesian Ridge | Weaker (linear but unconstrained Gaussian posterior over coefficients) | Rank statistic; the Bayesian Ridge posterior CI is Gaussian and ignores autocorrelation, so report alongside but do not over-interpret |
 
-Chen & Yan themselves caveat (Section 4): *"applied researchers are advised to exercise care when interpreting 'p-values' from the in-space or mixed placebo tests, as they may not be p-values in a formal statistical sense despite carrying useful information."* This caveat applies more strongly to the nonlinear models. We therefore treat the convex SCM and ASCM mixed-placebo p-values as the formal inferential anchor for the in-time placebo, and the Elastic-net / XGBoost / BSTS p-values as supporting rank evidence.
+Chen & Yan themselves caveat (Section 4): *"applied researchers are advised to exercise care when interpreting 'p-values' from the in-space or mixed placebo tests, as they may not be p-values in a formal statistical sense despite carrying useful information."* This caveat applies more strongly to the nonlinear models. We therefore treat the convex SCM and ASCM mixed-placebo p-values as the formal inferential anchor for the in-time placebo, and the Elastic-net / XGBoost / Bayesian Ridge p-values as supporting rank evidence.
 
 **Event-cleanliness audit of the fake post-period.** The in-time placebo only has interpretive force if the fake post-period is free of Brent-specific shocks. A non-zero fake-period gap should not be read as "the SCM produces spurious effects" if a real (smaller, unrelated) shock occurred inside the fake window. Each fake post-period is therefore audited against the EDA event timeline before the test is interpreted:
 
 - **Russia fake post-period (2021-08-24 → 2022-02-23).** Not automatically null. The window contains (i) the late-2021 oil rally driven by demand recovery and OPEC+ underproduction discipline (Brent rose from ~$70 to ~$95), (ii) the Omicron emergence in late November 2021 (a brief risk-off episode that hit Brent), and (iii) the runup-to-invasion premium starting roughly mid-January 2022 as intelligence and diplomacy signals priced in. The third point is the trickiest: if real Russia-invasion risk premium was already accruing in Jan-Feb 2022, the fake post-period *contains* real treatment effect, and a non-zero fake gap is **partially expected** rather than evidence of model fragility. Interpretation: read the Russia in-time placebo qualitatively, not as a hard pass/fail.
 - **Hormuz fake post-period (2025-08-01 → 2026-01-31).** Audited against the EDA event timeline notebook; any shock that materially moved Brent inside this window is flagged in the reporting of this test.
 
-**Model-specific power limitation — XGBoost in particular.** Refitting on $t < T_0^{\text{fake}}$ shrinks the pre-window from ~20 months to ~14 months (~290 trading days), which is below the ~400-obs lower bound [methodology.md §4](methodology.md) sets for stable XGBoost training. A "large" in-time placebo gap from XGBoost can therefore reflect training-instability under the shortened window rather than genuine spurious-effect generation by the model. Convex SCM, ASCM, and Elastic-net are linear and degrade gracefully; BSTS handles small samples by design via Bayesian priors. The XGBoost in-time placebo result is reported but **flagged as low-power** and not treated as load-bearing for the model's inclusion in the ensemble.
+**Model-specific power limitation — XGBoost in particular.** Refitting on $t < T_0^{\text{fake}}$ shrinks the pre-window from ~20 months to ~14 months (~290 trading days), which is below the ~400-obs lower bound [methodology.md §4](methodology.md) sets for stable XGBoost training. A "large" in-time placebo gap from XGBoost can therefore reflect training-instability under the shortened window rather than genuine spurious-effect generation by the model. Convex SCM, ASCM, and Elastic-net are linear and degrade gracefully; Bayesian Ridge handles small samples by design via Bayesian priors. The XGBoost in-time placebo result is reported but **flagged as low-power** and not treated as load-bearing for the model's inclusion in the ensemble.
 
 **(iii) Leave-one-donor-out (Abadie, Diamond & Hainmueller 2015).**
 
@@ -220,7 +226,7 @@ For the nonlinear and regression-based models in the ensemble, "non-trivial weig
 - **Convex SCM, Augmented SCM:** convex weight $w_j > 0.05$.
 - **Elastic-net:** $|\hat\beta_j| > $ a small threshold on the standardised coefficient (the $L_1$ component already zeros out unimportant donors, so the leave-out set is naturally compact).
 - **XGBoost:** top-$K$ donors by mean absolute **SHAP value** over the pre-period ($K = 5$). SHAP is preferred over gain-based importance because it is more stable across random seeds at this sample size.
-- **BSTS:** donors with **posterior inclusion probability** $\geq 0.5$ (top-$K$ if fewer than $K$ exceed the threshold; $K = 5$).
+- **Bayesian Ridge:** top-$K$ donors by **standardised-coefficient magnitude** $|\hat\beta_j|/\sigma_{\hat\beta_j}$, with $K=5$. This is the PIP *proxy* used in [lib/models.py](../lib/models.py); it is not a true posterior inclusion probability, which would require spike-and-slab donor selection (see [methodology.md §4](methodology.md) "Bayesian Ridge vs full BSTS").
 
 Reporting one importance metric per model — consistent between [methodology.md §4](methodology.md) (donor-importance column), §5e (iii), and [methodology.md §6](methodology.md) (per-model donor weights table) — preserves auditability across the pipeline.
 

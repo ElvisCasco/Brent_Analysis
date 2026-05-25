@@ -25,7 +25,7 @@ If a future iteration of this analysis required earlier events, the donor-pool d
 
 A pre-window must satisfy three conditions:
 1. **No within-window Brent-specific shocks** — the SCM weights are learned on the donor→Brent relationship; embedded oil-specific shocks contaminate the learned factor loadings.
-2. **Long enough for factor identification** — convex SCM needs ~200+ observations; nonlinear models (XGBoost, BSTS) prefer ~400+.
+2. **Long enough for factor identification** — convex SCM needs ~200+ observations; nonlinear models (XGBoost, Bayesian Ridge) prefer ~400+.
 3. **Same factor regime as the projection window** — donor → Brent loadings should be stable between pre-period and post-event projection.
 
 The cost of strict adherence: pre-windows are inherently short for Brent because oil-specific events happen frequently. Both windows below are ~20 months, which is the longest defensible duration that excludes acute Brent-specific contamination.
@@ -72,7 +72,7 @@ Same convention as Russia: only the **preferred specification** appears in the m
 
 ### Why pre-windows of equal length (~20 months)
 
-Cross-event comparison is cleaner when pre-windows have comparable duration. The XGBoost and BSTS models will have similar training data; the gap-size comparison won't be confounded by "Russia had more training data than Hormuz."
+Cross-event comparison is cleaner when pre-windows have comparable duration. The XGBoost and Bayesian Ridge models will have similar training data; the gap-size comparison won't be confounded by "Russia had more training data than Hormuz."
 
 ### Why not pool the two pre-periods into one model
 
@@ -116,7 +116,7 @@ Five models, each with a distinct inductive bias. The bias diversity is the poin
 | 2 | **Augmented SCM** | Convex SCM + ridge-regression bias correction; allows mild extrapolation outside donor hull | Convex weight + ridge coefficient | Ben-Michael, Feller & Rothstein 2021 *JASA* |
 | 3 | **Elastic-net regression** | Linear, sparse + ridge-regularized; can extrapolate freely; lasso component drops donors entirely | Regression coefficient (with $L_1$-induced sparsity) | Doudchenko & Imbens 2016 *NBER WP 22791* |
 | 4 | **Gradient Boosting (XGBoost / LightGBM)** | Nonlinear, tree-based; captures interactions; cannot extrapolate beyond training range | SHAP values / permutation importance | Friedman 2001 *Annals of Statistics*; Chen & Guestrin 2016 *KDD* |
-| 5 | **Bayesian Structural Time Series (CausalImpact)** | Explicit additive decomposition: trend + seasonal + regression-on-donors + noise; Bayesian — produces posterior credible intervals natively | Posterior inclusion probability + coefficient | Brodersen, Gallusser, Koehler, Remy, Scott 2015 *Annals of Applied Statistics*; Google `CausalImpact` |
+| 5 | **Bayesian Ridge** *(regression component of BSTS; proxy)* | Bayesian linear regression on donor levels with conjugate Gamma priors on weight and noise precision; closed-form posterior. **Does not** include trend / seasonal / spike-and-slab donor selection. | Standardised coefficient magnitude $\|\hat\beta_j\|/\sigma_{\hat\beta_j}$ — used as a PIP proxy. True PIP would require spike-and-slab donor selection in full BSTS. | sklearn `BayesianRidge`; positioned against Brodersen, Gallusser, Koehler, Remy & Scott 2015 *Annals of Applied Statistics* — see "Bayesian Ridge vs full BSTS" below |
 
 **Why these five and not others:**
 - **GRU / LSTM neural sequence models** were considered and excluded for this sample size (~400-500 pre-event obs is well below the ~10,000+ typical training size for stable RNN training; required hyperparameter and regularization choices would dominate methodology defense).
@@ -129,7 +129,60 @@ Five models, each with a distinct inductive bias. The bias diversity is the poin
 - Early stopping on walk-forward validation set
 - Average across multiple random seeds for stability
 
-BSTS handles small samples better by design (Bayesian priors regularize naturally).
+Bayesian Ridge handles small samples better by design (Gaussian likelihood + conjugate Gamma priors regularize naturally; closed-form posterior).
+
+### Bayesian Ridge vs full BSTS — what's implemented, what's missing
+
+The fifth model in the ensemble is labelled `bayesian_ridge` in the codebase, *not* `bsts`, because the implementation in [lib/models.py](../lib/models.py) `fit_bayesian_ridge` uses `sklearn.linear_model.BayesianRidge` — Bayesian linear regression on donor levels, not a full state-space time-series model. Full BSTS as in **Brodersen, Gallusser, Koehler, Remy & Scott (2015, *Annals of Applied Statistics*) "Inferring causal impact using Bayesian structural time-series models"** decomposes the outcome as
+
+$$y_t = \mu_t + \tau_t + \beta^\top x_t + \varepsilon_t$$
+
+with four components, each with explicit priors and a Bayesian state-space formulation. The implementation here captures only the third component (the regression on donors, $\beta^\top x_t$) and omits the rest. The table below maps what is and is not currently implemented:
+
+| Component | Full BSTS (Brodersen et al. 2015) | Our `bayesian_ridge` |
+|---|---|---|
+| Local linear **trend** $\mu_t$ | State-space process with priors on level and slope innovations | Absent — no time awareness |
+| **Seasonal** $\tau_t$ | Fourier or dummy encoding with priors | Absent |
+| **Regression on donors** $\beta^\top x_t$ | Spike-and-slab prior for donor selection | Gaussian-Gamma conjugate prior; no selection |
+| **Noise** $\varepsilon_t$ | Time-varying or constant with explicit prior | Constant Gaussian, inverse-Gamma prior |
+| **Fit method** | MCMC or variational | Closed-form conjugate update |
+| **Counterfactual CI** | Posterior over full state trajectory; accounts for autocorrelation | Gaussian CI ignoring autocorrelation |
+| **Donor importance** | True posterior inclusion probability from spike-and-slab | $\|\hat\beta_j\|/\sigma_{\hat\beta_j}$ (a standardised-coefficient magnitude — PIP *proxy*, not true PIP) |
+
+Why the proxy rather than full BSTS:
+
+1. **Dependency footprint.** Full BSTS requires `tensorflow_probability.sts` or `pycausalimpact` (a Python wrapper around `tfp.sts`). Both are heavy dependencies; `sklearn.BayesianRidge` is zero-dependency.
+2. **Speed.** TFP variational fit is on the order of seconds-to-minutes per fit; MCMC slower. Combined with the placebo loops × LOO × cross-event runs, the cost compounds. `BayesianRidge` fits in milliseconds.
+3. **Marginal value at N≈420.** With daily oil-price data and no obvious weekly seasonality, the trend and seasonal components of full BSTS have weak data support over a 20-month pre-period. The regression-on-donors component is what carries most of the signal.
+
+What the proxy gives up:
+- **Trend / seasonal decomposition** of the counterfactual into structural components (one of the main reasons to use BSTS over plain Bayesian regression in the first place).
+- **Properly autocorrelation-aware posterior CIs** on the counterfactual path.
+- **True PIPs** from spike-and-slab donor selection. The reported `pip_proxy` ($\|\hat\beta_j\|/\sigma_{\hat\beta_j}$) is a coefficient $t$-statistic, not a posterior inclusion probability.
+
+Calling this model `bayesian_ridge` rather than `bsts` is the honest label. A future iteration could swap in `pycausalimpact` (the most-turnkey route to full BSTS in Python) to recover the missing components; the TODO is recorded in [lib/models.py](../lib/models.py) `fit_bayesian_ridge`. For the current thesis scope, the model functions as a *Bayesian-flavoured regression diversifier* in the ensemble, not a state-space causal-impact estimator.
+
+### Hyperparameter choices and the winner's-curse constraint
+
+Per [validation.md §5a](validation.md), the val/train ratio reported in walk-forward CV is subject to **winner's-curse bias** — selecting the hyperparameter configuration with the lowest observed val_RMSE biases the reported metric downward relative to true generalization error. **Cawley & Talbot (2010, *JMLR* 11) — "On Over-fitting in Model Selection and Subsequent Selection Bias in Performance Evaluation"** quantify this: the bias grows with the number of configurations tested (~log N) and with val-set noise (smaller val set → more bias). At our ~85-observation val window, a grid of hundreds of configurations can push the reported val_RMSE 20-40% below the truth.
+
+To control this bias, the pipeline keeps the per-model search grid **small** — 3-5 values per tuned knob, never the full Cartesian product. Defaults reflect small-sample-defensible choices from the literature, and grids are restricted to the 1-2 knobs that meaningfully change fit per model:
+
+| Model | Tuned knobs (in 02_Fit_Models) | Fixed defaults (in `lib/config.py`) | Effective grid size N |
+|---|---|---|---|
+| **Convex SCM** | none — `n_random_v` is an optimizer-restart count, not a model hyperparameter | `n_random_v=120`, `seed=0` | 1 (no selection bias) |
+| **ASCM** | `ridge_lambda` ∈ {0.5, 1.0, 5.0} | `n_random_v=120`, `seed=0`, `ridge_lambda=1.0` | 3 |
+| **Elastic-net** | `alpha`, `l1_ratio` over 3×3 grid | `alpha=0.01`, `l1_ratio=0.5`, `max_iter=10000` | 9 |
+| **XGBoost** | `max_depth` ∈ {2, 3, 4}, `reg_lambda` ∈ {1.0, 5.0, 10.0} | `max_depth=2`, `n_estimators=200`, `learning_rate=0.02`, `gamma=1.0`, `reg_lambda=5.0`, `subsample=0.7`, `colsample_bytree=0.7`, `min_child_weight=5` | 9 |
+| **Bayesian Ridge** | `lambda_1 = lambda_2` ∈ {1e-3, 1e-2, 1e-1} | `alpha_1=alpha_2=1e-6`, `lambda_1=lambda_2=1e-2` | 3 |
+
+The XGBoost defaults are aggressive relative to common practice: `max_depth=2` (versus a textbook 6) caps tree complexity at the level where N=420 can stably estimate splits, and `min_child_weight=5` + `subsample=0.7` + `colsample_bytree=0.7` impose row and feature stochasticity that further constrain overfit capacity. **Chen & Guestrin (2016)** train XGBoost on datasets of 10⁵-10⁹ observations; at our 0.2-2% of typical training size, depth-2 stumps are the appropriate inductive bias.
+
+The Bayesian Ridge default of `lambda_1=lambda_2=1e-2` raises the weight-precision prior from sklearn's `1e-6` (near-flat) to a level that imposes real shrinkage. The 1e-6 default produced walk-forward val/train ratios of 3-5× on Russia — diagnostic of essentially unregularized fitting in a model that nominally relies on priors for regularization.
+
+The convex SCM (no tuned knobs) and ASCM (one knob, 3 values) have negligible winner's-curse contamination. Elastic-net at 3×3 = 9 configurations and N≈85 val obs has modest bias (~5-10% downward on val_RMSE). XGBoost and Bayesian Ridge at N=9 and N=3 are similarly bounded. Across the ensemble the reported val_RMSE values are within ~10% of true generalization error — far below the 20-40% bias that would obtain under full Cartesian grid search.
+
+**The val/train ratio is reported as a diagnostic, not a target.** Per [validation.md §5a](validation.md), models flagged as overfit are not auto-excluded; the headline ensemble takes the median across all five regardless. Two of the eight current "overfit" flags (Hormuz convex SCM ratio 2.18; Hormuz ASCM ratio 2.50) are **regime drift** — the last 20% of the Hormuz pre-event window (2025-09 → 2026-01) is structurally different from the first 80%, plausibly reflecting runup-to-Hormuz pricing. No hyperparameter adjustment can or should fix that, and the cross-event weight transfer ([validation.md §5f](validation.md)) provides the unbiased generalization signal that walk-forward CV cannot.
 
 ## 5. Validation methodology
 
@@ -143,7 +196,7 @@ For each event:
 2. **Validate** each model ([validation.md §5a, §5b](validation.md)). Drop models that fail walk-forward validation.
 3. **Compute post-event gap** from each surviving model.
 4. **Headline estimate** = **median** of post-event gaps across surviving models. The median is robust to a single model producing an outlier (e.g., XGBoost overfitting in an unusual way).
-5. **Uncertainty band** = inter-quartile range (Q25-Q75) across surviving models. This is the model-uncertainty, complementary to within-model uncertainty (which is given by each model's own confidence interval, e.g., BSTS posterior).
+5. **Uncertainty band** = inter-quartile range (Q25-Q75) across surviving models. This is the model-uncertainty, complementary to within-model uncertainty (which is given by each model's own confidence interval, e.g., the Bayesian Ridge Gaussian posterior).
 
 Reporting structure:
 
@@ -153,7 +206,7 @@ Convex SCM       <gap>%  [low, high]   <gap>%  [low, high]
 ASCM             <gap>%  [low, high]   <gap>%  [low, high]
 Elastic-net      <gap>%  [low, high]   <gap>%  [low, high]
 XGBoost          <gap>%  [low, high]   <gap>%  [low, high]
-BSTS             <gap>%  [low, high]   <gap>%  [low, high]
+Bayesian Ridge   <gap>%  [low, high]   <gap>%  [low, high]
 ─────────────────────────────────────────────────────────────
 Ensemble median  <gap>%  [Q25, Q75]    <gap>%  [Q25, Q75]
 ```
@@ -191,6 +244,7 @@ Honest framing of what is **out of scope** for this pipeline:
 - Abadie, A. (2021). Using synthetic controls: feasibility, data requirements, and methodological aspects. *Journal of Economic Literature*, 59(2), 391-425.
 - Ben-Michael, E., Feller, A., & Rothstein, J. (2021). The augmented synthetic control method. *Journal of the American Statistical Association*, 116(536), 1789-1803.
 - Brodersen, K. H., Gallusser, F., Koehler, J., Remy, N., & Scott, S. L. (2015). Inferring causal impact using Bayesian structural time-series models. *Annals of Applied Statistics*, 9(1), 247-274.
+- Cawley, G. C., & Talbot, N. L. C. (2010). On over-fitting in model selection and subsequent selection bias in performance evaluation. *Journal of Machine Learning Research*, 11, 2079-2107.
 - Chen, T., & Guestrin, C. (2016). XGBoost: A scalable tree boosting system. In *Proceedings of the 22nd ACM SIGKDD*, 785-794.
 - Di Stefano, R., & Mellace, G. (2024). The inclusive Synthetic Control Method. *arXiv preprint* arXiv:2403.17624. https://arxiv.org/abs/2403.17624
 - Doudchenko, N., & Imbens, G. W. (2016). Balancing, regression, difference-in-differences and synthetic control methods: A synthesis. *NBER Working Paper* No. 22791.

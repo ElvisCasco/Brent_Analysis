@@ -1,8 +1,8 @@
 event,hormuz
 window,preferred
 variant,shared
-model,bsts
-rmspe_pre_log,0.034689840382271984
+model,bayesian_ridge
+rmspe_pre_log,0.03468984038227202
 rmspe_pre_pct,3.529855119426495
 t0,2026-02-01 00:00:00
 t_pre_start,2024-06-01 00:00:00

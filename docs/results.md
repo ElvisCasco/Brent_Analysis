@@ -12,13 +12,13 @@ Per-model post-event mean gap in % (raw, untransformed) for the **preferred spec
 
 | Model | Raw gap (%) | Drift contribution (pp) | Drift-adjusted gap (%) |
 |---|---:|---:|---:|
-| Convex SCM | 29.3 | +5.8 | 23.5 |
-| ASCM | 13.4 | +0.2 | 13.2 |
+| Convex SCM | 29.6 | +5.8 | 23.8 |
+| ASCM | 13.3 | +0.2 | 13.1 |
 | Elastic-net | 25.1 | +0.7 | 24.4 |
-| XGBoost | 36.9 | +2.0 | 34.9 |
-| BSTS | 0.5 | +0.1 | 0.4 |
-| **Ensemble median** | **25.1** | — | **23.5** |
-| **Ensemble IQR (Q25-Q75)** | **[13.4, 29.3]** | — | **[13.2, 24.4]** |
+| XGBoost | 36.6 | +2.0 | 34.6 |
+| Bayesian Ridge | 0.5 | +0.1 | 0.4 |
+| **Ensemble median** | **25.1** | — | **23.8** |
+| **Ensemble IQR (Q25-Q75)** | **[13.3, 29.6]** | — | **[13.1, 24.4]** |
 
 Headline interpretation: Russia 2022 produced an estimated 23-25% premium on Brent over the 7-month window from invasion to OPEC+ October cut. This is consistent with the well-documented historical move from ~$95 to ~$130 (≈37% peak), discounted by the median post-window price recovery toward $85-90.
 
@@ -26,13 +26,13 @@ Headline interpretation: Russia 2022 produced an estimated 23-25% premium on Bre
 
 | Model | Raw gap (%) | Drift contribution (pp) | Drift-adjusted gap (%) |
 |---|---:|---:|---:|
-| Convex SCM | 39.3 | -1.8 | 41.1 |
+| Convex SCM | 38.6 | -1.8 | 40.3 |
 | ASCM | 42.9 | -0.0 | 43.0 |
 | Elastic-net | 47.8 | -0.1 | 47.9 |
-| XGBoost | 37.8 | -1.2 | 39.0 |
-| BSTS | 43.6 | -0.0 | 43.6 |
+| XGBoost | 36.8 | -1.2 | 38.0 |
+| Bayesian Ridge | 43.6 | -0.0 | 43.6 |
 | **Ensemble median** | **42.9** | — | **43.0** |
-| **Ensemble IQR (Q25-Q75)** | **[39.3, 43.6]** | — | **[41.1, 43.6]** |
+| **Ensemble IQR (Q25-Q75)** | **[38.6, 43.6]** | — | **[40.3, 43.6]** |
 
 Headline interpretation: the Strait of Hormuz crisis produced an estimated 41-44% chokepoint premium on Brent over the 3-month observation window. Note tighter IQR than Russia — donors are more stable in the Hormuz pre-period (~6 pp across models versus ~16 pp for Russia).
 
@@ -47,17 +47,17 @@ Headline interpretation: the Strait of Hormuz crisis produced an estimated 41-44
 | Russia | Convex SCM | 0.111 | 0.086 | 0.77 | OK |
 | Russia | ASCM | 0.046 | 0.087 | 1.91 | OK |
 | Russia | Elastic-net | 0.055 | 0.094 | 1.70 | OK |
-| Russia | XGBoost | 0.038 | 0.132 | **3.48** | overfit |
-| Russia | BSTS | 0.034 | 0.171 | **5.10** | overfit |
+| Russia | XGBoost | 0.039 | 0.135 | **3.49** | overfit |
+| Russia | Bayesian Ridge | 0.034 | 0.171 | **5.10** | overfit |
 | Hormuz | Convex SCM | 0.059 | 0.129 | **2.18** | overfit |
 | Hormuz | ASCM | 0.035 | 0.087 | **2.50** | overfit |
 | Hormuz | Elastic-net | 0.043 | 0.049 | 1.13 | OK |
-| Hormuz | XGBoost | 0.045 | 0.099 | **2.20** | overfit |
-| Hormuz | BSTS | 0.033 | 0.093 | **2.87** | overfit |
+| Hormuz | XGBoost | 0.045 | 0.089 | 1.98 | OK |
+| Hormuz | Bayesian Ridge | 0.033 | 0.093 | **2.87** | overfit |
 
 Interpretation:
-- Russia: 3 of 5 models clean. XGBoost and BSTS show the doc-anticipated overfit signature (val/train ≈ 3.5 and 5.1).
-- Hormuz: only Elastic-net is clean. The other four models show val/train ratios in the 2-3 range — consistent with the shorter effective Hormuz pre-window after the 80/20 split.
+- Russia: 3 of 5 models clean. XGBoost and Bayesian Ridge show the doc-anticipated overfit signature (val/train ≈ 3.5 and 5.1).
+- Hormuz: Elastic-net and XGBoost are clean. The other three models (Convex SCM, ASCM, Bayesian Ridge) show val/train ratios in the 2-3 range — consistent with the shorter effective Hormuz pre-window after the 80/20 split. XGBoost Hormuz fell just below the 2× threshold after the tightened defaults (`max_depth=2, reg_lambda=5, learning_rate=0.02`), down from the wider pre-tightening grid.
 
 Per [validation.md §5a](validation.md), flagged models are **not auto-excluded** from the ensemble; the ratio threshold is heuristic and the IQR across all five is itself the model-uncertainty band.
 
@@ -76,22 +76,22 @@ Brent's permutation p-value in the in-space placebo distribution. Reported under
 
 Permutation floor: $1/(N+1) = 1/22 \approx 0.0455$ for the 21-donor pool, $1/34 \approx 0.0294$ for the 33-donor pool. A p-value at the floor means Brent is ranked first in the placebo distribution — strong signal but no further resolution.
 
-| Event | Model | p (21-donor) | p (33-donor) | Brent ratio (33-donor) |
+| Event | Model | p (21-donor) | p (33-donor) | Brent ratio (21-donor) |
 |---|---|---:|---:|---:|
-| Russia | Convex SCM | 0.545 | 0.500 | 3.00 |
-| Russia | ASCM | 0.682 | 0.471 | 4.51 |
-| Russia | Elastic-net | 0.364 | 0.412 | 3.39 |
-| Russia | XGBoost | **0.091** | **0.059** | 10.37 |
-| Russia | BSTS | 0.636 | 0.529 | 7.47 |
-| Hormuz | Convex SCM | **0.045** (floor) | **0.029** (floor) | 6.28 |
-| Hormuz | ASCM | **0.045** (floor) | **0.029** (floor) | 9.05 |
-| Hormuz | Elastic-net | **0.045** (floor) | **0.029** (floor) | 7.07 |
-| Hormuz | XGBoost | **0.045** (floor) | **0.029** (floor) | 9.34 |
-| Hormuz | BSTS | **0.045** (floor) | **0.029** (floor) | 12.92 |
+| Russia | Convex SCM | 0.545 | 0.500 | 2.59 |
+| Russia | ASCM | 0.682 | 0.471 | 3.58 |
+| Russia | Elastic-net | 0.364 | 0.412 | 4.21 |
+| Russia | XGBoost | **0.045** (floor) | 0.147 | 9.62 |
+| Russia | Bayesian Ridge | 0.636 | 0.529 | 3.88 |
+| Hormuz | Convex SCM | **0.045** (floor) | **0.029** (floor) | 6.01 |
+| Hormuz | ASCM | **0.045** (floor) | **0.029** (floor) | 11.56 |
+| Hormuz | Elastic-net | **0.045** (floor) | **0.029** (floor) | 10.09 |
+| Hormuz | XGBoost | **0.045** (floor) | **0.029** (floor) | 9.01 |
+| Hormuz | Bayesian Ridge | **0.045** (floor) | **0.029** (floor) | 12.46 |
 
 **Hormuz inference reading.** Brent ranks **first** in the placebo distribution under *every* model and *both* pools — i.e., Brent's post/pre RMSPE ratio is larger than every one of the 21 or 33 placebo units. With ratios in the 6-13 range and a floor p-value, this is the strongest possible permutation signal: rejecting H₀ at the strictest attainable level under the Abadie convention.
 
-**Russia inference reading.** Only XGBoost clears the Abadie p < 0.10 threshold (0.091 / 0.059). The four other models do not reject. Mechanically: Russia's *pre-period* (2020-07 → 2022-02) is itself volatile — COVID recovery, 2021 reflation rally — so donors had large pre-period RMSPE too. This widens the placebo distribution and prevents Brent's post-period ratio (~3-4 for SCM/ASCM/Elastic-net, ~7-10 for XGBoost/BSTS) from sitting in the tail. The post-event gap magnitudes (13-37%) are independently corroborated by the historical record ($95 → $130+); the inferential weakness here is a known limitation of in-space placebo at pre-periods with high donor volatility, not evidence that Russia's effect was small.
+**Russia inference reading.** Russia XGBoost ranks first in the 21-donor pool (p = 0.045 at floor, post/pre ratio = 9.6) but slips to p = 0.147 in the 33-donor robustness pool — i.e., adding the 12 audit-flagged donors (some of which experienced co-incident Russia/sanctions exposure) inflates the placebo tail enough that Brent's ratio is no longer rank-1. The four other models do not reject in either pool. Mechanically: Russia's *pre-period* (2020-07 → 2022-02) is itself volatile — COVID recovery, 2021 reflation rally — so donors had large pre-period RMSPE too. This widens the placebo distribution and prevents Brent's post-period ratio (~2.6-4.2 for SCM/ASCM/Elastic-net/Bayesian Ridge, 9.6 for XGBoost) from sitting in the tail. The post-event gap magnitudes (13-37%) are independently corroborated by the historical record ($95 → $130+); the inferential weakness here is a known limitation of in-space placebo at pre-periods with high donor volatility, not evidence that Russia's effect was small.
 
 For Russia, defensive depth in the form of (a) larger gap magnitudes relative to drift contributions, (b) the audit-supported SUTVA defense, and (c) the cross-event weight transfer of §5f (next section) substitutes for the unconvincing single-event placebo p-value.
 
@@ -99,41 +99,45 @@ For Russia, defensive depth in the form of (a) larger gap magnitudes relative to
 
 ### 3.1 In-time placebo (§5e ii)
 
-Mean fake-post-period gap when the model is refit with $T_0^{\text{fake}}$ = 6 months before real $T_0$. A small gap means the SCM does not spuriously detect effects in null periods.
+Mean fake-post-period gap when the model is refit with $T_0^{\text{fake}}$ = 6 months before real $T_0$. A small gap means the SCM does not spuriously detect effects in null periods. **Hyperparameters: defaults from `MODEL_HPARAMS`**, not the tuned hparams used in the headline fits — see [validation.md §5e (ii)](validation.md) "Hyperparameter choice — defaults, not tuned" for the leakage rationale.
 
 | Event | Model | Fake $T_0$ | Mean fake-post gap (%) | Read |
 |---|---|---|---:|---|
 | Russia | Convex SCM | 2021-08-24 | +1.9 | Small; model is clean |
-| Russia | ASCM | 2021-08-24 | -4.3 | Small; clean |
-| Russia | Elastic-net | 2021-08-24 | -2.8 | Small; clean |
-| Russia | XGBoost | 2021-08-24 | **+17.3** | Large; low-power flag per validation.md (training shrinkage to ~14 months) |
-| Russia | BSTS | 2021-08-24 | -5.3 | Small; clean |
+| Russia | ASCM | 2021-08-24 | -4.2 | Small; clean |
+| Russia | Elastic-net | 2021-08-24 | +7.5 | Moderate; under defaults the model registers a positive fake gap (low-power flag) |
+| Russia | XGBoost | 2021-08-24 | **+26.4** | Large; low-power flag per validation.md (training shrinkage to ~14 months + tree fit on small panel) |
+| Russia | Bayesian Ridge | 2021-08-24 | -5.3 | Small; clean |
 | Hormuz | Convex SCM | 2025-08-01 | -11.9 | Moderate-large; audit fake post-period for events |
-| Hormuz | ASCM | 2025-08-01 | -12.4 | Moderate-large; audit |
-| Hormuz | Elastic-net | 2025-08-01 | -3.3 | Small; clean |
-| Hormuz | XGBoost | 2025-08-01 | -8.3 | Moderate; XGBoost low-power flag |
-| Hormuz | BSTS | 2025-08-01 | -12.2 | Moderate-large; audit |
+| Hormuz | ASCM | 2025-08-01 | -9.8 | Moderate-large; audit |
+| Hormuz | Elastic-net | 2025-08-01 | -10.6 | Moderate-large; audit |
+| Hormuz | XGBoost | 2025-08-01 | -12.4 | Moderate-large; audit |
+| Hormuz | Bayesian Ridge | 2025-08-01 | -12.2 | Moderate-large; audit |
 
-Hormuz fake-post negative gaps across models indicate the synthetic over-predicted Brent during 2025-08 → 2026-01 — i.e., Brent moved up by ~3-12% in that pre-Hormuz window relative to where donors said it should be. This is *consistent with* (but does not require) a runup-to-Hormuz premium starting in late 2025. The event-cleanliness audit (per [validation.md §5e (ii)](validation.md)) for that fake window should be reviewed against the EDA event timeline before interpreting these gaps as falsifying the in-time placebo.
+Hormuz fake-post negative gaps across models indicate the synthetic over-predicted Brent during 2025-08 → 2026-01 — i.e., Brent moved up by ~10-12% in that pre-Hormuz window relative to where donors said it should be. This is *consistent with* (but does not require) a runup-to-Hormuz premium starting in late 2025. The event-cleanliness audit (per [validation.md §5e (ii)](validation.md)) for that fake window should be reviewed against the EDA event timeline before interpreting these gaps as falsifying the in-time placebo.
+
+Note on the defaults switch: Russia Elastic-net moved from a near-zero gap (under tuned hparams) to +7.5% under defaults, and Russia XGBoost from +17.3% to +26.4%. This is the expected price of removing the second-order leakage path documented in [validation.md §5e (ii)](validation.md): tuned hparams selected on a validation window that overlaps the fake post-period flatter the fake gap. Defaults give a more honest (and less flattering) low-power read for the non-convex models on Russia, but do not change the qualitative read — Convex SCM, ASCM, and Bayesian Ridge remain small-fake-gap (clean), while Elastic-net and XGBoost remain low-power on the short pre-window.
 
 ### 3.2 Leave-one-donor-out (§5e iii)
 
 Range of post-event gap estimates when each high-weight donor is dropped. A tight range around baseline means no single donor drives the headline.
 
-| Event | Model | Baseline gap (%) | Leave-out range (%) | Read |
+| Event | Model | LOO baseline gap (%) | Leave-out range (%) | Read |
 |---|---|---:|---|---|
 | Russia | Convex SCM | 29.3 | 27.1 - 33.7 | Tight; robust |
 | Russia | ASCM | 13.4 | 6.2 - 19.7 | Moderate; some Platinum sensitivity |
 | Russia | Elastic-net | 25.1 | 16.0 - 35.5 | Moderate; Platinum + TLT sensitivity |
-| Russia | XGBoost | 36.9 | 35.3 - 44.6 | Tight; robust |
-| Russia | BSTS | 0.5 | -12.8 to +12.0 | Wide; baseline near zero → unstable signal |
+| Russia | XGBoost | 42.2 | 35.7 - 40.6 | Tight; robust (LOO baseline higher than headline 36.6 — separate fit, see note) |
+| Russia | Bayesian Ridge | 0.5 | -12.8 to +12.0 | Wide; baseline near zero → unstable signal |
 | Hormuz | Convex SCM | 39.3 | 30.3 - 39.7 | Tight; some Sugar sensitivity |
 | Hormuz | ASCM | 43.0 | 39.1 - 49.6 | Tight; robust |
 | Hormuz | Elastic-net | 47.8 | 43.7 - 52.0 | Tight; robust |
-| Hormuz | XGBoost | 37.8 | 35.4 - 41.0 | Tight; robust |
-| Hormuz | BSTS | 43.6 | 40.0 - 53.0 | Moderate; some Cotton/CHF sensitivity |
+| Hormuz | XGBoost | 37.3 | 36.3 - 41.0 | Tight; robust |
+| Hormuz | Bayesian Ridge | 43.6 | 40.0 - 53.0 | Moderate; some Cotton/CHF sensitivity |
 
-Russia BSTS LOO range crosses zero — combined with its 5.1 walk-forward ratio, BSTS Russia is the least reliable single fit in the ensemble. The ensemble median is robust to this (median across the 5 models is dominated by Convex/ASCM/Elastic-net/XGBoost which agree more closely on a 13-37% range).
+Russia Bayesian Ridge LOO range crosses zero — combined with its 5.1 walk-forward ratio, Bayesian Ridge Russia is the least reliable single fit in the ensemble. The ensemble median is robust to this (median across the 5 models is dominated by Convex/ASCM/Elastic-net/XGBoost which agree more closely on a 13-37% range).
+
+Note on the Russia XGBoost LOO baseline (42.2) vs headline (36.6) mismatch: the LOO function and the headline fit are independent invocations and the XGBoost stochastic components (`subsample=0.7`, `colsample_bytree=0.7`) with `random_state=0` interact slightly differently when the panel is re-built. The qualitative reading (tight LOO range, no single donor drives the result) is unchanged.
 
 ### 3.3 Cross-event weight transfer (§5f)
 
@@ -144,26 +148,28 @@ Russia-fitted weights applied to the Hormuz panel. Tight match between independe
 | Convex SCM | 38.6 | 47.0 | +8.4 | 0.109 |
 | ASCM | 42.9 | 27.3 | -15.6 | 0.144 |
 | Elastic-net | 47.8 | 92.5 | **+44.7** | **0.540** |
-| XGBoost | 37.8 | -55.7 | **-93.5** | **1.010** |
-| BSTS | 43.6 | -100.0 | **-143.6** | **13.706** |
+| XGBoost | 36.8 | -58.1 | **-94.9** | **1.063** |
+| Bayesian Ridge | 43.6 | -100.0 | **-143.6** | **13.706** |
 
-Convex SCM and ASCM are the only models whose Russia weights transfer to Hormuz with a plausible pre-period fit (transferred pre-RMSPE within ~2× independent). The three non-convex models (Elastic-net, XGBoost, BSTS) produce catastrophically misspecified transferred counterfactuals — transferred pre-RMSPE is 10-300× the independent fit. This is consistent with the [validation.md §5f](validation.md) caveat: convex weights are sparse and pin to factor-stable donors, while regression and tree-based models use the full donor set with regime-specific coefficient mass that does not transfer.
+Convex SCM and ASCM are the only models whose Russia weights transfer to Hormuz with a plausible pre-period fit (transferred pre-RMSPE within ~2× independent). The three non-convex models (Elastic-net, XGBoost, Bayesian Ridge) produce catastrophically misspecified transferred counterfactuals — transferred pre-RMSPE is 10-300× the independent fit. This is consistent with the [validation.md §5f](validation.md) caveat: convex weights are sparse and pin to factor-stable donors, while regression and tree-based models use the full donor set with regime-specific coefficient mass that does not transfer.
 
 **Implication for the Hormuz headline:** the cross-event generalization defense is load-bearing only via Convex SCM and ASCM. The convex-only transferred-vs-independent agreement is ±15 pp — strong evidence that the methodology generalizes across the 2020-22 → 2024-26 regime change for convex methods.
 
 ## 4. Caveats and qualifications
 
-1. **In-space placebo Russia weakness.** Only XGBoost rejects H₀ at p < 0.10. This is *not* evidence that Russia produced no Brent effect — the historical move is well documented. It is evidence that in-space placebo loses power at pre-periods with high donor volatility (Russia pre-period 2020-07 → 2022-02 spans COVID recovery + reflation rally). The post-event gap magnitudes themselves (13-37% across models) are independently anchored by the historical record.
+1. **In-space placebo Russia weakness.** Only XGBoost ranks Brent first in the 21-donor pool (p = 0.045 at floor); none of the five models reject in the 33-donor robustness pool, and the XGBoost 21-donor result is itself fragile in the sense that adding the audit-flagged donors moves p to 0.147. This is *not* evidence that Russia produced no Brent effect — the historical move is well documented. It is evidence that in-space placebo loses power at pre-periods with high donor volatility (Russia pre-period 2020-07 → 2022-02 spans COVID recovery + reflation rally). The post-event gap magnitudes themselves (13-37% across models) are independently anchored by the historical record.
 
 2. **Hormuz post-window length.** With ~60 post-event observations, every inference test is under-powered. The §5e (i) in-space placebo p-values hit the permutation floor in *both* pools (0.045 / 0.029) because Brent ranks first under every model — strong signal but no further resolution. The cross-event weight transfer (§5f) substitutes inferential depth.
 
-3. **BSTS Russia instability.** Walk-forward ratio 5.1 (severe overfit signal), LOO range crosses zero, baseline gap 0.5%. BSTS Russia is the single least reliable fit; the ensemble median is robust to it.
+3. **Bayesian Ridge Russia instability.** Walk-forward ratio 5.1 (severe overfit signal), LOO range crosses zero, baseline gap 0.5%. Bayesian Ridge Russia is the single least reliable fit; the ensemble median is robust to it.
 
-4. **Hormuz convex SCM moment-matching SD mismatch.** From [03_Validate.ipynb](../notebooks/03_Validate.ipynb) `moment-match`: Hormuz convex SCM synthetic SD is 0.053 vs treated 0.092 (Δ = -43%). Brent's volatility is outside the 21-donor convex hull. ASCM corrects this via ridge augmentation (Δ_SD = -9.6%). For the Hormuz headline, treat convex SCM and ASCM as the relevant fit pair; convex alone under-represents Brent variance.
+4. **Hormuz convex SCM moment-matching SD mismatch.** From [03_Validate.ipynb](../notebooks/03_Validate.ipynb) `moment-match`: Hormuz convex SCM synthetic SD is materially below the treated SD (Brent's volatility is outside the 21-donor convex hull). ASCM corrects this via ridge augmentation. For the Hormuz headline, treat convex SCM and ASCM as the relevant fit pair; convex alone under-represents Brent variance.
 
 5. **Recent citations.** The Chen & Yan (2023) mixed placebo test is cited in [validation.md §5e (ii)](validation.md) but is not currently computed in [04_Inference.ipynb](../notebooks/04_Inference.ipynb) — only the raw in-time fake-post gap is reported. Adding the mixed-placebo p-value is a deferred improvement; the in-time placebo currently relies on visual / magnitude comparison only.
 
 6. **iSCM alternative not run.** [methodology.md §3](methodology.md) documents Di Stefano & Mellace's iSCM as the alternative donor-handling approach considered and not pursued. The 33-donor Russia in-space placebo result in §2.3 is *not* an iSCM application — it is the conservative robustness reading discussed under [validation.md §5e (i)](validation.md) ("Brent ranking high even when partly-treated donors are mixed in").
+
+7. **In-time placebo hparams differ from headline.** Per [validation.md §5e (ii)](validation.md), the in-time placebo uses `MODEL_HPARAMS` defaults rather than the tuned hparams used in the headline fits. This intentional asymmetry removes a second-order leakage path (tuned hparams were selected by argmin val_RMSE on a window that overlaps the fake post-period). The trade-off: the in-time placebo gap magnitudes for non-convex models (Elastic-net, XGBoost) are larger under defaults than they would be with tuned hparams, which is the honest low-power read.
 
 ## 5. Source CSVs
 

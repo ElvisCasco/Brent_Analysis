@@ -48,11 +48,11 @@ def _add_window_markers(fig, t0, t_val_start=None):
                            xanchor='right')
 
 MODEL_COLORS = {
-    'convex_scm':  '#d62728',
-    'ascm':        '#2ca02c',
-    'elastic_net': '#9467bd',
-    'xgboost':     '#ff7f0e',
-    'bsts':        '#1f77b4',
+    'convex_scm':     '#d62728',
+    'ascm':           '#2ca02c',
+    'elastic_net':    '#9467bd',
+    'xgboost':        '#ff7f0e',
+    'bayesian_ridge': '#1f77b4',
 }
 
 

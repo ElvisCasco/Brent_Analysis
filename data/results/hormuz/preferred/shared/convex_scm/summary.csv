@@ -2,8 +2,8 @@ event,hormuz
 window,preferred
 variant,shared
 model,convex_scm
-rmspe_pre_log,0.06613764055536044
-rmspe_pre_pct,6.837375860379535
+rmspe_pre_log,0.06613764053006746
+rmspe_pre_pct,6.837375857677297
 t0,2026-02-01 00:00:00
 t_pre_start,2024-06-01 00:00:00
 n_pre,423

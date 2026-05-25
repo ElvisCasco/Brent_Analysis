@@ -63,7 +63,7 @@ DONOR_POOL_VARIANT = 'shared'
 
 
 # ===== Model ensemble (Option B from docs/methodology.md §4) =====
-MODELS = ['convex_scm', 'ascm', 'elastic_net', 'xgboost', 'bsts']
+MODELS = ['convex_scm', 'ascm', 'elastic_net', 'xgboost', 'bayesian_ridge']
 
 MODEL_HPARAMS = {
     'convex_scm': {
@@ -81,21 +81,33 @@ MODEL_HPARAMS = {
         'max_iter': 10000,
     },
     'xgboost': {
-        'max_depth': 4,
+        # Tightened for N~420 small-data regime. See docs/methodology.md §4
+        # "Hyperparameter choices". Most knobs fixed at small-data-defensible
+        # defaults; only `max_depth` and `reg_lambda` are tuned via a 3x3 grid
+        # in 02_Fit_Models to control winner's-curse bias on val_RMSE.
+        'max_depth': 2,
         'n_estimators': 200,
-        'learning_rate': 0.05,
-        'gamma': 0.1,
-        'reg_lambda': 1.0,
+        'learning_rate': 0.02,
+        'gamma': 1.0,
+        'reg_lambda': 5.0,
+        'subsample': 0.7,
+        'colsample_bytree': 0.7,
+        'min_child_weight': 5,
         'random_state': 0,
         'verbosity': 0,
     },
-    'bsts': {
-        # Bayesian Ridge as a sample-efficient BSTS proxy.
-        # TODO: swap in full BSTS via tfp.sts for explicit trend + seasonal decomposition.
+    'bayesian_ridge': {
+        # sklearn.linear_model.BayesianRidge — Bayesian linear regression on donor levels.
+        # Stands in for the regression-on-donors component of Brodersen et al. (2015) BSTS;
+        # the trend / seasonal / spike-and-slab components of full BSTS are NOT modelled here.
+        # See docs/methodology.md §4 for the relationship to full BSTS.
+        # lambda_1=lambda_2 raised from sklearn's 1e-6 default (near-flat prior)
+        # to 1e-2 to impose meaningful weight-precision shrinkage. The 1e-6
+        # default produced walk-forward val/train ratios of 3-5x on Russia.
         'alpha_1': 1e-6,
         'alpha_2': 1e-6,
-        'lambda_1': 1e-6,
-        'lambda_2': 1e-6,
+        'lambda_1': 1e-2,
+        'lambda_2': 1e-2,
     },
 }
 

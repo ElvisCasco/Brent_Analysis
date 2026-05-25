@@ -246,16 +246,19 @@ def fit_xgboost(panel, treated, donors, t0, t_pre_start,
     }
 
 
-# ===== 5. BSTS proxy via Bayesian Ridge (placeholder for full BSTS) =====
+# ===== 5. Bayesian Ridge (regression component of BSTS; proxy for full BSTS) =====
 
-def fit_bsts(panel, treated, donors, t0, t_pre_start,
-             alpha_1=1e-6, alpha_2=1e-6, lambda_1=1e-6, lambda_2=1e-6, **_):
-    """BSTS proxy: Bayesian Ridge regression on donor levels.
+def fit_bayesian_ridge(panel, treated, donors, t0, t_pre_start,
+                       alpha_1=1e-6, alpha_2=1e-6, lambda_1=1e-6, lambda_2=1e-6, **_):
+    """Bayesian linear regression on donor levels via sklearn.linear_model.BayesianRidge.
 
-    TODO: replace with full BSTS (Brodersen et al. 2015) via tfp.sts for explicit
-    trend + seasonal decomposition and proper posterior credible intervals. The current
-    implementation is a Bayesian linear regression that captures the regression-on-donors
-    component of BSTS but lacks the trend/seasonal decomposition.
+    This is the regression-on-donors component of Brodersen et al. (2015) BSTS, fit in
+    closed form with conjugate Gamma priors on weight and noise precision. It does NOT
+    include the trend / seasonal / spike-and-slab donor-selection components of full BSTS.
+    See docs/methodology.md §4 for the relationship to full BSTS and what is missing.
+
+    TODO: optionally swap in full BSTS via tfp.sts for explicit trend + seasonal
+    decomposition, proper posterior CIs, and true posterior inclusion probabilities.
     """
     from sklearn.linear_model import BayesianRidge
 
@@ -283,7 +286,7 @@ def fit_bsts(panel, treated, donors, t0, t_pre_start,
     pip_proxy = np.abs(model.coef_) / (coef_sd + 1e-12)
 
     return {
-        'model': 'bsts',
+        'model': 'bayesian_ridge',
         'weights': pd.Series(model.coef_, index=donors).round(6),
         'rmspe_pre': rmspe,
         'actual': pd.Series(Y_full_treated, index=idx, name='actual'),
@@ -295,7 +298,7 @@ def fit_bsts(panel, treated, donors, t0, t_pre_start,
             'intercept': float(model.intercept_),
             'posterior_sd': pd.Series(Y_hat_std, index=idx, name='posterior_sd'),
             'pip_proxy': pd.Series(pip_proxy, index=donors).round(4),
-            'note': 'Bayesian Ridge proxy; replace with tfp.sts for full BSTS',
+            'note': 'BayesianRidge regression-on-donors only; full BSTS (trend + seasonal + spike-and-slab) requires tfp.sts',
         },
     }
 
@@ -303,11 +306,11 @@ def fit_bsts(panel, treated, donors, t0, t_pre_start,
 # ===== Dispatcher =====
 
 MODEL_REGISTRY = {
-    'convex_scm':  fit_convex_scm,
-    'ascm':        fit_ascm,
-    'elastic_net': fit_elastic_net,
-    'xgboost':     fit_xgboost,
-    'bsts':        fit_bsts,
+    'convex_scm':     fit_convex_scm,
+    'ascm':           fit_ascm,
+    'elastic_net':    fit_elastic_net,
+    'xgboost':        fit_xgboost,
+    'bayesian_ridge': fit_bayesian_ridge,
 }
 
 
