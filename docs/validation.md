@@ -21,13 +21,11 @@ The six sub-sections below cover each level. Every test is run **per model in th
 | 5d (i) | Bootstrap structural break at $T_0$ | Donor SUTVA (model-agnostic) | Andrews 1993; Hansen 2000 | Enters BH-FDR ($\alpha = 0.10$) combined flag. |
 | 5d (i) | Wilcoxon event-window | Donor SUTVA (model-agnostic) | Brown & Warner 1985 | Enters BH-FDR combined flag. |
 | 5d (i) | KS distribution shift | Regime-shift diagnostic | Two-sample KS | Reported only; **excluded** from flag rule (over-rejects under regime shift). |
-| 5d (ii) | In-space placebo, donor-flag use | Donor SUTVA (model-native) | Abadie 2010 §3.3; Chen & Yan 2023\*; Di Stefano & Mellace 2024\* | Model-dependent; non-canonical use — supplementary evidence, not the primary exclusion mechanism. |
+| 5d (ii) | In-space placebo, donor-flag use | Donor SUTVA (model-native) | Abadie 2010 §3.3; Chen & Yan 2023; Di Stefano & Mellace 2024 | Model-dependent; non-canonical use — supplementary evidence, not the primary exclusion mechanism. |
 | 5e (i) | In-space placebo, inferential | Treated-unit inference | Abadie 2010 §3.3 | Min permutation $p \approx 1/N$: 0.048 (21-donor) vs 0.030 (33-donor) — **reported under both pools**. |
 | 5e (ii) | In-time placebo | Spurious-effect check on the treated unit | Abadie, Diamond & Hainmueller 2015 | Pre-window shrinks under refit (XGBoost low-power); fake post-period is audited for event-cleanliness before interpretation. |
 | 5e (iii) | Leave-one-donor-out | Donor-fragility robustness | Abadie, Diamond & Hainmueller 2015 | Importance metric is model-specific: convex weight (SCM, ASCM), regression coefficient (Elastic-net), SHAP (XGBoost), posterior inclusion probability (BSTS). |
 | 5f | Cross-event weight transfer | Cross-event methodology generalization | No canonical reference (designed for this analysis) | Requires the shared 21-donor pool ([methodology.md §3](methodology.md)); strongest single test of methodology generalization. |
-
-\* Recent citations — confirm against the primary source before final submission.
 
 ## 5a. Pre-event model fit
 
@@ -231,8 +229,8 @@ This is a single test that can be run per model in the ensemble (5 transfers tot
 - Andrews, D. W. K., & Ploberger, W. (1994). Optimal tests when a nuisance parameter is present only under the alternative. *Econometrica*, 62(6), 1383-1414.
 - Bergmeir, C., & Benítez, J. M. (2012). On the use of cross-validation for time series predictor evaluation. *Information Sciences*, 191, 192-213.
 - Brown, S. J., & Warner, J. B. (1985). Using daily stock returns: The case of event studies. *Journal of Financial Economics*, 14(1), 3-31.
-- Chen, Q., & Yan, G. (2023). A mixed placebo test for synthetic control method. *Economics Letters*, 224, 110997.
-- Di Stefano, R., & Mellace, G. (2024). The inclusive Synthetic Control Method. *arXiv preprint* arXiv:2403.17624.
+- Chen, Q., & Yan, G. (2023). A mixed placebo test for synthetic control method. *Economics Letters*, 224, 111004. https://doi.org/10.1016/j.econlet.2023.111004
+- Di Stefano, R., & Mellace, G. (2024). The inclusive Synthetic Control Method. *arXiv preprint* arXiv:2403.17624. https://arxiv.org/abs/2403.17624
 - Goodfellow, I., Bengio, Y., & Courville, A. (2016). *Deep Learning*. MIT Press.
 - Hansen, B. E. (2000). Testing for structural change in conditional models. *Journal of Econometrics*, 97(1), 93-115.
 - Hastie, T., Tibshirani, R., & Friedman, J. (2009). *The Elements of Statistical Learning: Data Mining, Inference, and Prediction* (2nd ed.). Springer.
