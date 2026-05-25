@@ -26,6 +26,20 @@ The six sub-sections below cover each level. Every test is run **per model in th
 | 5e (iii) | Leave-one-donor-out | Donor-fragility robustness | Abadie, Diamond & Hainmueller 2015 | Importance metric is model-specific: convex weight (SCM, ASCM), regression coefficient (Elastic-net), SHAP (XGBoost), posterior inclusion probability (BSTS). |
 | 5f | Cross-event weight transfer | Cross-event methodology generalization | No canonical reference (designed for this analysis) | Requires the shared 21-donor pool ([methodology.md §3](methodology.md)); strongest single test of methodology generalization. |
 
+### 5.0a Minimum load-bearing tests
+
+The twelve tests above span model fit, donor identification, and inference. The SCM literature does not formally validate any of them at this sample size (Roth 2022 on pretests; Chen & Yan 2023 §4 and Hahn & Shi 2017 on the symmetry assumption needed for the placebo test). What it *does* anchor on — the irreducible minimum — is much smaller:
+
+| Level | Irreducible test | Where it lives in this pipeline | Why it's the minimum |
+|---|---|---|---|
+| **Model fit** | §5a (i) Walk-forward CV | [03_Validate.ipynb](../notebooks/03_Validate.ipynb) `wf-cv` cell | Only out-of-sample signal in §5; works for all 5 models; reveals XGBoost/BSTS overfitting (val/train > 3 on Russia) |
+| **Donor identification** | Qualitative audit in [donor_catalog.md](donor_catalog.md), confirmed by §5d Andrews-Hansen bootstrap break | [01.5_Donor_Cleanliness.ipynb](../notebooks/01.5_Donor_Cleanliness.ipynb) | Per Abadie 2021 §3.1, donor exclusion is a-priori on substantive grounds; the bootstrap break test asks the literal SUTVA question (mean shift at $T_0$) |
+| **Inference** | §5e (i) in-space placebo run under **both** the 21-donor and the 33-donor pool | [04_Inference.ipynb](../notebooks/04_Inference.ipynb) `iso` cells | Canonical Abadie 2010 §3.3 test. The 21-donor permutation floor is $1/22 \approx 0.045$; without the 33-donor rerun (floor $1/34 \approx 0.029$) Hormuz p-values cannot be distinguished from the saturation value. |
+
+Everything else in §5 — moment matching (§5a ii), parallel-fit (§5b), regime-stability (§5c), Wilcoxon and KS (§5d), in-time placebo and LOO (§5e ii/iii), cross-event transfer (§5f) — is **defensive depth**. Each strengthens the headline when it agrees, or forces qualification when it disagrees, but none of them replace any of the three minimum tests.
+
+**Caveat for Hormuz only:** with ~60 post-event observations, §5e (i) is structurally underpowered even at the 33-donor floor. The cross-event weight transfer (§5f) substitutes inferential depth there — so the Hormuz minimum set is `{audit, walk-forward CV, in-space placebo 21+33, cross-event transfer §5f (convex SCM and ASCM only)}` rather than the simpler triple sufficient for Russia.
+
 ## 5a. Pre-event model fit
 
 Two sub-tests of the synthetic's quality as a pre-event approximator of log-Brent.
