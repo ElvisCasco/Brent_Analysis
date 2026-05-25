@@ -279,47 +279,39 @@
 \end{frame}
 
 % =====================================================================
-% 8. Donor importance
-% =====================================================================
-\begin{frame}{Donor importance}
-  \begin{center}
-    \includegraphics[width=0.98\textwidth,height=0.72\textheight,keepaspectratio]{../plots/milestone2/donor_importance_heatmap.png}
-  \end{center}
-
-  \vspace{-0.1em}
-  \begin{center}
-  {\scriptsize\textcolor{muted}{Per-model raw metric: convex weight $w_j$ (SCM, ASCM) / $|\hat\beta_j|$ (Elastic-net, Bayesian Ridge) / feature importance (XGBoost). Cells $= |w_j|$ normalised within each column to sum to 1.}}
-  \end{center}
-\end{frame}
-
-% =====================================================================
 % 9. Validation results — in-space placebo
 % =====================================================================
-\begin{frame}{Validation results --- in-space placebo}
-  \hd{Abadie's canonical test} \src{Abadie 2010 \S3.3}: rank Brent's post/pre RMSPE ratio against the placebo distribution.
-
-  \vspace{0.6em}
-  \hd{Two donor pools for resolution.}
-  \begin{itemize}\setlength\itemsep{0.1em}
-    \item Shared 21-donor preferred: $p$-floor $= 1/22 \approx 0.045$.
-    \item Full 33-donor pool: $p$-floor $= 1/34 \approx 0.029$.
-  \end{itemize}
-
-  \vspace{0.6em}
-  \hd{Headline.}
+\begin{frame}[shrink=5]{Validation results --- in-space placebo}
+  \footnotesize
+  \hd{Abadie 2010 \S3.3}: rank Brent's post/pre RMSPE ratio against placebo refits. 21-donor floor $= 0.045$; 33-donor full pool re-run gives floor $= 0.029$.
 
   \vspace{0.3em}
-  \begin{tabular}{@{}p{0.20\textwidth} p{0.30\textwidth} p{0.30\textwidth}@{}}
+  \begin{center}
+  \begin{tabular}{@{}l c c c c@{}}
     \toprule
-                  & \hd{Russia 2022} & \hd{Hormuz 2026} \\
+                   & \multicolumn{2}{c}{\hd{Russia 2022}} & \multicolumn{2}{c}{\hd{Hormuz 2026}} \\
+    \cmidrule(lr){2-3}\cmidrule(lr){4-5}
+    \hd{Model}     & 21-donor & 33-donor & 21-donor & 33-donor \\
     \midrule
-    21-donor      & \textcolor{muted}{[ $p$ ]} & \textcolor{muted}{[ $p$ ]} \\
-    33-donor      & \textcolor{muted}{[ $p$ ]} & \textcolor{muted}{[ $p$ ]} \\
+    Convex SCM     & 0.545           & 0.500           & \textbf{0.045}  & \textbf{0.029} \\
+    ASCM           & 0.682           & 0.471           & \textbf{0.045}  & \textbf{0.029} \\
+    Elastic-net    & 0.409           & 0.412           & \textbf{0.045}  & \textbf{0.029} \\
+    XGBoost        & \textbf{0.045}  & 0.147           & \textbf{0.045}  & \textbf{0.029} \\
+    Bayesian Ridge & 0.636           & 0.529           & \textbf{0.045}  & \textbf{0.029} \\
     \bottomrule
   \end{tabular}
+  \end{center}
 
-  \vspace{0.5em}
-  \smalltext{Everything else (parallel-fit, regime-stability, in-time placebo, LOO, cross-event transfer): appendix.}
+  \vspace{0.4em}
+  \hd{Headline.}
+  \begin{itemize}\setlength\itemsep{0.1em}
+    \item \hd{Hormuz:} all 5 models hit the floor under both pools.
+    \item \hd{Russia:} not decisively rejected --- only XGBoost reaches floor at 21-donor and fails at 33-donor. Feb-22 macro regime shift moves many donors too; Russia's inferential weight rests on EIA STEO (next slide).
+  \end{itemize}
+
+  \vspace{0.2em}
+  \smalltext{Other tests (parallel-fit, regime-stability, in-time placebo, LOO, cross-event transfer): appendix.}
+  \normalsize
 \end{frame}
 
 % =====================================================================
@@ -354,32 +346,31 @@
 % =====================================================================
 % 10. ATT estimate
 % =====================================================================
-\begin{frame}[shrink=5]{Headline result --- ATT estimate}
-  \hd{ATT (\% log Brent) over the post-event window.}
+\begin{frame}{Headline result --- ATT estimate}
+  \footnotesize
+  \hd{Why ATT?} One treated unit (Brent) $\rightarrow$ effect \emph{for that unit}, not a population ATE \src{Abadie 2010, 2021}. Mean gap over the post-event window --- integrates path-reversion, robust to single-day liquidity jumps.
 
-  \vspace{0.6em}
+  \vspace{0.5em}
+  \begin{center}
   \begin{tabular}{@{}l c c@{}}
     \toprule
     \hd{Model}     & \hd{Russia 2022} & \hd{Hormuz 2026} \\
-                   & \smalltext{(2022-02-24 $\rightarrow$ 2022-09-30)} & \smalltext{(2026-02-01 $\rightarrow$ latest)} \\
     \midrule
-    Convex SCM         & \textcolor{muted}{[ \% ]} & \textcolor{muted}{[ \% ]} \\
-    ASCM               & \textcolor{muted}{[ \% ]} & \textcolor{muted}{[ \% ]} \\
-    Elastic-net        & \textcolor{muted}{[ \% ]} & \textcolor{muted}{[ \% ]} \\
-    XGBoost            & \textcolor{muted}{[ \% ]} & \textcolor{muted}{[ \% ]} \\
-    Bayesian Ridge     & \textcolor{muted}{[ \% ]} & \textcolor{muted}{[ \% ]} \\
+    Convex SCM         & $+29.6\%$ & $+38.6\%$ \\
+    ASCM               & $+13.3\%$ & $+43.7\%$ \\
+    Elastic-net        & $+21.7\%$ & $+49.8\%$ \\
+    XGBoost            & $+36.8\%$ & $+36.8\%$ \\
+    Bayesian Ridge     & $+0.5\%$ \smalltext{(deg.)} & $+43.6\%$ \\
     \midrule
-    \hd{Ensemble median} & \textcolor{accent}{\hd{[ \% ]}} & \textcolor{accent}{\hd{[ \% ]}} \\
-    IQR                & \textcolor{muted}{[ band ]} & \textcolor{muted}{[ band ]} \\
+    \hd{Ensemble median} & \textcolor{accent}{\hd{$+21.7\%$}} & \textcolor{accent}{\hd{$+43.6\%$}} \\
+    IQR                  & $[+13.3,\ +29.6]$ & $[+38.6,\ +43.7]$ \\
     \bottomrule
   \end{tabular}
+  \end{center}
 
-  \vspace{0.6em}
-  \hd{Reading.}
-  \begin{itemize}\setlength\itemsep{0.05em}
-    \item Russia: calibration case; compare to documented \$95 $\rightarrow$ \$130+ move.
-    \item Hormuz: main thesis result; place against scenario estimates (Dallas Fed, OIES, IEA).
-  \end{itemize}
+  \vspace{0.5em}
+  \hd{Reading.} Russia $+21.7\%$ within $\sim$2.5 pp of STEO cross-check; Bayesian Ridge degenerate, IQR excludes it. Hormuz $+43.6\%$ with tight IQR --- place against Dallas Fed / OIES / IEA scenarios.
+  \normalsize
 \end{frame}
 
 % =====================================================================
@@ -412,5 +403,142 @@
   \vfill
 \end{frame}
 }
+
+% =====================================================================
+% APPENDIX
+% =====================================================================
+\appendix
+
+% ---------------------------------------------------------------------
+% A1. Excluded donors
+% ---------------------------------------------------------------------
+\begin{frame}[shrink=10]{Appendix --- excluded donors}
+  \footnotesize
+  \hd{A. Categorical exclusions} \smalltext{(never enter the candidate pool).}
+  \vspace{0.2em}
+  \begin{tabular}{@{}p{0.20\textwidth} p{0.74\textwidth}@{}}
+    \toprule
+    \hd{Category} & \hd{Excluded \& reason} \\
+    \midrule
+    Energy complex        & WTI, NatGas, refined products (RBOB, heating oil, jet fuel), EIA inventories --- mechanical SUTVA violation on any oil shock. \\
+    Petrocurrencies       & CAD, NOK, BRL, RUB, COP, MYR --- value partly set by oil exports. \\
+    FX unstable           & TRY, ARS, EGP --- domestic crisis dynamics dominate; noise, not signal. \\
+    Equities rejected     & DAX, FTSE, TSX 60 (energy weight), KOSPI, Hang Seng (redundant with KRW / CNY). \\
+    Commodities rejected  & Cocoa, OJ, Lean hogs (thin / idiosyncratic), Lumber (LBS$\rightarrow$LBR contract break), Aluminium (Rusal $\sim$6\% supply). \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{0.6em}
+  \hd{B. Per-event SUTVA exclusions} \smalltext{(33-donor pool $\rightarrow$ 21-donor strict-clean preferred).}
+  \begin{itemize}\setlength\itemsep{0.1em}
+    \item \hd{Russia H-tier} \smalltext{(direct supply/demand)}: Wheat, Corn, Palladium, EUR, DXY, BTC.
+    \item \hd{Russia M-tier} \smalltext{(terms-of-trade / secondary)}: Copper, IronOre, Soybeans, EM\_Eq, GBP, US10Y.
+    \item \hd{Hormuz:} no H/M flags --- audit clean on all 33 candidates. The 21-donor intersection is used to enable cross-event weight transfer (\S5f), at the cost of 12 Hormuz-clean donors.
+  \end{itemize}
+  \normalsize
+\end{frame}
+
+% ---------------------------------------------------------------------
+% A1b. Donor importance heatmap
+% ---------------------------------------------------------------------
+\begin{frame}{Appendix --- donor importance}
+  \begin{center}
+    \includegraphics[width=0.98\textwidth,height=0.72\textheight,keepaspectratio]{../plots/milestone2/donor_importance_heatmap.png}
+  \end{center}
+
+  \vspace{-0.1em}
+  \begin{center}
+  {\scriptsize\textcolor{muted}{Per-model raw metric: convex weight $w_j$ (SCM, ASCM) / $|\hat\beta_j|$ (Elastic-net, Bayesian Ridge) / feature importance (XGBoost). Cells $= |w_j|$ normalised within each column to sum to 1.}}
+  \end{center}
+\end{frame}
+
+% ---------------------------------------------------------------------
+% A2. Pre-event diagnostics — moments, parallel-fit, regime-stability
+% ---------------------------------------------------------------------
+\begin{frame}[shrink=10]{Appendix --- pre-event diagnostics}
+  \footnotesize
+  \hd{Moment matching} \src{Abadie 2010}. Mean $|\Delta| < 0.01$ logs for all 10 (model $\times$ event) fits. SD undercoverage is the only material issue: convex SCM $-23\%$ on Russia (donor pool cannot span Brent's pre-period vol $\rightarrow$ ridge correction in ASCM closes the gap).
+
+  \vspace{0.5em}
+  \hd{Parallel-fit defence (gap-series slope, \%/yr)} \src{Roth 2022 --- pretest with caution}. Reported, not pass/fail.
+  \vspace{0.2em}
+  \begin{center}
+  \begin{tabular}{@{}l r r@{}}
+    \toprule
+    \hd{Model}     & \hd{Russia} & \hd{Hormuz} \\
+    \midrule
+    Convex SCM     & $+10.0$ & $-7.0$ \\
+    ASCM           & $+0.3$  & $-1.9$ \\
+    Elastic-net    & $+0.9$  & $-1.2$ \\
+    XGBoost        & $+3.4$  & $-4.7$ \\
+    Bayesian Ridge & $+0.2$  & $-0.1$ \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \smalltext{Large slopes (convex SCM both events; XGBoost Russia / Hormuz) flag drift; drift-corrected gap = raw gap $-$ slope $\times$ post-window length (Russia $L \approx 0.58$ yr; Hormuz $L \approx 0.25$ yr).}
+
+  \vspace{0.5em}
+  \hd{Regime stability} \src{distance correlation $\Delta$ across pre-period thirds; Sz\'ekely \& Rizzo 2007}: 8 of 21 donors exceed the $0.30$ narrative-flag threshold on each event --- read qualitatively (sub-period $n \approx 140$ confounds drift with sampling noise).
+  \normalsize
+\end{frame}
+
+% ---------------------------------------------------------------------
+% A3. In-time placebo + LOO
+% ---------------------------------------------------------------------
+\begin{frame}{Appendix --- in-time placebo \& LOO}
+  \footnotesize
+  \hd{In-time placebo} \src{Abadie 2015; Chen \& Yan 2023}. Fake $T_0$ set 6 months before real $T_0$; mean fake-period gap (\%), defaults hparams (avoid val-leakage).
+  \vspace{0.3em}
+  \begin{center}
+  \begin{tabular}{@{}l r r@{}}
+    \toprule
+    \hd{Model}     & \hd{Russia (2021-08-24)} & \hd{Hormuz (2025-08-01)} \\
+    \midrule
+    Convex SCM     & $+1.9$  & $-11.9$ \\
+    ASCM           & $-4.2$  & $-9.8$  \\
+    Elastic-net    & $+7.5$  & $-10.6$ \\
+    XGBoost        & $+26.4$ & $-12.4$ \\
+    Bayesian Ridge & $-5.3$  & $-12.2$ \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \smalltext{Russia fake window contains the late-2021 oil rally and the Jan-2022 invasion runup --- partial real-effect contamination expected. Hormuz fake window has no curated events; the concentrated $-10$ to $-12\%$ across models reflects regime drift the synthetic does not absorb, not model-class failure.}
+
+  \vspace{0.6em}
+  \hd{Leave-one-donor-out} \src{Abadie 2015}. Post-event gap stable within $\pm 6$ pp across leave-outs for convex SCM / ASCM / Elastic-net / Bayesian Ridge (no single donor drives the headline); XGBoost more fragile ($\pm 12$ pp).
+  \normalsize
+\end{frame}
+
+% ---------------------------------------------------------------------
+% A4. Cross-event weight transfer
+% ---------------------------------------------------------------------
+\begin{frame}{Appendix --- cross-event weight transfer}
+  \footnotesize
+  \hd{\S5f --- strongest single test of methodology generalization.} Russia-fitted weights applied to the Hormuz post-window vs independently-fit Hormuz gap:
+  \vspace{0.4em}
+  \begin{center}
+  \begin{tabular}{@{}l r r r@{}}
+    \toprule
+    \hd{Model}     & \hd{Independent} & \hd{Transferred} & \hd{$\Delta$} \\
+    \midrule
+    Convex SCM     & $+38.6\%$ & $+47.0\%$  & $+8.4$ pp \\
+    ASCM           & $+43.7\%$ & $+27.3\%$  & $-16.4$ pp \\
+    Elastic-net    & $+49.8\%$ & $+23.2\%$  & $-26.6$ pp \\
+    XGBoost        & $+36.8\%$ & $-58.2\%$  & $-95.0$ pp (deg.) \\
+    Bayesian Ridge & $+43.6\%$ & $-100.0\%$ & $-143.6$ pp (deg.) \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+
+  \vspace{0.6em}
+  \hd{Reading.}
+  \begin{itemize}\setlength\itemsep{0.1em}
+    \item Convex SCM transfers cleanly ($+8$ pp drift).
+    \item ASCM and Elastic-net give qualitatively consistent direction with magnitude attenuation.
+    \item XGBoost and Bayesian Ridge degenerate --- regime drift in Russia-fitted weights blows up the projection.
+    \item Factor structure has shifted between 2020--22 and 2024--26, but the \hd{sign and order of magnitude} of the Hormuz effect are robust under the linear-convex models.
+  \end{itemize}
+  \normalsize
+\end{frame}
 
 \end{document}
