@@ -25,3 +25,11 @@ plots/
 
 # Local copies of cited papers / external PDFs for personal reading
 references/
+
+presentation/*
+!presentation/**/*.pdf
+!presentation/**/*.tex
+!presentation/*.pdf
+!presentation/*.tex
+
+
