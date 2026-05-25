@@ -1,6 +1,6 @@
 # Donor Catalog
 
-Reference document for the Brent SCM analysis. Records every series **considered** for the donor pool — those *in* the pool (33 selected), those *rejected* with reason, and the per-event SUTVA treatment audit. The qmd's methodological argument for *non-energy* donor selection is in [synthetic_control_oil.qmd §5](synthetic_control_oil.qmd). The machine-readable audit table is in [data/donor_audit.csv](data/donor_audit.csv).
+Reference document for the Brent SCM analysis. Records every series **considered** for the donor pool — those *in* the pool (33 selected), those *rejected* with reason, and the per-event SUTVA treatment audit. The machine-readable audit table is in [../data/donor_audit.csv](../data/donor_audit.csv). Companion to [methodology.md](methodology.md) (design decisions) and [validation.md](validation.md) (full validation battery).
 
 ## Focal events
 
@@ -11,7 +11,7 @@ The SCM analysis estimates the chokepoint / geopolitical-risk premium on Brent f
 | **Russia invades Ukraine** | 2022-02-24 | 2020-01-01 → 2022-02-23 | *Magnitude validation* — historically large, well-documented Brent disruption ($95 → $130+); cross-validates the SCM design before applying it to Hormuz |
 | **Strait of Hormuz crisis** | 2026-02-01 | 2024-06-01 → 2026-01-31 | *Main thesis* — out-of-sample estimate of the chokepoint premium |
 
-**Why Red Sea is not a focal event.** The 2023-11-19 Bab-el-Mandeb / Galaxy Leader hijack diverted container shipping (Cape rerouting) but crude tankers retained Suez access through 2024 — Brent did not visibly disrupt. The qmd originally used Red Sea as a *null* validation case ("does SCM correctly produce no effect when none should exist?"). That is a weaker form of validation than *magnitude* validation, which is what Russia 2022 provides. Red Sea remains in the historical events table for the EDA timeline but does not get its own SCM estimate.
+**Why Red Sea is not a focal event.** The 2023-11-19 Bab-el-Mandeb / Galaxy Leader hijack diverted container shipping (Cape rerouting) but crude tankers retained Suez access through 2024 — Brent did not visibly disrupt. An earlier iteration of this analysis used Red Sea as a *null* validation case ("does SCM correctly produce no effect when none should exist?"). That is a weaker form of validation than *magnitude* validation, which is what Russia 2022 provides. Red Sea remains in the historical events table for the EDA timeline but does not get its own SCM estimate.
 
 ## Selection criteria
 
@@ -22,7 +22,7 @@ A series enters the pool only if it satisfies all four:
 3. **Liquid and daily-traded** with a redistributable Yahoo Finance / EIA / Caldara-Iacoviello source.
 4. **Sufficient pre-period history** for the events under study (extending at least to 2020-01).
 
-The qmd §5's rejected energy-complex donors (WTI, Henry Hub, refined products, US crude stocks) is recorded below for completeness.
+Rejected energy-complex donors (WTI, Henry Hub, refined products, US crude stocks) are recorded below for completeness — every one violates SUTVA on any chokepoint or oil-supply shock.
 
 ## Status code legend (per-event audit)
 
@@ -34,7 +34,7 @@ The qmd §5's rejected energy-complex donors (WTI, Henry Hub, refined products, 
 
 **Pool variants used in the SCM notebook (see [methodology.md §3](methodology.md) for the design rationale):**
 
-- *Strict clean* (drops H + M): 21 donors for Russia; the same 21 donors are the **preferred specification for both events** (shared pool enables cross-event weight-transfer validation per [methodology.md §5d](methodology.md)).
+- *Strict clean* (drops H + M): 21 donors for Russia; the same 21 donors are the **preferred specification for both events** (shared pool enables cross-event weight-transfer validation per [validation.md §5f](validation.md)).
 - *Permissive* (drops H only): 27 donors — Russia-only appendix robustness check.
 - *Full pool* (no exclusions): 33 donors — appendix robustness for both events, also a contamination diagnostic for Russia.
 
@@ -116,13 +116,13 @@ Direction conventions are mixed because that is how Yahoo publishes them — the
 | Permissive (drops H only) | 27 donors | n/a | Russia appendix robustness |
 | Full pool (no exclusions) | 33 donors | 33 donors | Both events appendix robustness |
 
-Russia 2022 excludes for the strict-clean pool: **Wheat, Corn, Palladium, EUR, DXY, BTC** (H) **+ Copper, IronOre, Soybeans, EM_Eq, GBP, US10Y** (M). Hormuz 2026 uses the same 21-donor intersection as preferred specification (sacrificing 12 Hormuz-clean donors to enable cross-event weight-transfer validation); see [methodology.md §3](methodology.md) for the rationale and §5d for the validation test that requires the shared pool.
+Russia 2022 excludes for the strict-clean pool: **Wheat, Corn, Palladium, EUR, DXY, BTC** (H) **+ Copper, IronOre, Soybeans, EM_Eq, GBP, US10Y** (M). Hormuz 2026 uses the same 21-donor intersection as preferred specification (sacrificing 12 Hormuz-clean donors to enable cross-event weight-transfer validation); see [methodology.md §3](methodology.md) for the rationale and [validation.md §5f](validation.md) for the validation test that requires the shared pool.
 
 ---
 
 ## Rejected candidates — with reason
 
-### A. Energy complex (per qmd §5)
+### A. Energy complex
 
 These have the highest pre-period correlation with Brent and would yield the lowest pre-period RMSPE — but every one violates SUTVA on any chokepoint or oil-supply shock.
 
@@ -183,7 +183,7 @@ Even if not petrocurrency, some FX are poor donors because their volatility is d
 | Candidate | Reason |
 |---|---|
 | Caldara-Iacoviello GPR index | Used as a **descriptive overlay** (gap plots, EDA Plot 4) but **not** a donor — GPR spikes endogenously to the very events we are estimating, so it is treated by definition |
-| EIA STEO / IEA Oil Market Report forecasts | Forecasts are not observed values — see qmd §2 data-trustability statement |
+| EIA STEO / IEA Oil Market Report forecasts | Forecasts are not observed values, only realized prices are admissible inputs |
 | Bloomberg / Reuters consensus oil-price forecasts | Same reason |
 | Model-implied counterfactual scenarios | Would import external structural identification |
 
@@ -192,8 +192,8 @@ Even if not petrocurrency, some FX are poor donors because their volatility is d
 ## Updating this catalog
 
 When adding a new donor:
-1. Append the ticker to `TICKERS` in [notebooks/00_Data_Fetching.ipynb](notebooks/00_Data_Fetching.ipynb).
-2. Append a row to the `DONOR_AUDIT_RAW` list in the same notebook so [data/donor_audit.csv](data/donor_audit.csv) is regenerated.
+1. Append the ticker to `TICKERS` in [notebooks/00_Data_Fetching.ipynb](../notebooks/00_Data_Fetching.ipynb).
+2. Append a row to the `DONOR_AUDIT_RAW` list in the same notebook so [data/donor_audit.csv](../data/donor_audit.csv) is regenerated.
 3. Append a row here in `donor_catalog.md` with category, factor, and per-event status.
 4. Re-run `00_Data_Fetching.ipynb` — only the new ticker is fetched thanks to per-ticker caching in `data/donors/`.
 
