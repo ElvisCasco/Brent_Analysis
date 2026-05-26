@@ -351,6 +351,13 @@ def permutation_mean_shift_test(series, break_date, n_boot=500, seed=0):
     Null: log-returns have no mean shift at break_date (i.e., the pre/post
     labels are exchangeable).
     Test statistic: |mean(post) - mean(pre)| / pooled SD.
+
+    P-value uses the Phipson & Smyth (2010, Statistical Applications in
+    Genetics and Molecular Biology 9(1):39) correction p = (1 + B*) / (1 + B)
+    where B* is the count of permutation statistics at least as extreme as
+    observed. This guarantees p in [1/(B+1), 1] -- a literal p=0 is not a
+    valid Monte Carlo permutation p-value because the observed statistic
+    itself is one realization from the permutation distribution.
     """
     s = np.log(series.dropna()).diff().dropna()
     pre = s[s.index < break_date]
@@ -372,7 +379,8 @@ def permutation_mean_shift_test(series, break_date, n_boot=500, seed=0):
         rng.shuffle(combined)
         boot_stats[i] = stat(combined[:n_pre], combined[n_pre:])
 
-    p = float((boot_stats >= observed).mean())
+    # Phipson & Smyth (2010) correction: +1 to numerator and denominator.
+    p = float((1 + (boot_stats >= observed).sum()) / (1 + n_boot))
     return {
         'observed_stat': float(observed),
         'p': p,

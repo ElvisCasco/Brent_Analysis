@@ -87,48 +87,55 @@
 % 1. From previous — blank
 % =====================================================================
 \begin{frame}{From the previous presentation}
-  \vfill
-  \begin{center}
-    \textcolor{muted}{\large [ transition recap --- to be added ]}
-  \end{center}
-  \vfill
+  \footnotesize
+  \hd{Original framing.} \emph{How does the topology of the global maritime oil trade network shape the dynamics of oil prices?}
+  \begin{itemize}\setlength\itemsep{0.1em}
+    \item \hd{Q1.} Can network topology improve oil-price forecasts beyond classical time-series baselines?
+    \item \hd{Q2.} How does a maritime disruption propagate into oil prices across horizons, and how long does its effect linger?
+  \end{itemize}
+
+  \vspace{0.6em}
+  \hd{Why the pivot to causal SCM.}
+  \begin{itemize}\setlength\itemsep{0.1em}
+    \item Feedback: focus on \hd{causal} estimation rather than forecasting --- forecasting is hard and crowded; a credible counterfactual on a specific disruption is more tractable and policy-relevant.
+    \item Reviewed candidate causal methods: event studies, structural VARs (Kilian-style supply/demand decomposition), DiD, network-shock propagation, synthetic control.
+    \item \hd{SCM} selected: cleanest combination of \hd{inferential machinery} (in-space placebo, cross-event weight transfer) and \hd{interpretable result} (donor-weighted counterfactual on the observed price), and it directly produces an ATT estimate rather than a shock decomposition.
+  \end{itemize}
+  \normalsize
 \end{frame}
 
 % =====================================================================
 % 2. Problem statement + contribution
 % =====================================================================
-\begin{frame}[shrink=5]{Problem statement \& contribution}
+\begin{frame}{Problem statement}
   \footnotesize
-  \hd{The question (part 1).}
-  \begin{itemize}\setlength\itemsep{0.1em}
-    \item Brent price impact of the 2026-02-01 Strait of Hormuz disruption.
-    \item Estimand: ATT over a defined post-event window; method: synthetic control on the observed price series.
-  \end{itemize}
+  \begin{center}
+  \fcolorbox{accent!50}{accent!5}{\begin{minipage}{0.94\textwidth}
+    \vspace{0.3em}
+    \begin{center}
+      {\normalsize\bfseries\textcolor{accent}{Part 1 \emph{(today)}: What was the Brent price impact of the 2026-02-01 Strait of Hormuz disruption?}}\\[0.3em]
+      {\footnotesize Estimand: ATT over a defined post-event window. Method: synthetic control on the observed price series.}
+    \end{center}
+    \vspace{0.1em}
+  \end{minipage}}
+  \end{center}
+
+  \vspace{0.2em}
+  \hd{Part 2 \emph{(open; discussed at the end)}.}
 
   \vspace{0.5em}
-  \hd{What is new in this research field.}
+  \hd{What is new in the field.}
   \begin{itemize}\setlength\itemsep{0.1em}
-    \item No peer-reviewed SCM applied to a crude benchmark for a geopolitical disruption.
-    \item Closest mechanical precedent: SCM on Austrian retail fuel \src{Becker, Pfeifer \& Schweikert 2021, \textit{Energy Economics}}.
-    \item Field default: structural VAR \src{Kilian 2009; Baumeister \& Hamilton 2019} or scenario models (Dallas Fed, OIES, Kiel, IEA).
+    \item Closest mechanical SCM-on-price precedent: Austrian retail fuel \src{Becker, Pfeifer \& Schweikert 2021, \textit{Energy Economics}}. Field default for oil-price impact: structural VAR \src{Kilian 2009; Baumeister \& Hamilton 2019} or scenario models (Dallas Fed, OIES, Kiel, IEA).
+    \item \hd{Method extension:} retail fuel $\rightarrow$ crude benchmark; cross-country $\rightarrow$ cross-asset donors; regulatory $\rightarrow$ exogenous geopolitical treatment.
+    \item \hd{Two-event robustness design:} Russia 2022 used as a magnitude-validation case --- SCM counterfactual within \$$3.98$/bbl of EIA STEO's last pre-invasion structural forecast on the matched 151-day window ($\sim 5.7$ pp on implied ATT), an independent-method check that the design generalises to the Hormuz application.
   \end{itemize}
-
-  \vspace{0.5em}
-  \hd{Contribution and value.}
-  \begin{itemize}\setlength\itemsep{0.1em}
-    \item Data-driven counterfactual complements scenario estimates.
-    \item Method extension: retail fuel $\rightarrow$ crude benchmark; cross-country $\rightarrow$ cross-asset donors; regulatory $\rightarrow$ exogenous geopolitical treatment.
-    \item Policy inputs: SPR sizing, central-bank reaction, fiscal buffers, sovereign hedging, infrastructure investment.
-  \end{itemize}
-
-  \vspace{0.5em}
-  \hd{Part 2 of the thesis.} \textcolor{muted}{[ discussed at the end ]}
 \end{frame}
 
 % =====================================================================
 % 3. Historical Brent + events
 % =====================================================================
-\begin{frame}{???}
+\begin{frame}{Brent spot price, post-COVID --- curated event timeline}
   \begin{center}
     \includegraphics[width=0.95\textwidth,height=0.80\textheight,keepaspectratio]{../plots/eda_brent_events_postcovid.png}
   \end{center}
@@ -163,56 +170,28 @@
 \end{frame}
 
 % =====================================================================
-% 4b. Model setup --- windows, walk-forward CV, final refit
+% 4b. Model training and validation (windows + CV + validation battery)
 % =====================================================================
-\begin{frame}[shrink=5]{Model setup}
+\begin{frame}{Model training and validation}
   \footnotesize
   \begin{tabular}{@{}l l l@{}}
     \toprule
-                       & \hd{Pre-event window (walk-forward CV)}              & \hd{Treatment (post)} \\
+                       & \hd{Pre-event (CV)}                                 & \hd{Treatment (post)} \\
     \midrule
     \hd{Russia 2022}   & 2020-07-01 $\rightarrow$ 2022-02-23 \quad 421 obs    & 2022-02-24 $\rightarrow$ 2022-09-30 \quad 151 obs \\
-    \addlinespace
     \hd{Hormuz 2026}   & 2024-06-03 $\rightarrow$ 2026-01-30 \quad 423 obs    & 2026-02-01 $\rightarrow$ 2026-05-01 \quad $\sim$59 obs \\
     \bottomrule
   \end{tabular}
-  \normalsize
-
-  \vspace{0.5em}
-  \hd{Hyperparameter tuning --- multi-fold walk-forward CV.}
-  \begin{itemize}\setlength\itemsep{0.08em}
-    \item 5 expanding-window folds inside the pre-event period; 20-bday horizon per fold.
-    \item Pick hparams by pooled val RMSE \src{Hyndman \& Athanasopoulos 2018 \S5.10}.
-    \item Final fit refits on full pre-event window, projects through treatment.
-  \end{itemize}
-
-  \vspace{0.4em}
-  \hd{Limitation.} No held-out test set beyond train/val; generalisation to unseen data cannot be measured directly. Formal inference $\rightarrow$ in-space placebo.
-\end{frame}
-
-% =====================================================================
-% 5. Validation — minimum load-bearing
-% =====================================================================
-\begin{frame}{Validation }
 
   \vspace{0.6em}
-  \hd{1. Model fit.} \smalltext{Is the synthetic a credible pre-event approximator?}
-  \begin{itemize}\setlength\itemsep{0.15em}
-    \item Walk-forward CV \src{Hyndman \& Athanasopoulos 2018; Bergmeir \& Benítez 2012}.
-  \end{itemize}
+  \hd{Training.} 5-fold expanding-window walk-forward CV \src{Hyndman \& Athanasopoulos 2018; Bergmeir \& Benítez 2012}; hparams chosen by pooled val RMSE; final fit refits on full pre-event window.
 
-  \vspace{0.5em}
-  \hd{2. Donor identification.} \smalltext{Are the donors statistically clean of the event (SUTVA)?}
-  \begin{itemize}\setlength\itemsep{0.15em}
-    \item Qualitative audit on causal channels \src{Abadie 2021 \S3.1}.
-    \item Bootstrap structural break at $T_0$ \src{Andrews 1993; Hansen 2000}.
-  \end{itemize}
-
-  \vspace{0.5em}
-  \hd{3. Inference.} \smalltext{Is the post-event gap larger than under the no-treatment null?}
-  \begin{itemize}\setlength\itemsep{0.15em}
-    \item In-space placebo, 21- and 33-donor pools \src{Abadie 2010 \S3.3}.
-    \item Cross-event weight transfer --- Hormuz only, substitutes for the low-power placebo at $\sim$60 post-event obs.
+  \vspace{0.6em}
+  \hd{Validation battery.}
+  \begin{itemize}\setlength\itemsep{0.12em}
+    \item \hd{Model fit} --- walk-forward CV val/train RMSE.
+    \item \hd{SUTVA} --- qualitative donor audit on causal channels \src{Abadie 2021 \S3.1}.
+    \item \hd{Inference} --- in-space placebo, 21- and 33-donor pools \src{Abadie 2010 \S3.3}; cross-event weight transfer substitutes for the low-power Hormuz placebo ($\sim$60 post-event obs).
   \end{itemize}
 \end{frame}
 
@@ -220,7 +199,7 @@
 % 6. Donor selection
 % =====================================================================
 \begin{frame}{Donor selection}
-  \hd{21 audited donors.} Inclusion requires \emph{both}: \hd{pre-treatment} co-movement with Brent through a common global factor, \emph{and} \hd{treatment} cleanliness (no Russia/Ukraine or Persian Gulf exposure --- SUTVA).
+  \hd{21 audited donors (of 33 candidates).} The full 33-donor catalog was audited for SUTVA and pre-event co-movement; 12 were dropped for event-specific exposure (Russia/Ukraine or Persian Gulf channels), leaving 21 in the shared pool used for both events --- so we know the full scope of what was excluded and why. Inclusion requires \emph{both}: \hd{pre-treatment} co-movement with Brent through a common global factor, \emph{and} \hd{treatment} cleanliness (SUTVA).
 
   \vspace{0.4em}
   \scriptsize
@@ -306,12 +285,9 @@
   \hd{Headline.}
   \begin{itemize}\setlength\itemsep{0.1em}
     \item \hd{Hormuz:} all 5 models hit the floor under both pools.
-    \item \hd{Russia:} not decisively rejected --- only XGBoost reaches floor at 21-donor and fails at 33-donor. Feb-22 macro regime shift moves many donors too; Russia's inferential weight rests on EIA STEO (next slide).
+    \item \hd{Russia:} not decisively rejected --- only XGBoost reaches floor at 21-donor and fails at 33-donor. Feb-22 macro regime shift moves many donors too; 
   \end{itemize}
 
-  \vspace{0.2em}
-  \smalltext{Other tests (parallel-fit, regime-stability, in-time placebo, LOO, cross-event transfer): appendix.}
-  \normalsize
 \end{frame}
 
 % =====================================================================
@@ -453,32 +429,29 @@
 \end{frame}
 
 % ---------------------------------------------------------------------
-% A2. Pre-event diagnostics — moments, parallel-fit, regime-stability
+% A2. Donor SUTVA cleanliness (§5d)
 % ---------------------------------------------------------------------
-\begin{frame}[shrink=10]{Appendix --- pre-event diagnostics}
+\begin{frame}{Appendix --- donor SUTVA cleanliness}
   \footnotesize
-  \hd{Moment matching} \src{Abadie 2010}. Mean $|\Delta| < 0.01$ logs for all 10 (model $\times$ event) fits. SD undercoverage is the only material issue: convex SCM $-23\%$ on Russia (donor pool cannot span Brent's pre-period vol $\rightarrow$ ridge correction in ASCM closes the gap).
+  \hd{Permutation mean-shift test} at known $T_0$ on donor log-returns \src{Chow 1960 hypothesis + Lehmann \& Romano 2005 permutation + Phipson \& Smyth 2010 correction}. Combined flag = permutation \emph{or} Wilcoxon event-window rejects under Benjamini-Hochberg FDR ($\alpha = 0.10$).
 
-  \vspace{0.5em}
-  \hd{Parallel-fit defence (gap-series slope, \%/yr)} \src{Roth 2022 --- pretest with caution}. Reported, not pass/fail.
-  \vspace{0.2em}
+  \vspace{0.6em}
   \begin{center}
-  \begin{tabular}{@{}l r r@{}}
+  \begin{tabular}{@{}l r r r r@{}}
     \toprule
-    \hd{Model}     & \hd{Russia} & \hd{Hormuz} \\
+                & \hd{Permut.} & \hd{Event-wind.} & \hd{Combined} & \hd{Audit} \\
     \midrule
-    Convex SCM     & $+10.0$ & $-7.0$ \\
-    ASCM           & $+0.3$  & $-1.9$ \\
-    Elastic-net    & $+0.9$  & $-1.2$ \\
-    XGBoost        & $+3.4$  & $-4.7$ \\
-    Bayesian Ridge & $+0.2$  & $-0.1$ \\
+    Russia 2022 & 1 / 33       & 0 / 33           & 1 / 33        & 12 / 33    \\
+    Hormuz 2026 & 0 / 33       & 1 / 33           & 1 / 33        & 0 / 33     \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \smalltext{Large slopes (convex SCM both events; XGBoost Russia / Hormuz) flag drift; drift-corrected gap = raw gap $-$ slope $\times$ post-window length (Russia $L \approx 0.58$ yr; Hormuz $L \approx 0.25$ yr).}
 
-  \vspace{0.5em}
-  \hd{Regime stability} \src{distance correlation $\Delta$ across pre-period thirds; Sz\'ekely \& Rizzo 2007}: 8 of 21 donors exceed the $0.30$ narrative-flag threshold on each event --- read qualitatively (sub-period $n \approx 140$ confounds drift with sampling noise).
+  \vspace{0.6em}
+  \begin{itemize}\setlength\itemsep{0.15em}
+    \item \hd{Hormuz: 32 / 33 agree.} Audit's ``no Persian-Gulf routing'' confirmed; only IronOre triggers (event-window).
+    \item \hd{Russia: 20 / 33 agree.} Audit's H/M tier captures \emph{causal channels} (Wheat: Russia+Ukraine $\approx 30\%$ world exports) that daily-return tests can't reproduce at $N = 33$ after FDR. Tests' lone rejection (CNY) is China zero-COVID, not Russia-treatment.
+  \end{itemize}
   \normalsize
 \end{frame}
 
@@ -487,25 +460,29 @@
 % ---------------------------------------------------------------------
 \begin{frame}{Appendix --- in-time placebo \& LOO}
   \footnotesize
-  \hd{In-time placebo} \src{Abadie 2015; Chen \& Yan 2023}. Fake $T_0$ set 6 months before real $T_0$; mean fake-period gap (\%), defaults hparams (avoid val-leakage).
-  \vspace{0.3em}
+  \hd{In-time placebo} \src{Abadie 2015} --- mean fake-period gap (\%) at $T_0^{\text{fake}} = $ real $T_0 - 6$ months, defaults hparams. \hd{LOO} --- range (max $-$ min, pp) across leave-one-donor-out refits.
+
+  \vspace{0.4em}
   \begin{center}
-  \begin{tabular}{@{}l r r@{}}
+  \begin{tabular}{@{}l r r | r r@{}}
     \toprule
-    \hd{Model}     & \hd{Russia (2021-08-24)} & \hd{Hormuz (2025-08-01)} \\
+                   & \multicolumn{2}{c|}{\hd{In-time gap (\%)}} & \multicolumn{2}{c}{\hd{LOO range (pp)}} \\
+    \hd{Model}     & \hd{Russia} & \hd{Hormuz} & \hd{Russia} & \hd{Hormuz} \\
     \midrule
-    Convex SCM     & $+1.9$  & $-11.9$ \\
-    ASCM           & $-4.2$  & $-9.8$  \\
-    Elastic-net    & $+7.5$  & $-10.6$ \\
-    XGBoost        & $+26.4$ & $-12.4$ \\
-    Bayesian Ridge & $-5.3$  & $-12.2$ \\
+    Convex SCM     & $+1.9$  & $-11.9$ & $6.6$           & $9.4$ \\
+    ASCM           & $-4.2$  & $-9.8$  & $13.4$          & $8.9$ \\
+    Elastic-net    & $+7.5$  & $-10.6$ & $15.6$          & $11.0$ \\
+    XGBoost        & $+26.4$ & $-12.4$ & $\mathbf{4.9}$  & $\mathbf{4.7}$ \\
+    Bayesian Ridge & $-5.3$  & $-12.2$ & $24.9\,\dagger$ & $13.1$ \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \smalltext{Russia fake window contains the late-2021 oil rally and the Jan-2022 invasion runup --- partial real-effect contamination expected. Hormuz fake window has no curated events; the concentrated $-10$ to $-12\%$ across models reflects regime drift the synthetic does not absorb, not model-class failure.}
 
-  \vspace{0.6em}
-  \hd{Leave-one-donor-out} \src{Abadie 2015}. Post-event gap stable within $\pm 6$ pp across leave-outs for convex SCM / ASCM / Elastic-net / Bayesian Ridge (no single donor drives the headline); XGBoost more fragile ($\pm 12$ pp).
+  \vspace{0.5em}
+  \smalltext{\hd{In-time.} Russia fake window contains late-2021 oil rally + Jan-2022 invasion runup --- partial real-effect contamination expected; XGBoost $+26\%$ low-power (training shrinks $\sim 31\%$). Hormuz $-10$ to $-12\%$ across all five models = pre-Hormuz runup donors did not absorb, not model failure.}
+
+  \vspace{0.3em}
+  \smalltext{\hd{LOO.} Tightest: \hd{XGBoost} ($\sim 5$ pp, bold). Widest: \hd{Bayesian Ridge Russia} ($\dagger$ range crosses zero, $-12.8$ to $+12.0$) --- LOO-fragile, consistent with its $3.07$ walk-forward overfit ratio and $0.5\%$ baseline. Ensemble median robust because Convex / ASCM / EN / XGBoost agree more closely.}
   \normalsize
 \end{frame}
 
