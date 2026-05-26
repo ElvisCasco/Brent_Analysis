@@ -334,12 +334,23 @@ def ks_distribution_shift(series, break_date):
             'n_pre': int(len(pre)), 'n_post': int(len(post))}
 
 
-def chow_break_test_bootstrap(series, break_date, n_boot=500, seed=0):
-    """Bootstrap structural break test on log-returns.
+def permutation_mean_shift_test(series, break_date, n_boot=500, seed=0):
+    """Permutation test for a mean shift in log-returns at a known break date.
 
-    Null: returns have no structural break at break_date.
+    Tests the Chow-style hypothesis (Chow 1960 *Econometrica*) of equal pre/post
+    means at a *pre-specified* break date, but uses a permutation reference
+    distribution (Lehmann & Romano 2005 *Testing Statistical Hypotheses* ch. 15)
+    rather than the parametric F-statistic. This is not the Andrews (1993)
+    sup-Wald test, which is for an *unknown* break point.
+
+    Implementation: random permutation of the pre/post labels (sampling without
+    replacement via np.shuffle), not a true bootstrap (sampling with replacement).
+    The function argument `n_boot` is retained for backward compatibility but
+    refers to the number of permutation draws.
+
+    Null: log-returns have no mean shift at break_date (i.e., the pre/post
+    labels are exchangeable).
     Test statistic: |mean(post) - mean(pre)| / pooled SD.
-    Bootstrap p-value from random permutation of pre/post labels.
     """
     s = np.log(series.dropna()).diff().dropna()
     pre = s[s.index < break_date]

@@ -64,7 +64,7 @@ Interpretation:
 
 Per [validation.md §5a](validation.md), flagged models are **not auto-excluded** from the ensemble; the ratio threshold is heuristic and the IQR across all five is itself the model-uncertainty band.
 
-### 2.2 Donor identification — Audit + bootstrap break test (§5d)
+### 2.2 Donor identification — Audit + permutation mean-shift test at $T_0$ (§5d)
 
 Primary defense: the qualitative audit in [donor_catalog.md](donor_catalog.md). Statistical confirmation from the model-agnostic battery in [01.5_Donor_Cleanliness.ipynb](../notebooks/01.5_Donor_Cleanliness.ipynb).
 

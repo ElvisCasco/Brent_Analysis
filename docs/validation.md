@@ -18,7 +18,7 @@ The six sub-sections below cover each level. Every test is run **per model in th
 | 5a (ii) | Moment matching (mean, SD, min, max, AR(1)) | Pre-period distributional coverage | Abadie 2010 | Hard threshold on mean ($\|\Delta\| < 0.01$ log); softer on SD / extrema / AR(1). |
 | 5b | Pre-period parallel-fit (gap-series mean / SD / AR(1) / OLS slope) | Parallel-trends analog | Abadie 2010, 2015, 2021; Roth 2022 | No formal threshold (SCM-literature convention); drift-correction recipe in text. |
 | 5c | Pre-period regime-stability (distance correlation across thirds) | Donor-Brent factor stability | Székely & Rizzo 2007; Stock & Watson 1996, 2002 | Model-agnostic; no canonical SCM precedent; `max_shift > 0.30` is a narrative flag, not exclusion. |
-| 5d | Bootstrap structural break at $T_0$ | Donor SUTVA (model-agnostic) | Andrews 1993; Hansen 2000 | Enters BH-FDR ($\alpha = 0.10$) combined flag. |
+| 5d | Permutation mean-shift test at known $T_0$ | Donor SUTVA (model-agnostic) | Chow 1960 (hypothesis); Lehmann & Romano 2005 (permutation reference dist.) | Enters BH-FDR ($\alpha = 0.10$) combined flag. |
 | 5d | Wilcoxon event-window | Donor SUTVA (model-agnostic) | Brown & Warner 1985 | Enters BH-FDR combined flag. |
 | 5d | KS distribution shift | Regime-shift diagnostic | Two-sample KS | Reported only; **excluded** from flag rule (over-rejects under regime shift). |
 | 5e (i) | In-space placebo, inferential | Treated-unit inference | Abadie 2010 §3.3 | Min permutation $p \approx 1/N$: 0.048 (21-donor) vs 0.030 (33-donor) — **reported under both pools**. |
@@ -33,7 +33,7 @@ The twelve tests above span model fit, donor identification, and inference. The 
 | Level | Irreducible test | Where it lives in this pipeline | Why it's the minimum |
 |---|---|---|---|
 | **Model fit** | §5a (i) Walk-forward CV | [03_Validate.ipynb](../notebooks/03_Validate.ipynb) `wf-cv` cell | Only out-of-sample signal in §5; works for all 5 models; reveals XGBoost/Bayesian Ridge overfitting (val/train > 3 on Russia) |
-| **Donor identification** | Qualitative audit in [donor_catalog.md](donor_catalog.md), confirmed by §5d Andrews-Hansen bootstrap break | [01.5_Donor_Cleanliness.ipynb](../notebooks/01.5_Donor_Cleanliness.ipynb) | Per Abadie 2021 §3.1, donor exclusion is a-priori on substantive grounds; the bootstrap break test asks the literal SUTVA question (mean shift at $T_0$) |
+| **Donor identification** | Qualitative audit in [donor_catalog.md](donor_catalog.md), confirmed by §5d permutation mean-shift test at $T_0$ | [01.5_Donor_Cleanliness.ipynb](../notebooks/01.5_Donor_Cleanliness.ipynb) | Per Abadie 2021 §3.1, donor exclusion is a-priori on substantive grounds; the permutation mean-shift test asks the literal SUTVA question (mean shift at $T_0$) |
 | **Inference** | §5e (i) in-space placebo run under **both** the 21-donor and the 33-donor pool | [04_Inference.ipynb](../notebooks/04_Inference.ipynb) `iso` cells | Canonical Abadie 2010 §3.3 test. The 21-donor permutation floor is $1/22 \approx 0.045$; without the 33-donor rerun (floor $1/34 \approx 0.029$) Hormuz p-values cannot be distinguished from the saturation value. |
 
 Everything else in §5 — moment matching (§5a ii), parallel-fit (§5b), regime-stability (§5c), Wilcoxon and KS (§5d), in-time placebo and LOO (§5e ii/iii), cross-event transfer (§5f) — is **defensive depth**. Each strengthens the headline when it agrees, or forces qualification when it disagrees, but none of them replace any of the three minimum tests.
@@ -138,9 +138,11 @@ Three tests on each donor's own time-series — none depend on any SCM model:
 
 | Test | Null hypothesis | Used in combined flag? | Source |
 |---|---|---|---|
-| **Bootstrap structural break** at $T_0$ | Donor's log-returns have no mean shift at $T_0$ | **Yes** | Andrews 1993; Hansen 2000 |
+| **Permutation mean-shift test** at known $T_0$ | Donor's log-returns have no mean shift at $T_0$ (pre/post labels are exchangeable) | **Yes** | Chow 1960 (known break point hypothesis); Lehmann & Romano 2005 ch. 15 (permutation methodology) |
 | **Wilcoxon event-window** | Mean return in $[-5d, +20d]$ equals mean in a 60-day pre-window control | **Yes** | Brown & Warner 1985; Wilcoxon |
 | **Kolmogorov-Smirnov distribution shift** | Pre-event and post-event return distributions are equal | **No — informational only** | Two-sample KS |
+
+**Why this is not the Andrews 1993 test.** The Andrews (1993, *Econometrica*) and Andrews & Ploberger (1994, *Econometrica*) tests target an *unknown* break point — they maximise the Wald or Wald-style statistic over all candidate break dates and use a non-standard reference distribution. Here the break point is fixed at the focal event date $T_0$ (a known calendar date), so the Chow (1960, *Econometrica*) hypothesis "equality of pre/post means at a known break" applies directly. We replace the parametric F-statistic with a permutation reference distribution (Lehmann & Romano 2005, ch. 15) to avoid normality and equal-variance assumptions on daily log-returns. The implementation function is `permutation_mean_shift_test` in [lib/validation.py](../lib/validation.py); the older name `chow_break_test_bootstrap` is deprecated.
 
 **Combined flag rule:** donor flagged as *potentially treated* if **either** of the two SUTVA-specific tests (break OR event-window) rejects after **Benjamini-Hochberg FDR correction at $\alpha = 0.10$**.
 
@@ -249,11 +251,26 @@ If the two Hormuz counterfactuals agree closely → factor structure is regime-s
 
 This is a single test that can be run per model in the ensemble (5 transfers total).
 
+### What the test does and does not establish about donor weights
+
+The test compares *projected synthetics*, not *individual donor weights*. Donor weight rankings often shift substantially between events even for models that pass the transfer test. For instance, convex SCM puts its Russia mass on soft commodities (Cotton 0.45, Sugar 0.29, Coffee 0.26) and its Hormuz mass on a mixed basket (JPY 0.40, Sugar 0.35, Cotton 0.07, KRW 0.06) — JPY moves from rank 12 (zero weight) on Russia to rank 1 on Hormuz, and Coffee from rank 3 to rank 13.
+
+This is consistent with the test passing for two reasons:
+
+1. **Convex SCM weights are not unique when donors are correlated.** With 21 donors clustered into highly-correlated groups (soft commodities, precious metals, Asian FX, safe-haven FX), the pre-period RMSPE surface is flat over a low-dimensional manifold of weight vectors. Two materially different `w` vectors can produce nearly identical synthetic paths. Abadie & L'Hour (2021, *Journal of Business & Economic Statistics*) document this non-uniqueness problem and propose a penalty term to break ties; we do not apply that penalty, so the solver picks an arbitrary point on the flat region. The arbitrary point can shift substantially between events without the underlying factor structure changing.
+
+2. **What is stable is the projection onto donor space, not the per-donor coefficient.** Soft commodities and Asian FX both proxy for the same latent factor that co-moves with Brent (global demand × inflation expectations × risk appetite). The 2020-22 Russia pre-period happened to have soft commodities as the cleanest available proxy (the 2021 inflation rally); the 2024-26 Hormuz pre-period has Asian FX as the cleanest proxy (post-2024 yen carry dynamics). The latent factor is the same; the best in-pool proxy differs.
+
+**Interpretive consequence.** The test supports *aggregate prediction transfer* (the synthetic path is similar across events), not *interpretive narrative transfer* (no donor can be called "the" Brent proxy across events). A statement like "JPY is the most important Brent proxy because it's the safe-haven asset" is not supportable from the cross-event comparison; the model's claim is only that some combination of soft commodities and Asian FX consistently proxies for the latent factor, with the exact mix regime-dependent. The honest framing of §5f is therefore "the projection onto donor space is regime-stable enough to support cross-event prediction," not "donor weights are stable."
+
+The progression Convex SCM < ASCM < Elastic-net in transfer fidelity (transferred pre-RMSPE ratios 1.65, 2.18, 3.85 vs. independent) matches the progression in solution-space dimensionality: convex SCM lives on the simplex (sparsest); ASCM's ridge augmentation uses the full donor space; Elastic-net uses signed dense regression. The more degrees of freedom the model has in fitting donor coefficients, the less stable the projection across events, even though all three pass the heuristic threshold of "transferred RMSPE within 4× independent."
+
 ## References (full citations)
 
 - Abadie, A., Diamond, A., & Hainmueller, J. (2010). Synthetic control methods for comparative case studies: Estimating the effect of California's Tobacco Control Program. *Journal of the American Statistical Association*, 105(490), 493-505.
 - Abadie, A., Diamond, A., & Hainmueller, J. (2015). Comparative politics and the synthetic control method. *American Journal of Political Science*, 59(2), 495-510.
 - Abadie, A. (2021). Using synthetic controls: feasibility, data requirements, and methodological aspects. *Journal of Economic Literature*, 59(2), 391-425.
+- Abadie, A., & L'Hour, J. (2021). A penalized synthetic control estimator for disaggregated data. *Journal of Business & Economic Statistics*. (Cited for the non-uniqueness of convex SCM weights under correlated donors; verify exact volume/issue against the publication record.)
 - Andrews, D. W. K. (1993). Tests for parameter instability and structural change with unknown change point. *Econometrica*, 61(4), 821-856.
 - Andrews, D. W. K., & Ploberger, W. (1994). Optimal tests when a nuisance parameter is present only under the alternative. *Econometrica*, 62(6), 1383-1414.
 - Bergmeir, C., & Benítez, J. M. (2012). On the use of cross-validation for time series predictor evaluation. *Information Sciences*, 191, 192-213.
@@ -262,7 +279,7 @@ This is a single test that can be run per model in the ensemble (5 transfers tot
 - Chen, Q., & Yan, G. (2023). A mixed placebo test for synthetic control method. *Economics Letters*, 224, 111004. https://doi.org/10.1016/j.econlet.2023.111004
 - Goodfellow, I., Bengio, Y., & Courville, A. (2016). *Deep Learning*. MIT Press.
 - Hahn, J., & Shi, R. (2017). Synthetic control and inference. *Econometrics*, 5(4), 52.
-- Hansen, B. E. (2000). Testing for structural change in conditional models. *Journal of Econometrics*, 97(1), 93-115.
+- Chow, G. C. (1960). Tests of equality between sets of coefficients in two linear regressions. *Econometrica*, 28(3), 591-605.
 - Hastie, T., Tibshirani, R., & Friedman, J. (2009). *The Elements of Statistical Learning: Data Mining, Inference, and Prediction* (2nd ed.). Springer.
 - Hyndman, R. J., & Athanasopoulos, G. (2018). *Forecasting: Principles and Practice* (2nd ed.). OTexts.
 - Kohavi, R. (1995). A study of cross-validation and bootstrap for accuracy estimation and model selection. *Proceedings of IJCAI* 1995, 1137-1143.
