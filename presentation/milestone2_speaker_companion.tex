@@ -1,0 +1,345 @@
+% Speaker companion for milestone2 — 15-minute presentation.
+% Per-slide talking points, background context, and Q&A backup material.
+% Compile: pdflatex milestone2_speaker_companion.tex
+
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2cm,top=1.8cm,bottom=2cm]{geometry}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{parskip}
+\usepackage{tcolorbox}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+
+\definecolor{accent}{HTML}{8B0000}
+\definecolor{muted}{HTML}{555555}
+\definecolor{lightbg}{HTML}{F7F4F0}
+
+% Section: slide title
+\titleformat{\section}{\large\bfseries\color{accent}}{\thesection.}{0.6em}{}
+\titlespacing*{\section}{0pt}{1.2em}{0.2em}
+
+% Subsection: structural labels (Talking points / If asked / etc.)
+\titleformat{\subsection}{\normalsize\bfseries}{}{0em}{}
+\titlespacing*{\subsection}{0pt}{0.6em}{0.1em}
+
+\setlist[itemize]{leftmargin=1.2em,itemsep=0.15em,topsep=0.2em}
+
+\newcommand{\timetag}[1]{\hfill\textcolor{muted}{\small[#1]}}
+\newcommand{\highlight}[1]{\textcolor{accent}{\textbf{#1}}}
+
+\title{\bfseries Milestone 2 --- Speaker Companion}
+\author{15-minute presentation: per-slide guidance, background, and Q\&A backup}
+\date{}
+
+\begin{document}
+
+\maketitle
+\vspace{-2em}
+
+\begin{tcolorbox}[colback=lightbg,colframe=accent!40,arc=2pt]
+\textbf{Pacing.} 13 main-content slides over $\sim$15 minutes $\approx$ 45--75 seconds per slide. Spend most time on the highlighted headline-result and in-space placebo slides; move quickly through the methodology recap. Appendix slides are reserve material for Q\&A --- do not budget time for them. \textbf{Watch the clock at slide 11 (headline)}; if behind, compress Part 2 (slide 13) and go straight to thanks.
+\end{tcolorbox}
+
+% =====================================================================
+\section{Title slide \timetag{10s}}
+
+Open with the title. The framing is causal estimation of one specific event, not forecasting and not the network-topology project from the previous milestone. Mention that today is Part 1 of a two-part thesis.
+
+% =====================================================================
+\section{From the previous presentation \timetag{45s}}
+
+\subsection{Talking points}
+\begin{itemize}
+  \item State the original framing: maritime trade network topology shaping oil prices, with a forecasting question and a propagation question.
+  \item Pivot reason: feedback to focus on \highlight{causal estimation} rather than forecasting. Forecasting is hard and crowded; a credible counterfactual for one specific disruption is more tractable and policy-relevant.
+  \item Reviewed several causal methods (event studies, structural VARs, DiD, network-shock propagation, SCM).
+  \item SCM chosen for two reasons: \emph{inferential machinery} (in-space placebo, cross-event transfer) and \emph{interpretable result} (donor-weighted counterfactual on the observed price), and it produces an ATT directly rather than a shock decomposition.
+\end{itemize}
+
+\subsection{Behind the slide}
+The maritime-network framing was scoped down rather than abandoned. The structural-VAR alternative (Kilian-style) was the most natural competitor but requires identification restrictions that are themselves contested and that have no standard precedent for chokepoint events. Event studies don't produce a continuous counterfactual; DiD needs a clear treated/control structure that doesn't exist for a single global commodity.
+
+\subsection{If asked}
+\begin{itemize}
+  \item \textit{Why not just stick with the network framing?} Network propagation on oil prices is interesting but very hard to identify from observational data; the network-as-donor approach we considered ends up looking similar to SCM with engineered features. SCM gives a cleaner identification story now.
+  \item \textit{Could the network framing come back in Part 2?} Yes --- network centrality or routing-disruption features could enter the donor pool, or layered as a propagation model on top of the ATT. Part 2 is open.
+\end{itemize}
+
+% =====================================================================
+\section{Problem statement \timetag{60s}}
+
+\subsection{Talking points}
+\begin{itemize}
+  \item \highlight{The question (highlighted in red box):} What was the Brent price impact of the 2026-02-01 Strait of Hormuz disruption?
+  \item Estimand: ATT over a defined post-event window. Method: SCM on the observed price series.
+  \item Part 2 is open; come back to it at the end.
+  \item What is new: SCM-on-price design is rare (closest precedent is Becker, Pfeifer \& Schweikert 2021 on Austrian retail fuel); field default is structural VAR or scenario models.
+  \item Method extensions vs the precedent: crude benchmark (not retail fuel), cross-asset donors (not cross-country), exogenous geopolitical treatment (not endogenous policy).
+  \item \highlight{Two-event robustness design}: Russia 2022 used as a magnitude-validation case. SCM Russia counterfactual lands within \$3.98/bbl of EIA STEO's last pre-invasion structural forecast on the matched 151-day window ($\sim$5.7 pp on implied ATT).
+\end{itemize}
+
+\subsection{Behind the slide}
+The two-event design is the most important methodological contribution. SCM on a global benchmark price is structurally different from SCM on a country-level outcome --- there's only one Brent. The Russia case validates that the design produces magnitudes consistent with an independent structural forecast, before applying it to the focal Hormuz case where no such external anchor exists (Hormuz is too recent).
+
+\subsection{If asked}
+\begin{itemize}
+  \item \textit{Why is there no peer-reviewed SCM precedent on crude?} A combination of recency (price-impact SCM applications are mostly post-2020), data availability (good donor pools for global commodities are non-obvious), and convention (the oil literature defaults to structural VAR for identified shock decomposition; SCM is more common in policy-evaluation settings). We don't claim "no peer-reviewed work has tried it," just that the closest mechanical precedent is regulated retail fuel.
+  \item \textit{What's the policy use?} SPR sizing, central-bank reaction function (oil shocks pass through to headline inflation), fiscal buffers, sovereign hedging.
+\end{itemize}
+
+% =====================================================================
+\section{Brent spot price, post-COVID --- curated event timeline \timetag{45s}}
+
+\subsection{Talking points}
+\begin{itemize}
+  \item Visual orientation: where Hormuz 2026 sits in the broader post-COVID Brent path. Roughly $\$60$/bbl in 2020, runs up through 2021--22 (Russia), declines through 2023--24, then the Hormuz spike in early 2026.
+  \item Events colour-coded by category (demand, supply, policy, geopolitics) --- shows the data is event-rich, which is why donor cleanliness matters.
+  \item Highlight the two focal events visually: \highlight{Russia 2022} (calibration) and \highlight{Hormuz 2026} (focal).
+\end{itemize}
+
+\subsection{If asked}
+\begin{itemize}
+  \item \textit{Why these two events specifically?} Both are large, well-measured, recent geopolitical disruptions. Russia 2022 is the most recent large oil shock with a long enough post-window to be well-measured; Hormuz 2026 is the focal event of interest.
+  \item \textit{Why not Abqaiq 2019 or others?} Discussed in donor\_catalog.md: pre-windows for older events overlap with Hormuz's, breaking the cross-event independence we exploit in $\S$5f. Russia 2022 is independent of the Hormuz pre-window.
+\end{itemize}
+
+% =====================================================================
+\section{Methodology --- ensemble of 5 models \timetag{60s}}
+
+\subsection{Talking points}
+\begin{itemize}
+  \item Ensemble of 5 models spanning the SCM design space:
+  \begin{itemize}
+    \item \textbf{Convex SCM} (Abadie, Diamond \& Hainmueller 2010): canonical, no extrapolation.
+    \item \textbf{Augmented SCM} (Ben-Michael, Feller \& Rothstein 2021): ridge bias correction to allow extrapolation when convex hull is too tight.
+    \item \textbf{Elastic-net} (Doudchenko \& Imbens 2016): $L_1+L_2$ regression, sparse signed weights.
+    \item \textbf{XGBoost} (Chen \& Guestrin 2016): nonlinear, captures interactions.
+    \item \textbf{Bayesian Ridge}: Bayesian linear regression with normal prior. Note: this is NOT the full state-space BSTS of Brodersen 2015, just the regression component (clarified in methodology.md).
+  \end{itemize}
+  \item \highlight{Why an ensemble:} the headline is the median across models; IQR is the model-uncertainty band. No single model assumption is privileged.
+\end{itemize}
+
+\subsection{Behind the slide}
+The ensemble spans key SCM regularization assumptions: simplex (convex SCM), ridge (ASCM, BR), L1+L2 (Elastic-net), tree-based (XGBoost). Disagreement across models is itself informative: tight agreement = factor structure is well-identified; wide spread = model-uncertainty band that the headline IQR captures honestly.
+
+\subsection{If asked}
+\begin{itemize}
+  \item \textit{Why not include BSTS proper?} The implementation in lib/models.py is \texttt{sklearn.linear\_model.BayesianRidge} --- Bayesian linear regression on donor levels, not the full state-space BSTS with trend + seasonal + spike-and-slab. Documented honestly in methodology.md $\S$4 ``Bayesian Ridge vs full BSTS.''
+  \item \textit{Why not include simpler models like OLS?} OLS without regularization overfits at $N \approx 420$ obs and 21 donors. Elastic-net at low $\alpha$ approximates OLS while preventing overfit.
+\end{itemize}
+
+% =====================================================================
+\section{Model training and validation \timetag{75s}}
+
+\subsection{Talking points}
+\begin{itemize}
+  \item Pre-event windows: Russia 2020-07 $\to$ 2022-02 (421 obs); Hormuz 2024-06 $\to$ 2026-01 (423 obs). Post-event: 151 obs Russia / $\sim$59 obs Hormuz.
+  \item \highlight{Training:} 5-fold expanding-window walk-forward CV (Hyndman \& Athanasopoulos 2018; Bergmeir \& Benítez 2012). Hyperparameters chosen by pooled val RMSE across folds; final fit refits on full pre-event window.
+  \item Validation battery: model fit (walk-forward), SUTVA (donor audit), inference (in-space placebo + cross-event transfer).
+\end{itemize}
+
+\subsection{Behind the slide}
+The walk-forward CV is a recent refactor (previously was a single 80/20 hold-out, which is a time-series train-test split, not true walk-forward CV per Hyndman). The 5-fold expanding-window scheme is more robust because it averages over 5 forecast windows rather than concentrating all val mass on the last 20\%. Headline numbers shifted modestly under the refactor: Russia ensemble median 25.1\% $\to$ 21.7\%; Hormuz unchanged at 43\%.
+
+\subsection{If asked}
+\begin{itemize}
+  \item \textit{Why expanding-window rather than sliding-window or pure k-fold?} K-fold breaks time-series structure (uses future to predict past). Sliding-window discards early data. Expanding-window matches the operational reality (you have more data as you go).
+  \item \textit{Hyperparameter selection bias?} Yes: hparams are picked to minimize val RMSE, so reported val RMSE is biased downward. Documented in validation.md $\S$5a as a ``winner's-curse'' caveat. Mitigation: tightened grids (each model has at most 9 candidates) per Cawley \& Talbot 2010.
+  \item \textit{Why not a separate test set?} Pre-event window is sample-size-constrained. Splitting off a test set would shrink training meaningfully. Formal inference is delegated to the in-space placebo (which is genuinely out-of-sample at the unit level).
+\end{itemize}
+
+% =====================================================================
+\section{Donor selection \timetag{75s}}
+
+\subsection{Talking points}
+\begin{itemize}
+  \item \highlight{21 audited donors out of 33 candidates.} The full 33-donor catalog was audited for both pre-treatment co-movement with Brent AND treatment cleanliness (SUTVA). 12 dropped due to event-specific exposure.
+  \item Categories: metals (3), agriculturals (4), equities (3), FX (8), rates/credit (2), volatility (1).
+  \item Inclusion rule: pre-treatment co-movement through a \emph{common global factor} AND treatment cleanliness (no Russia/Ukraine or Persian Gulf exposure).
+  \item Same pool used for both events, enabling the cross-event weight transfer test ($\S$5f).
+\end{itemize}
+
+\subsection{Behind the slide}
+Donor selection is the SCM-canonical SUTVA defense (Abadie 2021 $\S$3.1: substantive grounds, not statistical tests). The audit reasoning is in donor\_catalog.md. The dropped 12 includes: Russia commodities (Wheat, Palladium, Russian-channel FX like EUR), risk-off proxies that loaded on Russia specifically (DXY, BTC due to sanctions-evasion narrative), and others.
+
+\subsection{If asked}
+\begin{itemize}
+  \item \textit{What's the full list of dropped donors?} See backup slide ``Excluded donors.'' 12 Russia-exposed (H or M tier): Copper, IronOre, Palladium, Soybeans, Wheat, Corn, EM\_Eq, EUR, GBP, DXY, US10Y, BTC. Plus another set of categorical exclusions (energy complex itself: WTI, NatGas, refined products; oil-currency: NOK, CAD; etc.) that never entered the candidate pool.
+  \item \textit{What if a clean donor is actually treated?} The model-agnostic battery in 01.5\_Donor\_Cleanliness checks this empirically. Russia perfectly identifies 20/33 cases between audit and tests; Hormuz 32/33. Discrepancies are concurrent macro events (CNY's China zero-COVID), not Russia-treatment.
+  \item \textit{Why 21 specifically and not 24 or 18?} The shared pool is the intersection of Russia-clean (21 of 33) and Hormuz-clean (33 of 33). Russia is the binding constraint.
+\end{itemize}
+
+% =====================================================================
+\section{Donor co-movement with Brent --- audited pool \timetag{30s}}
+
+\subsection{Talking points}
+\begin{itemize}
+  \item Visual: 21 audited donors rebased to 100 at pre-window start, with Brent in black on top. Dashed line marks $T_0$.
+  \item Show the audited donors are visibly correlated with Brent in the pre-event window --- the SCM has something real to fit.
+  \item Move quickly; this is an orientation slide, not an analytical one.
+\end{itemize}
+
+% =====================================================================
+\section{Validation results --- model fit \timetag{60s}}
+
+\subsection{Talking points}
+\begin{itemize}
+  \item Ensemble paths (left Russia, right Hormuz): all 5 model synthetics overlay observed Brent in the pre-event window, then fan out post-event. Visual evidence of pre-event fit AND post-event divergence.
+  \item Walk-forward CV table: \highlight{train and val RMSE per model}. Convex SCM val/train ratio is 1.16 Russia / 1.26 Hormuz (clean). ASCM 2.04 Russia (just over 2$\times$ heuristic threshold). XGBoost 3.00 Russia and Bayesian Ridge 3.07 Russia are the overfit-flagged cases.
+  \item Hormuz: 4 of 5 models clean; only Bayesian Ridge flagged.
+  \item Ensemble is robust to individual model overfit because median across 5 models smooths.
+\end{itemize}
+
+\subsection{If asked}
+\begin{itemize}
+  \item \textit{Why don't you exclude the overfit models?} The heuristic threshold (val/train $>2$) is just a flag, not a gate. Auto-excluding would impose a literature-unsupported cutoff and would tighten the IQR artificially. Defense is the IQR-as-uncertainty-band convention.
+  \item \textit{Is the validation downward biased by hyperparameter selection?} Yes; documented. Magnitude: the bias is small ($\sim$10\% on val RMSE) because grids are tight per Cawley \& Talbot.
+\end{itemize}
+
+% =====================================================================
+\section{Validation results --- in-space placebo \timetag{90s}}
+
+\subsection{Talking points}
+\begin{itemize}
+  \item Abadie's randomization inference: refit treating each donor as the placebo treated unit, compute Brent's rank in the post/pre RMSPE distribution.
+  \item \highlight{Permutation floor}: 1/22 $\approx 0.045$ for 21-donor pool; 1/34 $\approx 0.029$ for 33-donor full pool.
+  \item Hormuz: \highlight{all 5 models hit the floor under both pools} --- Brent ranks 1 of 22 in each. Strongest possible permutation signal.
+  \item Russia: not decisively rejected. Only XGBoost reaches floor at 21-donor (0.045) and slips to 0.147 at 33-donor. Other models p $\sim$ 0.4--0.7.
+\end{itemize}
+
+\subsection{Behind the slide}
+The two-pool design (21-donor and 33-donor full) is a robustness check. The 21-donor floor is too coarse to distinguish ``Brent is rank 1'' from anything below 0.045. The 33-donor pool with audit-flagged donors mixed back in tests whether the rank-1 finding holds when ``noisier'' donors expand the placebo distribution. Hormuz is robust; Russia is not.
+
+The Russia weakness is the known limitation of in-space placebo at pre-periods with high donor volatility (Russia's pre-period 2020-07 $\to$ 2022-02 spans COVID recovery + 2021 reflation rally, both of which moved donors). This widens the placebo distribution and prevents Brent's post-period ratio from sitting in the tail.
+
+\subsection{If asked}
+\begin{itemize}
+  \item \textit{Is XGBoost's Russia rejection meaningful?} It clears at 21-donor floor but fails at 33-donor (p $\sim$ 0.147), so the rejection is fragile. Russia's case for a real effect rests on (a) the historical record (well-documented \$95 $\to$ \$130 move), (b) the audit-supported SUTVA defense, and (c) the cross-event weight transfer (slide A5), not on the in-space placebo alone.
+  \item \textit{Why does Hormuz have such tight p-values?} Brent's post/pre RMSPE ratios for Hormuz are 6 to 12 across models --- much bigger than any donor's. The donor pool is also more stable in the Hormuz pre-window (no COVID-style regime shifts), so the placebo distribution is tight.
+  \item \textit{Permutation test theory: how do we know p-values are valid?} The randomization-inference framework (Fisher 1935; Lehmann \& Romano 2005) is what justifies SCM's p-values. Abadie 2010 $\S$4 explicitly grounds the placebo inference in this framework. Exact at the unit level (we enumerate all 22 or 34 placebo refits).
+\end{itemize}
+
+% =====================================================================
+\section{External validation --- EIA STEO pre-invasion forecasts (Russia only) \timetag{75s}}
+
+\subsection{Talking points}
+\begin{itemize}
+  \item Two-method cross-check: SCM Russia counterfactual vs EIA STEO's pre-invasion forecast of 2022 Brent, measured on the \emph{exact same 151-day treatment window} (Feb 24 $\to$ Sep 30 2022).
+  \item Two STEO vintages: \highlight{Jan-22} (issued $\sim$Jan 11, 2022 --- 6 weeks pre-invasion) and \highlight{Feb-22} (issued $\sim$Feb 8, 2022 --- 16 days pre-invasion, last pre-invasion STEO).
+  \item Result table: SCM ensemble-median counterfactual \$88.92/bbl. STEO Feb-22 step-function \$84.94/bbl. \highlight{Disagreement: only \$3.98/bbl, or 5.7 pp on implied ATT.}
+  \item Three of five SCM models bracket STEO Feb-22 within $\pm$\$6.
+  \item Implied ATTs: SCM-based 25.3\%, STEO-Feb-22-based 27.8\%, STEO-Jan-22-based 41.9\% (further in time = larger gap).
+\end{itemize}
+
+\subsection{Behind the slide}
+SCM and STEO share no information path: SCM uses cross-asset co-movement; STEO uses EIA's structural supply/demand model. The agreement is independent-method evidence the SCM isn't producing a fantasy counterfactual. The disagreement direction matters too: SCM is more \emph{conservative} (lower implied ATT) because donor co-movement absorbs macro spillover (inflation, demand recovery) that the STEO doesn't.
+
+This is uniquely available for Russia: Hormuz has no equivalent pre-event structural forecast because Hormuz happened in early 2026 and the methodology was developed after the event.
+
+\subsection{If asked}
+\begin{itemize}
+  \item \textit{Why use STEO and not other forecasts?} STEO is the most prominent monthly oil forecast and publicly available with archive vintages. EIA Short-Term Energy Outlook archives at \texttt{eia.gov/outlooks/steo/archives}.
+  \item \textit{Is STEO the ground truth?} No; STEO is another model. The agreement says two independent methods produce the same counterfactual, not that either is correct.
+  \item \textit{What if STEO is just wrong?} Then the SCM might also be wrong in the same direction. The two-method agreement is necessary but not sufficient evidence. The qualitative case rests on the broader battery (placebo + cross-event transfer + donor audit).
+\end{itemize}
+
+% =====================================================================
+\section{Headline result --- ATT estimate \timetag{90s}}
+
+\subsection{Talking points}
+\begin{itemize}
+  \item \highlight{Headline numbers:}
+  \begin{itemize}
+    \item Russia 2022 ensemble median: \highlight{$\sim$21--22\%} drift-adjusted Brent premium over the 7-month post-window. IQR [13.1, 23.8].
+    \item Hormuz 2026 ensemble median: \highlight{$\sim$43--44\%} chokepoint premium over the 3-month post-window. IQR [40.3, 44.2].
+  \end{itemize}
+  \item Hormuz IQR is tighter than Russia (4 pp vs 11 pp) --- donors are more stable in the Hormuz pre-period.
+  \item Drift adjustment: subtract the pre-period slope $\times$ post-window length per Roth 2022 (pretest-with-caution framework).
+  \item Russia validation: matches EIA STEO to within \$3.98/bbl. Hormuz: validated by in-space placebo at the floor under both pools across all 5 models, plus cross-event weight transfer (appendix).
+\end{itemize}
+
+\subsection{Behind the slide}
+This is the punchline of Part 1. The Hormuz $\sim$43\% is the substantive headline; Russia $\sim$22\% is the methodology-validation case. The cross-event weight transfer (appendix) shows that the same factor structure that fits Russia transfers to Hormuz for the linear/sparse models (Convex SCM, ASCM, Elastic-net), giving regime-stability evidence for the focal estimate.
+
+If asked for a single number for Hormuz: 43\%. If asked for a range: 38--50\% across models, 40--44\% interquartile.
+
+\subsection{If asked}
+\begin{itemize}
+  \item \textit{How does 43\% compare to scenario-model estimates?} Dallas Fed WP 2609, Kiel Policy Brief 206, and IEA OMR April--May 2026 report scenario-model estimates for partial vs full Hormuz closure. The SCM is in the same order of magnitude as the partial-closure scenarios.
+  \item \textit{What's the standard error?} The IQR is the model-uncertainty band; no formal SE is reported because SCM doesn't naturally have one. Inference is via the in-space placebo p-value.
+  \item \textit{Is the Hormuz post-window long enough?} 59 obs is short by SCM convention. The cross-event weight transfer substitutes inferential depth.
+\end{itemize}
+
+% =====================================================================
+\section{Part 2 --- ideas for the second half \timetag{45s}}
+
+\subsection{Talking points}
+\begin{itemize}
+  \item Currently a placeholder for discussion. Possible directions (per the muted footnote):
+  \begin{itemize}
+    \item Pass-through of the Brent ATT to retail fuel prices and headline CPI.
+    \item Direct comparison: SCM ATT vs scenario-model price paths (Dallas Fed, OIES, Kiel) on the same window.
+    \item Severity-dependent extrapolation: the SCM gives one ATT for the realized disruption; what about counterfactual closure intensities?
+    \item Alternative donor pool designs or maritime-network features re-entering as donor candidates.
+  \end{itemize}
+  \item \highlight{Open to suggestions from the audience.}
+\end{itemize}
+
+\subsection{Behind the slide}
+The Part 2 slide is deliberately under-specified. The intent is to elicit feedback from the committee on direction. Have one or two preferred directions ready in case nobody pushes back: the most natural is the SCM vs scenario-model comparison (slide reuses the STEO machinery from Part 1).
+
+% =====================================================================
+\section{Thank you / Q\&A}
+
+Open the floor. The appendix slides are reserve material; navigate to them on demand:
+
+\begin{itemize}
+  \item \textbf{Appendix A1 --- excluded donors:} 12 Russia-treated drops with audit reasons; categorical exclusions (energy complex, oil-currencies).
+  \item \textbf{Appendix A2 --- donor importance:} per-model weight heatmaps (note: weights are not identical across events, see A5 nuance).
+  \item \textbf{Appendix A3 --- donor SUTVA cleanliness:} permutation mean-shift test results (Chow 1960 hypothesis + Lehmann \& Romano 2005 permutation + Phipson \& Smyth 2010 correction). Russia 1/33 flagged (CNY); Hormuz 1/33 (IronOre). Audit agreement: Russia 20/33, Hormuz 32/33.
+  \item \textbf{Appendix A4 --- in-time placebo and LOO:} combined diagnostics table. Tightest LOO: XGBoost ($\sim$5 pp both events). Widest: Bayesian Ridge Russia (24.9 pp, range crosses zero) --- the LOO-fragile case.
+  \item \textbf{Appendix A5 --- cross-event weight transfer:} the $\S$5f test. Russia weights applied to Hormuz panel: Convex SCM transfers cleanly (+8 pp), ASCM and Elastic-net transfer with attenuation, XGBoost and Bayesian Ridge transfer pathologically (transferred pre-RMSPE 22$\times$ and 314$\times$ independent). The relevant subtlety: per-donor weights aren't stable across events (e.g., JPY moves from rank 12 to rank 1 in convex SCM), but the \emph{projection onto donor space} is. Cite Abadie \& L'Hour 2021 on convex SCM weight non-uniqueness.
+\end{itemize}
+
+% =====================================================================
+\section*{General Q\&A backup material}
+
+\subsection{Methodological choices to be ready to defend}
+\begin{itemize}
+  \item \textbf{Why 5 models and not 1?} Ensemble spans the SCM regularization design space; no single model assumption is privileged; IQR is the honest uncertainty band.
+  \item \textbf{Why log-Brent and log-donors?} Stationarity (log-returns are approximately stationary; levels are not), interpretability (log differences $\approx$ percentage changes), variance stabilization.
+  \item \textbf{Why a shared 21-donor pool for both events?} Enables the cross-event weight transfer test (the strongest single methodology generalization test). Alternative per-event pools would give somewhat different headline numbers but break the cross-event design.
+  \item \textbf{Why Russia 2022 specifically as the validation case?} Most recent large oil shock with a long post-window; independent of Hormuz pre-period; well-documented; matches the Hormuz design template.
+  \item \textbf{Why pre-windows starting 2020-07 (Russia) and 2024-06 (Hormuz)?} 18--20 month pre-windows balance sample size against regime stability. Earlier starts include too much COVID disruption (Russia) or pre-2024 macro instability (Hormuz). Documented in PRE\_WINDOWS at lib/config.py:29.
+\end{itemize}
+
+\subsection{Numbers to know cold}
+\begin{itemize}
+  \item Russia headline drift-adjusted ATT: \textbf{21--22\%} (IQR 13--24).
+  \item Hormuz headline drift-adjusted ATT: \textbf{43\%} (IQR 40--44).
+  \item Actual Russia Brent mean over Feb 24 $\to$ Sep 30 2022: \$108.54/bbl.
+  \item SCM ensemble median Russia counterfactual: \$88.92/bbl.
+  \item EIA STEO Feb-22 forecast for the same window: \$84.94/bbl.
+  \item Russia pre-event window: 421 obs / Hormuz pre-event: 423 obs.
+  \item Hormuz post-event obs: $\sim$59 (the binding constraint on in-event inference).
+  \item In-space placebo floors: 1/22 = 0.045 (21-donor); 1/34 = 0.029 (33-donor).
+\end{itemize}
+
+\subsection{Hardest critiques}
+\begin{itemize}
+  \item \textbf{``Your Hormuz IQR is 4 pp --- too narrow given 60 obs.''} The IQR reflects model agreement, not statistical uncertainty. The structural uncertainty is in the in-space placebo (floor) and cross-event transfer (degraded RMSPE for nonlinear models). Honest reading: 38--50\% across all models, 40--44\% across the agreeable models.
+  \item \textbf{``Cross-event weight transfer fails for 2 of 5 models.''} It fails for the dense / regime-dependent models (XGBoost, Bayesian Ridge) and works for the sparse models (Convex SCM, ASCM, Elastic-net). This is mechanically expected: sparse weights pin to factor-stable donors. The Hormuz headline rests on the sparse models, which transfer.
+  \item \textbf{``In-space placebo for Russia is weak.''} Yes. Russia's defense is multi-layered: EIA STEO external validation, historical record (\$95 $\to$ \$130 move is documented), audit-supported SUTVA, cross-event weight transfer. The in-space placebo is one of four pieces of evidence.
+  \item \textbf{``You changed the in-time placebo to use defaults instead of tuned hparams.''} Yes, intentionally: the fake-post period overlaps the val window used for hparam tuning, so tuned hparams would induce second-order leakage. Defaults are the literature-defensible choice for an unselection-bias test. Documented in validation.md $\S$5e (ii).
+\end{itemize}
+
+\vspace{2em}
+\hrule
+\vspace{0.5em}
+\textcolor{muted}{\small\itshape Companion compiled from docs/methodology.md, docs/validation.md, docs/results.md, docs/donor\_catalog.md, and docs/motivation.md as of commit \texttt{8721f35}. For full details on any item, the source-of-truth documents are in \texttt{docs/}.}
+
+\end{document}
