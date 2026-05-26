@@ -150,16 +150,16 @@ Three tests on each donor's own time-series — none depend on any SCM model:
 
 **Empirical findings from 01.5:**
 
-- **Hormuz 2026: perfect agreement** between the audit and the tests (0 of 33 flagged on both sides). The audit's qualitative "no Persian-Gulf routing for any donor" call is empirically confirmed.
-- **Russia 2022: partial disagreement** (19 of 33 agree, 14 disagree):
+- **Hormuz 2026: 32 of 33 agree.** The audit's qualitative "no Persian-Gulf routing for any donor" call is empirically confirmed except for IronOre, which the Wilcoxon event-window test flags on a concurrent commodity-cycle move (not Hormuz-treatment).
+- **Russia 2022: partial disagreement** (20 of 33 agree, 13 disagree):
   - *Audit flags, tests miss* (12 cases): the audit's H/M tier (Wheat, Corn, Palladium, EUR, DXY, BTC + the 6 M-tier donors) captures *causal channels* the model-agnostic tests cannot reproduce. The tests see "wheat moved" but the move isn't extreme enough to register after FDR with $N = 33$.
-  - *Tests flag, audit clean* (2 cases — JPY, CNY): the tests detect mean shifts (Fed/BoJ policy divergence, China zero-COVID) that are **concurrent macro events, not Russia-treatment**.
+  - *Tests flag, audit clean* (1 case — CNY): the permutation mean-shift test detects China zero-COVID dynamics — **a concurrent macro event, not Russia-treatment**.
 
-**Interpretation.** The hand-curated audit remains the primary SUTVA defense; the model-agnostic tests **confirm** the audit on Hormuz and **supplement** it on Russia (highlighting JPY/CNY as flagged-but-not-audit-relevant — informative for the discussion section but not a reason to revise the audit). Tests and audit are *complementary*, not substitutes: audit captures causal-channel reasoning; tests capture event-localized empirical shifts (excluding KS, which captures the broader regime change).
+**Interpretation.** The hand-curated audit remains the primary SUTVA defense; the model-agnostic tests **largely confirm** the audit on Hormuz (32/33 agreement; the lone test flag is IronOre on a concurrent commodity-cycle move) and **supplement** it on Russia (highlighting CNY as flagged-but-not-audit-relevant — informative for the discussion section but not a reason to revise the audit). Tests and audit are *complementary*, not substitutes: audit captures causal-channel reasoning; tests capture event-localized empirical shifts (excluding KS, which captures the broader regime change).
 
 ### Honest power limitations
 
-~415 obs per pre-period is low for detecting small contamination — tests can produce false negatives (failing to detect real contamination, as we see for the Russia H/M tier). Hormuz's post-event window is especially short (~60 obs) → very low power; perfect agreement there is partly because both audit and tests are too conservative at that sample size to call anything treated. The qualitative SUTVA defense in [donor_catalog.md](donor_catalog.md) is the **primary** defense; the statistical tests are **secondary** empirical confirmation.
+~415 obs per pre-period is low for detecting small contamination — tests can produce false negatives (failing to detect real contamination, as we see for the Russia H/M tier). Hormuz's post-event window is especially short (~60 obs) → very low power; the near-agreement there (32/33, with the lone IronOre flag attributable to a concurrent commodity-cycle move) is partly because both audit and tests are too conservative at that sample size to call anything treated. The qualitative SUTVA defense in [donor_catalog.md](donor_catalog.md) is the **primary** defense; the statistical tests are **secondary** empirical confirmation.
 
 ## 5e. Inferential validation on the treated unit
 
@@ -175,7 +175,7 @@ Note: this is the *same procedure* as §5d's donor-cleanliness placebo, but used
 
 A small p-value (< 0.10 is the conventional Abadie threshold) means Brent's gap is unusually large relative to what the SCM produces on units that were not treated. This is the standard non-parametric SCM inference.
 
-**Permutation-distribution resolution — report under both pools.** With the shared 21-donor pool, the permutation distribution has 21 placebo units, so the minimum attainable p-value is $1/21 \approx 0.048$. This sits right at Abadie's conventional 0.10 threshold but leaves very little headroom below 0.05. To increase resolution, the in-space placebo is **re-run under the 33-donor full pool** (Russia: 33 donors; Hormuz: 33 donors), where the minimum attainable p-value is $1/33 \approx 0.030$. Both permutation p-values are reported in the appendix robustness table ([methodology.md §7](methodology.md)) alongside the headline 21-donor result. Reading: if the 21-donor p-value is at or near the floor of $0.048$, the 33-donor p-value is the cleaner signal of statistical significance; if both are well above the floor, the 21-donor result stands on its own and the 33-donor reading is supplementary.
+**Permutation-distribution resolution — report under both pools.** With the shared 21-donor pool, the permutation distribution has 21 placebo units plus Brent (22 units total), so the minimum attainable p-value is $1/22 \approx 0.045$. This sits right at Abadie's conventional 0.10 threshold but leaves very little headroom below 0.05. To increase resolution, the in-space placebo is **re-run under the 33-donor full pool** (Russia: 33 donors; Hormuz: 33 donors), where the minimum attainable p-value is $1/34 \approx 0.029$. Both permutation p-values are reported in the appendix robustness table ([methodology.md §7](methodology.md)) alongside the headline 21-donor result. Reading: if the 21-donor p-value is at or near the floor of $0.048$, the 33-donor p-value is the cleaner signal of statistical significance; if both are well above the floor, the 21-donor result stands on its own and the 33-donor reading is supplementary.
 
 For reference, Abadie 2010 (California tobacco) has 38 placebo states; Abadie, Diamond & Hainmueller 2015 (German reunification) has 16 countries. 21 donors is comparable to the latter — defensible, but not generous on resolution.
 

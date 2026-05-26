@@ -19,11 +19,11 @@ The SCM analysis estimates the chokepoint / geopolitical-risk premium on Brent f
 
 **Preferred specification.** A **21-donor strict-clean intersection** used for both events. Drops the Russia H-tier (Wheat, Corn, Palladium, EUR, DXY, BTC — direct exposure to the focal event) and the Russia M-tier (Copper, Iron Ore, Soybeans, EM_Eq, GBP, US10Y — secondary or terms-of-trade exposure). Hormuz audits to all-C on the full 33, but the same 21-donor pool is used to enable the cross-event weight-transfer validation in [validation.md §5f](validation.md). The 27-donor permissive pool and 33-donor full pool are reported as appendix robustness.
 
-**Focal-event audit (SUTVA on $T_0$).** Russia 2022: **12 of 33 donors flagged** (6 H + 6 M) through identifiable causal channels — Russia / Ukraine agricultural exports, palladium supply concentration, EU energy-crisis pass-through to EUR / DXY, sanctions-evasion narrative for BTC. Hormuz 2026: **0 of 33 donors flagged** — the no-Persian-Gulf-routing criterion makes the audit empty by construction, and the empirical SUTVA tests in [validation.md §5d](validation.md) confirm it.
+**Focal-event audit (SUTVA on $T_0$).** Russia 2022: **12 of 33 donors flagged** (6 H + 6 M) through identifiable causal channels — Russia / Ukraine agricultural exports, palladium supply concentration, EU energy-crisis pass-through to EUR / DXY, sanctions-evasion narrative for BTC. Hormuz 2026: **0 of 33 donors flagged** — the no-Persian-Gulf-routing criterion makes the audit empty by construction; the empirical SUTVA tests in [validation.md §5d](validation.md) flag 1 of 33 (IronOre, Wilcoxon-only) on a concurrent commodity-cycle move rather than Hormuz-treatment.
 
 **Pre-window audit (events inside the fitting window).** Russia pre-window (2020-07 → 2022-02) contains one curated event — the **2021-10 energy-cycle reflation** — which is a common oil-cycle factor; every donor-specific channel through which it could contaminate the SCM weights is already absorbed by the M-tier downgrade. Hormuz pre-window (2024-06 → 2026-01) contains **no curated events**. The pre-window is therefore event-clean for the donor pool under both specifications.
 
-**Empirical support.** The qualitative audits above are confirmed (Hormuz) or supplemented (Russia: 2 additional flags on JPY / CNY, attributable to concurrent macro events rather than Russia-treatment) by the model-agnostic SUTVA battery in [validation.md §5d](validation.md) and the regime-stability test in §5c. The qualitative audit remains the primary defence; the tests are secondary empirical confirmation.
+**Empirical support.** The qualitative audits above are confirmed (Hormuz: 32 of 33 agreement; the lone test flag is IronOre on a concurrent commodity-cycle move) or supplemented (Russia: 1 additional flag on CNY, attributable to a concurrent macro event — China zero-COVID — rather than Russia-treatment) by the model-agnostic SUTVA battery in [validation.md §5d](validation.md) and the regime-stability test in §5c. The qualitative audit remains the primary defence; the tests are secondary empirical confirmation.
 
 ## Selection criteria
 
@@ -161,7 +161,7 @@ One curated event falls inside this window:
 
 **No curated events fall inside this window.** The two most recent entries on the timeline before $T_0$ — Israel–Hamas war (2023-10-07) and Red Sea diversion (2023-11-19) — both predate the pre-window start, and Red Sea was specifically considered and rejected as a focal event because Brent did not visibly disrupt (see "Why Red Sea is not a focal event" above).
 
-The implication for the donor audit is that, in the curated-event sense, the Hormuz pre-window is event-clean. This is structurally consistent with the all-C audit for Hormuz: there is no qualifying pre-window event for the audit to flag against, and the empirical SUTVA tests in §5d return no significant donor flags either ([validation.md §5d](validation.md), "Hormuz 2026: perfect agreement").
+The implication for the donor audit is that, in the curated-event sense, the Hormuz pre-window is event-clean. This is structurally consistent with the all-C audit for Hormuz: there is no qualifying pre-window event for the audit to flag against, and the empirical SUTVA tests in §5d return only one borderline flag — IronOre on the Wilcoxon event-window test, attributable to a concurrent commodity-cycle move ([validation.md §5d](validation.md), "Hormuz 2026: 32 of 33 agree").
 
 ### Where this argument can fail
 

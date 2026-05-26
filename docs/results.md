@@ -70,8 +70,8 @@ Primary defense: the qualitative audit in [donor_catalog.md](donor_catalog.md). 
 
 | Event | Audit verdict | Statistical confirmation (BH-FDR α=0.10) |
 |---|---|---|
-| Russia 2022 | 12 of 33 donors flagged (6 H + 6 M); excluded → 21-donor shared pool | Tests confirm 0 of audit's 12, but flag JPY + CNY (concurrent Fed/BoJ + China zero-COVID — not Russia-treatment). Audit remains primary. |
-| Hormuz 2026 | 0 of 33 donors flagged ("no Persian Gulf routing for any donor") | Tests confirm 0 flagged — perfect agreement with audit. |
+| Russia 2022 | 12 of 33 donors flagged (6 H + 6 M); excluded → 21-donor shared pool | Tests confirm 0 of audit's 12, but flag CNY (concurrent China zero-COVID — not Russia-treatment). Audit-vs-test agreement: 20 of 33. Audit remains primary. |
+| Hormuz 2026 | 0 of 33 donors flagged ("no Persian Gulf routing for any donor") | Tests flag 1 of 33 (IronOre, Wilcoxon event-window — concurrent commodity-cycle, not Hormuz-treatment). Audit-vs-test agreement: 32 of 33. |
 
 ### 2.3 Inference — In-space placebo, 21- and 33-donor pools (§5e i)
 

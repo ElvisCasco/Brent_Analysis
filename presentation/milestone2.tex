@@ -1,5 +1,5 @@
 % Master's thesis defence — 15 min, widescreen, minimalist design.
-% Compile: pdflatex thesis_defense.tex
+% Compile: pdflatex milestone2.tex
 % Prerequisite: run notebooks/01_EDA.ipynb to regenerate ../plots/eda_brent_events_postcovid.png
 
 \documentclass[aspectratio=169,11pt]{beamer}
@@ -161,7 +161,7 @@
     Augmented SCM  & Convex + ridge bias correction                      & Ben-Michael, Feller \& Rothstein (2021, \textit{JASA}) \\
     Elastic-net    & $L_1 + L_2$ regression, sparse donor weights        & Doudchenko \& Imbens (2016, NBER WP) \\
     XGBoost        & Gradient-boosted trees, flexible nonlinear          & Chen \& Guestrin (2016, \textit{KDD}) \\
-    Bayesian Ridge & Bayesian linear with normal prior, donor PIPs       & Tipping (2001); Brodersen et al.\ (2015) \\
+    Bayesian Ridge & Bayesian linear with normal prior, donor PIPs       & Brodersen et al.\ (2015) \\
     \bottomrule
   \end{tabular}
 
@@ -242,15 +242,17 @@
   \vspace{-0.1em}
   \begin{center}
   \tiny
-  \begin{tabular}{@{}l r r r r@{}}
+  \begin{tabular}{@{}l r r r r r r@{}}
     \toprule
-    \hd{Model}     & \hd{Russia train} & \hd{Russia val} & \hd{Hormuz train} & \hd{Hormuz val} \\
+                   & \multicolumn{3}{c}{\hd{Russia 2022}} & \multicolumn{3}{c}{\hd{Hormuz 2026}} \\
+    \cmidrule(lr){2-4}\cmidrule(lr){5-7}
+    \hd{Model}     & \hd{train} & \hd{val} & \hd{val/train} & \hd{train} & \hd{val} & \hd{val/train} \\
     \midrule
-    Convex SCM     & 0.111 & 0.086 & 0.059 & 0.129 \\
-    ASCM           & 0.046 & 0.087 & 0.035 & 0.087 \\
-    Elastic-net    & 0.055 & 0.094 & 0.043 & 0.049 \\
-    XGBoost        & 0.039 & 0.135 & 0.045 & 0.089 \\
-    Bayesian Ridge & 0.034 & 0.171 & 0.033 & 0.093 \\
+    Convex SCM     & 0.109 & 0.127 & 1.16          & 0.059 & 0.075 & 1.26 \\
+    ASCM           & 0.043 & 0.088 & \textbf{2.04} & 0.047 & 0.064 & 1.35 \\
+    Elastic-net    & 0.049 & 0.089 & 1.83          & 0.045 & 0.070 & 1.55 \\
+    XGBoost        & 0.039 & 0.117 & \textbf{3.00} & 0.044 & 0.076 & 1.72 \\
+    Bayesian Ridge & 0.031 & 0.096 & \textbf{3.07} & 0.031 & 0.066 & \textbf{2.10} \\
     \bottomrule
   \end{tabular}
   \normalsize
@@ -285,7 +287,7 @@
   \hd{Headline.}
   \begin{itemize}\setlength\itemsep{0.1em}
     \item \hd{Hormuz:} all 5 models hit the floor under both pools.
-    \item \hd{Russia:} not decisively rejected --- only XGBoost reaches floor at 21-donor and fails at 33-donor. Feb-22 macro regime shift moves many donors too; 
+    \item \hd{Russia:} not decisively rejected --- only XGBoost reaches floor at 21-donor and fails at 33-donor. Feb-22 macro regime shift moves many donors too; the historical \$95--\$130 record, EIA STEO cross-check, and cross-event transfer (\S5f) carry the Russia case.
   \end{itemize}
 
 \end{frame}
@@ -304,17 +306,17 @@
     \midrule
     Convex SCM     & 83.55             & 84.94                   & $-$\$1.39  \\
     ASCM           & 95.52             & 84.94                   & $+$\$10.58 \\
-    Elastic-net    & 86.61             & 84.94                   & $+$\$1.67  \\
-    XGBoost        & 79.37             & 84.94                   & $-$\$5.57  \\
+    Elastic-net    & 88.92             & 84.94                   & $+$\$3.98  \\
+    XGBoost        & 79.28             & 84.94                   & $-$\$5.66  \\
     Bayesian Ridge & 107.91            & 84.94                   & $+$\$22.97 (deg.) \\
     \midrule
-    \hd{Ensemble median} & \hd{86.61}  & \hd{84.94}              & \hd{$+$\$1.67} \\
+    \hd{Ensemble median} & \hd{88.92}  & \hd{84.94}              & \hd{$+$\$3.98} \\
     \bottomrule
   \end{tabular}
   \normalsize
 
   \vspace{0.6em}
-  \hd{Implied ATT} \smalltext{(Brent actual \$108.54)}: SCM ensemble $+$25.3\% \quad vs \quad STEO Feb-22 $+$27.8\% \quad ($\Delta \sim$ 2.5 pp).
+  \hd{Implied ATT} \smalltext{(Brent actual \$108.54)}: SCM ensemble $+$22.1\% \quad vs \quad STEO Feb-22 $+$27.8\% \quad ($\Delta \sim$ 5.7 pp).
 
   \vspace{0.3em}
 \end{frame}
@@ -345,7 +347,7 @@
   \end{center}
 
   \vspace{0.5em}
-  \hd{Reading.} Russia $+21.7\%$ within $\sim$2.5 pp of STEO cross-check; Bayesian Ridge degenerate, IQR excludes it. Hormuz $+43.6\%$ with tight IQR --- place against Dallas Fed / OIES / IEA scenarios.
+  \hd{Reading.} Russia $+21.7\%$ within $\sim$5.7 pp of STEO Feb-22 ATT (synth \$88.92 vs STEO \$84.94, $\Delta$ \$3.98/bbl); Bayesian Ridge degenerate, IQR excludes it. Hormuz $+43.6\%$ with tight IQR --- place against Dallas Fed / OIES / IEA scenarios.
   \normalsize
 \end{frame}
 
