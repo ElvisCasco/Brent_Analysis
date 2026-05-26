@@ -334,8 +334,8 @@ Donors: metals, FX, equities, rates. &
   \hd{Validation battery.}
   \begin{itemize}\setlength\itemsep{0.12em}
     \item \hd{Model fit} --- walk-forward CV val/train RMSE.
-    \item \hd{SUTVA} --- qualitative donor audit on causal channels \src{Abadie 2021 \S3.1}.
-    \item \hd{Inference} --- in-space placebo, 21- and 33-donor pools \src{Abadie 2010 \S3.3}; cross-event weight transfer substitutes for the low-power Hormuz placebo ($\sim$60 post-event obs).
+    \item \hd{SUTVA} --- qualitative donor audit on causal channels.
+    \item \hd{Inference} --- in-space placebo, 21- and 33-donor pools.
   \end{itemize}
 \end{frame}
 
@@ -380,17 +380,17 @@ Donors: metals, FX, equities, rates. &
 % =====================================================================
 \begin{frame}{Validation results --- model fit}
   \begin{center}
-    \includegraphics[width=0.90\textwidth,height=0.56\textheight,keepaspectratio]{../plots/milestone2/ensemble_paths_side_by_side.png}
+    \includegraphics[width=0.95\textwidth,height=0.58\textheight,keepaspectratio]{../plots/milestone2/ensemble_paths_side_by_side.png}
   \end{center}
 
-  \vspace{-0.1em}
+  \vspace{-0.4em}
   \begin{center}
   \tiny
   \begin{tabular}{@{}l r r r r r r@{}}
     \toprule
                    & \multicolumn{3}{c}{\hd{Hormuz 2026}} & \multicolumn{3}{c}{\hd{Russia 2022}} \\
     \cmidrule(lr){2-4}\cmidrule(lr){5-7}
-    \hd{Model}     & \hd{train} & \hd{val} & \hd{val/train} & \hd{train} & \hd{val} & \hd{val/train} \\
+    \hd{Model}     & \hd{train RMSE} & \hd{val RMSE} & \hd{val/train} & \hd{train RMSE} & \hd{val RMSE} & \hd{val/train} \\
     \midrule
     Convex SCM     & 0.059 & 0.075 & 1.26          & 0.109 & 0.127 & 1.16 \\
     ASCM           & 0.047 & 0.064 & 1.35          & 0.043 & 0.088 & \textbf{2.04} \\
@@ -406,32 +406,35 @@ Donors: metals, FX, equities, rates. &
 % =====================================================================
 % 9. Validation results — in-space placebo
 % =====================================================================
-\begin{frame}[shrink=5]{Validation results --- in-space placebo}
+\begin{frame}[shrink=10]{Validation results --- in-space placebo}
   \footnotesize
-  \hd{Abadie 2010 \S3.3}: rank Brent's post/pre RMSPE ratio against placebo refits. 21-donor floor $= 0.045$; 33-donor full pool re-run gives floor $= 0.029$.
+  \hd{Procedure} \src{Abadie 2010 \S3.3}: refit the SCM treating each donor as treated. Rank Brent's post/pre RMSPE ratio against the $N$ placebos (Brent $+$ donors). \hd{Permutation $p$-value $= $ rank $/\, N$.} Rank 1 $=$ Brent's break beats every placebo $\rightarrow$ strongest possible signal; floor $p = 1/N$ ($0.045$ at 21-donor, $0.029$ at 33-donor).
 
   \vspace{0.3em}
   \begin{center}
+  \scriptsize
   \begin{tabular}{@{}l c c c c@{}}
     \toprule
                    & \multicolumn{2}{c}{\hd{Hormuz 2026}} & \multicolumn{2}{c}{\hd{Russia 2022}} \\
     \cmidrule(lr){2-3}\cmidrule(lr){4-5}
-    \hd{Model}     & 21-donor & 33-donor & 21-donor & 33-donor \\
+    \hd{Model}     & 21-donor ($N{=}22$) & 33-donor ($N{=}34$) & 21-donor ($N{=}22$) & 33-donor ($N{=}34$) \\
+                   & rank\,$\rightarrow$\,$p$ & rank\,$\rightarrow$\,$p$ & rank\,$\rightarrow$\,$p$ & rank\,$\rightarrow$\,$p$ \\
     \midrule
-    Convex SCM     & \textbf{0.045}  & \textbf{0.029} & 0.545           & 0.500           \\
-    ASCM           & \textbf{0.045}  & \textbf{0.029} & 0.682           & 0.471           \\
-    Elastic-net    & \textbf{0.045}  & \textbf{0.029} & 0.409           & 0.412           \\
-    XGBoost        & \textbf{0.045}  & \textbf{0.029} & \textbf{0.045}  & 0.147           \\
-    Bayesian Ridge & \textbf{0.045}  & \textbf{0.029} & 0.636           & 0.529           \\
+    Convex SCM     & \textbf{1\,$\rightarrow$\,0.045} & \textbf{1\,$\rightarrow$\,0.029} & 12\,$\rightarrow$\,0.545 & 17\,$\rightarrow$\,0.500 \\
+    ASCM           & \textbf{1\,$\rightarrow$\,0.045} & \textbf{1\,$\rightarrow$\,0.029} & 15\,$\rightarrow$\,0.682 & 16\,$\rightarrow$\,0.471 \\
+    Elastic-net    & \textbf{1\,$\rightarrow$\,0.045} & \textbf{1\,$\rightarrow$\,0.029} & 9\,$\rightarrow$\,0.409  & 14\,$\rightarrow$\,0.412 \\
+    XGBoost        & \textbf{1\,$\rightarrow$\,0.045} & \textbf{1\,$\rightarrow$\,0.029} & \textbf{1\,$\rightarrow$\,0.045}  & 5\,$\rightarrow$\,0.147  \\
+    Bayesian Ridge & \textbf{1\,$\rightarrow$\,0.045} & \textbf{1\,$\rightarrow$\,0.029} & 14\,$\rightarrow$\,0.636 & 18\,$\rightarrow$\,0.529 \\
     \bottomrule
   \end{tabular}
+  \normalsize
   \end{center}
 
-  \vspace{0.4em}
-  \hd{Headline.}
-  \begin{itemize}\setlength\itemsep{0.1em}
-    \item \hd{Hormuz:} all 5 models hit the floor under both pools.
-    \item \hd{Russia:} not decisively rejected --- only XGBoost reaches floor at 21-donor and fails at 33-donor. Feb-22 macro regime shift moves many donors too; the historical \$95--\$130 record, EIA STEO cross-check, and cross-event transfer (\S5f) carry the Russia case.
+  \vspace{0.3em}
+  \hd{How to read.}
+  \begin{itemize}\setlength\itemsep{0.05em}
+    \item \hd{Hormuz:} Brent ranks 1 in \hd{every cell} $\rightarrow$ strongest possible signal across all 5 models and both pools.
+    \item \hd{Russia:} mid-pack (rank 9--18) for the linear models; only XGBoost at 21-donor reaches rank 1 (slips to 5 at 33-donor). Feb-22 macro shift inflates the placebo tail; Russia case carried by historical \$95--\$130 record, EIA STEO cross-check, and \S5f transfer.
   \end{itemize}
 
 \end{frame}
