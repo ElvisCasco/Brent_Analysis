@@ -37,5 +37,7 @@ presentation/*
 plots/*
 !plots/milestone2/
 !plots/milestone2/*
+# Allow-list standalone interactive HTMLs for GitHub Pages publication.
+!plots/eda_*.html
 
 
