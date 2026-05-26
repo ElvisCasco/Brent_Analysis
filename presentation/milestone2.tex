@@ -83,6 +83,7 @@
 \end{frame}
 }
 
+
 % =====================================================================
 % 1. From previous — blank
 % =====================================================================
@@ -97,39 +98,182 @@
   \vspace{0.6em}
   \hd{Why the pivot to causal SCM.}
   \begin{itemize}\setlength\itemsep{0.1em}
-    \item Feedback: focus on \hd{causal} estimation rather than forecasting --- forecasting is hard and crowded; a credible counterfactual on a specific disruption is more tractable and policy-relevant.
-    \item Reviewed candidate causal methods: event studies, structural VARs (Kilian-style supply/demand decomposition), DiD, network-shock propagation, synthetic control.
+    \item We agreed to focus on \hd{causal} estimation rather than forecasting --- forecasting is hard and crowded; a credible counterfactual on a specific disruption is more tractable and policy-relevant.
+    \item We reviewed candidate causal methods: event studies, Local Projection, structural VARs (Kilian-style supply/demand decomposition), DiD, network-shock propagation, synthetic control.
     \item \hd{SCM} selected: cleanest combination of \hd{inferential machinery} (in-space placebo, cross-event weight transfer) and \hd{interpretable result} (donor-weighted counterfactual on the observed price), and it directly produces an ATT estimate rather than a shock decomposition.
   \end{itemize}
   \normalsize
 \end{frame}
 
 % =====================================================================
-% 2. Problem statement + contribution
+% SLIDE 1: Research question (simplified)
 % =====================================================================
-\begin{frame}{Problem statement}
-  \footnotesize
+\begin{frame}{Research question (Part 1)}
   \begin{center}
-  \fcolorbox{accent!50}{accent!5}{\begin{minipage}{0.94\textwidth}
-    \vspace{0.3em}
+  \fcolorbox{accent!50}{accent!5}{\begin{minipage}{0.90\textwidth}
+    \vspace{0.35em}
     \begin{center}
-      {\normalsize\bfseries\textcolor{accent}{Part 1 \emph{(today)}: What was the Brent price impact of the 2026-02-01 Strait of Hormuz disruption?}}\\[0.3em]
-      {\footnotesize Estimand: ATT over a defined post-event window. Method: synthetic control on the observed price series.}
+      {\normalsize\bfseries\textcolor{accent}{%
+        What was the causal effect of the 2026 Strait of Hormuz disruption\\[0.15em]
+        on the Brent crude price?}}\\[0.4em]
+      {\footnotesize Estimand: average treatment effect on the treated (ATT)
+        over a defined post-event window.}
     \end{center}
-    \vspace{0.1em}
+    \vspace{0.2em}
   \end{minipage}}
   \end{center}
 
-  \vspace{0.2em}
-  \hd{Part 2 \emph{(open; discussed at the end)}.}
+  \vspace{0.9em}
 
-  \vspace{0.5em}
-  \hd{What is new in the field.}
-  \begin{itemize}\setlength\itemsep{0.1em}
-    \item Closest mechanical SCM-on-price precedent: Austrian retail fuel \src{Becker, Pfeifer \& Schweikert 2021, \textit{Energy Economics}}. Field default for oil-price impact: structural VAR \src{Kilian 2009; Baumeister \& Hamilton 2019} or scenario models (Dallas Fed, OIES, Kiel, IEA).
-    \item \hd{Method extension:} retail fuel $\rightarrow$ crude benchmark; cross-country $\rightarrow$ cross-asset donors; regulatory $\rightarrow$ exogenous geopolitical treatment.
-    \item \hd{Two-event robustness design:} Russia 2022 used as a magnitude-validation case --- SCM counterfactual within \$$3.98$/bbl of EIA STEO's last pre-invasion structural forecast on the matched 151-day window ($\sim 5.7$ pp on implied ATT), an independent-method check that the design generalises to the Hormuz application.
+  \begin{columns}[T]
+    \begin{column}{0.46\textwidth}
+      \hd{Approach}\\[0.4em]
+      \footnotesize
+      Synthetic control method (SCM) on the observed Brent price series.
+      An ensemble of five model specifications spans the SCM design space.
+    \end{column}
+    \hfill
+    \begin{column}{0.46\textwidth}
+      \hd{Answer \emph{(today)}}\\[0.4em]
+      \footnotesize
+      Brent traded at a \textcolor{accent}{\bfseries $\sim$44\%} premium
+      above its donor-weighted counterfactual over the March--May 2026
+      post-event window.\\[0.25em]
+      \smalltext{Ensemble IQR across five models: [40\%,\;44\%].}
+    \end{column}
+  \end{columns}
+
+  \vspace{1.1em}
+
+  \begin{center}
+  \fcolorbox{black!18}{black!3}{\begin{minipage}{0.90\textwidth}
+    \vspace{0.15em}
+    \footnotesize
+    \hd{Part 2 \emph{(open)} ---}
+    \emph{Possible Directions will be discussed at the end of today's presentation.}
+    \vspace{0.12em}
+  \end{minipage}}
+  \end{center}
+\end{frame}
+
+
+% =====================================================================
+% SLIDE: Literature overview — compact
+% =====================================================================
+\begin{frame}{How the field estimates oil-price impacts of disruptions}
+  \scriptsize
+  \vspace{0.1em}
+
+  \begin{tabular}{@{}p{0.295\textwidth} p{0.295\textwidth} p{0.325\textwidth}@{}}
+    \toprule
+    \hd{Structural VAR} & \hd{Event study} & \hd{Scenario models} \\
+    \src{Kilian 2009; Baumeister \& Hamilton 2019} &
+    \src{Standard in energy \& finance} &
+    \src{Dallas Fed WP\,2609; OIES; Kiel PB\,206; IEA OMR 2026} \\
+    \midrule
+    Decomposes price into supply, demand, inventory shocks via structural restrictions. &
+    Measures abnormal return around $T_0$ using a pre-event benchmark. &
+    Assumes a supply-shortfall scenario; propagates via structural supply/demand model. \\[0.3em]
+    \textcolor{muted}{No counterfactual path. Restrictions contested for chokepoint events.} &
+    \textcolor{muted}{No path beyond a few days. Persistence not captured.} &
+    \textcolor{muted}{Counterfactual is assumed, not read from observed prices.} \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{0.35em}
+  \hd{Closest SCM-on-price precedents}
+  \vspace{0.15em}
+
+  \begin{tabular}{@{}p{0.46\textwidth} p{0.46\textwidth}@{}}
+    \toprule
+    \hd{Becker, Pfeifer \& Schweikert 2021} \src{\textit{Energy Economics}} &
+    \hd{Gharehgozli 2017} \src{\textit{Economics Letters}} \\
+    \midrule
+    SCM on Austrian retail fuel after a regulatory act.
+    Cross-country donors. Reports 23\% price reduction vs synthetic.
+    Closest mechanical design to ours. &
+    SCM on Iran GDP under sanctions 2011--15.
+    Cross-country donors. Establishes SCM for geopolitical disruptions
+    --- but outcome is GDP, not a market price. \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{0.35em}
+  \begin{center}
+  \fcolorbox{accent!40}{accent!5}{\begin{minipage}{0.90\textwidth}
+    \vspace{0.1em}
+    \begin{center}
+      \textcolor{accent}{\bfseries No published study applies SCM to a globally traded
+      crude benchmark price under an exogenous geopolitical disruption.
+      This is the gap we fill.}
+    \end{center}
+    \vspace{0.05em}
+  \end{minipage}}
+  \end{center}
+
+\end{frame}
+
+
+% =====================================================================
+% SLIDE: What is new and what additional value — compact
+% =====================================================================
+\begin{frame}{What we do differently, and what we add}
+  \scriptsize
+  \vspace{0.1em}
+
+  \hd{Three design extensions beyond the existing precedent}
+  \vspace{0.15em}
+
+  \begin{tabular}{@{}p{0.295\textwidth} p{0.295\textwidth} p{0.325\textwidth}@{}}
+    \toprule
+    \hd{Retail fuel $\to$ crude benchmark} &
+    \hd{Cross-country $\to$ cross-asset donors} &
+    \hd{Regulatory $\to$ geopolitical treatment} \\
+    \midrule
+    Brent underpins retail fuel, CPI,
+and sovereign hedging. &
+No crude benchmark is Hormuz-clean.
+Donors: metals, FX, equities, rates. &
+    Treatment is exogenous and unannounced. SUTVA is about asset-class routing, not policy endogeneity. \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{0.35em}
+  \hd{Two-event validation design}
+  \hfill \textcolor{muted}{Own contribution --- no canonical SCM precedent}
+  \vspace{0.1em}
+  \begin{itemize}\setlength\itemsep{0.06em}
+    \item Russia 2022 run first as a \hd{known disruption}: verifies the design recovers a credible
+      magnitude before applying to Hormuz.
+    \item SCM counterfactual vs EIA STEO last pre-invasion forecast:
+      $\Delta = \$3.98$/bbl ($\sim$5.7\,pp on ATT) ---
+      independent-method agreement, no shared information path.
   \end{itemize}
+
+  \vspace{0.3em}
+  \hrule
+  \vspace{0.2em}
+
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \hd{Complement, not substitute}\\[0.2em]
+      Scenario models: \emph{``What price does an \textbf{assumed} shortfall imply?''}\\[0.15em]
+      This paper: \emph{``What gap does \textbf{observed market data} imply?''}\\[0.15em]
+      \textcolor{muted}{If they agree $\to$ independent validation.
+      If they disagree $\to$ reveals what structural assumptions miss.}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \hd{Additional value SCM provides}\\[0.2em]
+      \begin{itemize}\setlength\itemsep{0.10em}
+        \item \hd{Full price path} --- integrates persistence
+          \textcolor{muted}{(SPR sizing, CPI pass-through, hedging)}
+        \item \hd{Auditable identification} --- donor pool open to challenge
+        \item \hd{No structural stance} --- total reduced-form effect;
+          no prior on supply vs.\ risk premium split
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
 \end{frame}
 
 % =====================================================================
@@ -350,22 +494,56 @@
   \hd{Reading.} Russia $+21.7\%$ within $\sim$5.7 pp of STEO Feb-22 ATT (synth \$88.92 vs STEO \$84.94, $\Delta$ \$3.98/bbl); Bayesian Ridge degenerate, IQR excludes it. Hormuz $+43.6\%$ with tight IQR --- place against Dallas Fed / OIES / IEA scenarios.
   \normalsize
 \end{frame}
+% =====================================================================
+% SLIDE: Part 2 — Future directions overview
+% =====================================================================
+\begin{frame}[shrink=5]{Part 2 --- future directions}
+  \scriptsize
+  \vspace{0.15em}
 
-% =====================================================================
-% 11. Part 2
-% =====================================================================
-\begin{frame}{Part 2 --- ideas for the second half}
-  \vfill
+  Three directions build directly on the Brent SCM result established in Part~1.
+
+  \vspace{0.4em}
+  \hd{1 \ \ Local projections (LP) across horizons}
+  
+  \textcolor{muted}{Estimate the Brent treatment effect at
+  $h = 1, 5, 14, 30$ days using PortWatch throughput shortfall
+  as a continuous treatment variable.}
+  Produces a horizon-by-horizon impulse response: how fast the effect builds
+  and how long it persists.
+  SCM gives the average ATT over a window; LP gives the \emph{shape} of the
+  path --- different and complementary information. Also continues treatment variable can give us a possibility to analyze elasticities across different horizons.
+
+  \vspace{0.5em}
+  \hd{2 \ \ LNG market causal estimation (JKM, TTF)}
+
+  \textcolor{muted} {Instead of building the whole story around Brent, change the focus on commodity prices in general which were affected by the disruption. Apply the same SCM design to JKM Asian LNG spot price and/or TTF European LNG spot price.
+  Identify the Hormuz LNG premium paid by Asian buyers vs a cross-asset counterfactual.}
+  First causal estimate of the Hormuz effect on Asian LNG pricing.
+  Same methodology, different treated asset.
+
+  \vspace{0.5em}
+  \hd{3 \ \ Retail fuel and CPI pass-through}
+  
+  \textcolor{muted}{Estimate what share of the $\sim$44\% Brent premium
+  passed through to retail gasoline and headline CPI in oil-importing economies.}
+  Converts the upstream ATT into a consumer-price impact estimate.
+  The Brent ATT is the upstream input; pass-through delivers the
+  policy-relevant inflation number.
+
+  \vspace{0.5em}
   \begin{center}
-    \textcolor{muted}{\large [ to be added by author ]}
+  \fcolorbox{accent!50}{accent!5}{\begin{minipage}{0.90\textwidth}
+    \vspace{0.1em}
+    \begin{center}
+      We consider to choose one of those three directions.
+    \end{center}
+    \vspace{0.05em}
+  \end{minipage}}
   \end{center}
 
-  \vspace{1.5em}
-  \begin{center}
-    \smalltext{Possible directions: pass-through to retail fuel / headline CPI; SCM vs scenario-model comparison; severity-dependent extrapolation; alternative donor pools.}
-  \end{center}
-  \vfill
 \end{frame}
+
 
 % =====================================================================
 % Closing
