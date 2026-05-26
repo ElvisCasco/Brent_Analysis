@@ -99,8 +99,8 @@
   \hd{Why the pivot to causal SCM.}
   \begin{itemize}\setlength\itemsep{0.1em}
     \item We agreed to focus on \hd{causal} estimation rather than forecasting --- forecasting is hard and crowded; a credible counterfactual on a specific disruption is more tractable and policy-relevant.
-    \item We reviewed candidate causal methods: event studies, Local Projection, structural VARs (Kilian-style supply/demand decomposition), DiD, network-shock propagation, synthetic control.
-    \item \hd{SCM} selected: cleanest combination of \hd{inferential machinery} (in-space placebo, cross-event weight transfer) and \hd{interpretable result} (donor-weighted counterfactual on the observed price), and it directly produces an ATT estimate rather than a shock decomposition.
+    \item We reviewed candidate causal methods: event studies, DiD, network-shock propagation, synthetic control.
+    \item \hd{SCM} selected: cleanest combination of \hd{inferential machinery} (in-space placebo) and \hd{interpretable result} (donor-weighted counterfactual on the observed price), and it directly produces an ATT estimate rather than a shock decomposition.
   \end{itemize}
   \normalsize
 \end{frame}
@@ -243,7 +243,6 @@ Donors: metals, FX, equities, rates. &
   \hfill \textcolor{muted}{Own contribution --- no canonical SCM precedent}
   \vspace{0.1em}
   \begin{itemize}\setlength\itemsep{0.06em}
-    \item Hormuz 2026 is the \hd{focal event}: out-of-sample estimate of the chokepoint premium.
     \item Russia 2022 supplies a \hd{magnitude-validation} case: the design recovers a credible magnitude on a known disruption before being applied to Hormuz.
     \item SCM counterfactual on Russia vs EIA STEO last pre-invasion forecast:
       $\Delta = \$3.98$/bbl ($\sim$5.7\,pp on ATT) ---
@@ -254,25 +253,7 @@ Donors: metals, FX, equities, rates. &
   \hrule
   \vspace{0.2em}
 
-  \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \hd{Complement, not substitute}\\[0.2em]
-      Scenario models: \emph{``What price does an \textbf{assumed} shortfall imply?''}\\[0.15em]
-      This paper: \emph{``What gap does \textbf{observed market data} imply?''}\\[0.15em]
-      \textcolor{muted}{If they agree $\to$ independent validation.
-      If they disagree $\to$ reveals what structural assumptions miss.}
-    \end{column}
-    \begin{column}{0.48\textwidth}
-      \hd{Additional value SCM provides}\\[0.2em]
-      \begin{itemize}\setlength\itemsep{0.10em}
-        \item \hd{Full price path} --- integrates persistence
-          \textcolor{muted}{(SPR sizing, CPI pass-through, hedging)}
-        \item \hd{Auditable identification} --- donor pool open to challenge
-        \item \hd{No structural stance} --- total reduced-form effect;
-          no prior on supply vs.\ risk premium split
-      \end{itemize}
-    \end{column}
-  \end{columns}
+
 
 \end{frame}
 
@@ -506,25 +487,28 @@ Donors: metals, FX, equities, rates. &
 
   Three directions build directly on the Brent SCM result established in Part~1.
 
-  \vspace{0.4em}
-  \hd{1 \ \ Local projections (LP) across horizons}
-  
-  \textcolor{muted}{Estimate the Brent treatment effect at
-  $h = 1, 5, 14, 30$ days using PortWatch throughput shortfall
-  as a continuous treatment variable.}
-  Produces a horizon-by-horizon impulse response: how fast the effect builds
-  and how long it persists.
-  SCM gives the average ATT over a window; LP gives the \emph{shape} of the
-  path --- different and complementary information. Also continues treatment variable can give us a possibility to analyze elasticities across different horizons.
 
   \vspace{0.5em}
-  \hd{2 \ \ LNG market causal estimation (JKM, TTF)}
+  \hd{1 \ \ LNG market causal estimation (JKM, TTF)}
 
   \textcolor{muted} {Instead of building the whole story around Brent, change the focus on commodity prices in general which were affected by the disruption. Apply the same SCM design to JKM Asian LNG spot price and/or TTF European LNG spot price.
   Identify the Hormuz LNG premium paid by Asian buyers vs a cross-asset counterfactual.}
   First causal estimate of the Hormuz effect on Asian LNG pricing.
   Same methodology, different treated asset.
 
+
+
+  \vspace{0.4em}
+  \hd{2 \ \ Local projections (LP) across horizons}
+  
+  \textcolor{muted}{Estimate the Brent treatment effect at
+  $h = 1, 5, 14, 30$ days.}
+  Produces a horizon-by-horizon impulse response: how fast the effect builds
+  and how long it persists.
+  SCM gives the average ATT over a window; LP gives the \emph{shape} of the
+  path --- different and complementary information.
+
+  
   \vspace{0.5em}
   \hd{3 \ \ Retail fuel and CPI pass-through}
   
@@ -539,7 +523,7 @@ Donors: metals, FX, equities, rates. &
   \fcolorbox{accent!50}{accent!5}{\begin{minipage}{0.90\textwidth}
     \vspace{0.1em}
     \begin{center}
-      We consider to choose one of those three directions.
+      Currently, we are considering the following 3 options, however we're happy to discuss further options/suggestions.
     \end{center}
     \vspace{0.05em}
   \end{minipage}}
