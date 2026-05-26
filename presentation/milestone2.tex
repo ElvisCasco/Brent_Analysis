@@ -135,7 +135,7 @@
     \hfill
     \begin{column}{0.46\textwidth}
       \hd{Answer \emph{(today)}}\\[0.4em]
-      \footnotesize
+        \footnotesize
       Brent traded at a \textcolor{accent}{\bfseries $\sim$44\%} premium
       above its donor-weighted counterfactual over the March--May 2026
       post-event window.\\[0.25em]
@@ -243,9 +243,9 @@ Donors: metals, FX, equities, rates. &
   \hfill \textcolor{muted}{Own contribution --- no canonical SCM precedent}
   \vspace{0.1em}
   \begin{itemize}\setlength\itemsep{0.06em}
-    \item Russia 2022 run first as a \hd{known disruption}: verifies the design recovers a credible
-      magnitude before applying to Hormuz.
-    \item SCM counterfactual vs EIA STEO last pre-invasion forecast:
+    \item Hormuz 2026 is the \hd{focal event}: out-of-sample estimate of the chokepoint premium.
+    \item Russia 2022 supplies a \hd{magnitude-validation} case: the design recovers a credible magnitude on a known disruption before being applied to Hormuz.
+    \item SCM counterfactual on Russia vs EIA STEO last pre-invasion forecast:
       $\Delta = \$3.98$/bbl ($\sim$5.7\,pp on ATT) ---
       independent-method agreement, no shared information path.
   \end{itemize}
@@ -322,8 +322,8 @@ Donors: metals, FX, equities, rates. &
     \toprule
                        & \hd{Pre-event (CV)}                                 & \hd{Treatment (post)} \\
     \midrule
-    \hd{Russia 2022}   & 2020-07-01 $\rightarrow$ 2022-02-23 \quad 421 obs    & 2022-02-24 $\rightarrow$ 2022-09-30 \quad 151 obs \\
     \hd{Hormuz 2026}   & 2024-06-03 $\rightarrow$ 2026-01-30 \quad 423 obs    & 2026-02-01 $\rightarrow$ 2026-05-01 \quad $\sim$59 obs \\
+    \hd{Russia 2022}   & 2020-07-01 $\rightarrow$ 2022-02-23 \quad 421 obs    & 2022-02-24 $\rightarrow$ 2022-09-30 \quad 151 obs \\
     \bottomrule
   \end{tabular}
 
@@ -370,7 +370,7 @@ Donors: metals, FX, equities, rates. &
 % =====================================================================
 \begin{frame}{Donor co-movement with Brent --- audited pool}
   \begin{center}
-    \includegraphics[width=0.85\textwidth,height=0.72\textheight,keepaspectratio]{../plots/eda_donors_audited_side_by_side.png}\\[0.1em]
+    \includegraphics[width=0.85\textwidth,height=0.72\textheight,keepaspectratio]{../plots/milestone2/donors_audited_side_by_side.png}\\[0.1em]
     \smalltext{Brent (black) vs 21 audited donors, rebased to 100 at pre-window start; dashed line marks $T_0$. Same windows as the SCM.}
   \end{center}
 \end{frame}
@@ -380,7 +380,7 @@ Donors: metals, FX, equities, rates. &
 % =====================================================================
 \begin{frame}{Validation results --- model fit}
   \begin{center}
-    \includegraphics[width=0.90\textwidth,height=0.56\textheight,keepaspectratio]{../plots/ensemble/ensemble_paths_side_by_side.png}
+    \includegraphics[width=0.90\textwidth,height=0.56\textheight,keepaspectratio]{../plots/milestone2/ensemble_paths_side_by_side.png}
   \end{center}
 
   \vspace{-0.1em}
@@ -388,15 +388,15 @@ Donors: metals, FX, equities, rates. &
   \tiny
   \begin{tabular}{@{}l r r r r r r@{}}
     \toprule
-                   & \multicolumn{3}{c}{\hd{Russia 2022}} & \multicolumn{3}{c}{\hd{Hormuz 2026}} \\
+                   & \multicolumn{3}{c}{\hd{Hormuz 2026}} & \multicolumn{3}{c}{\hd{Russia 2022}} \\
     \cmidrule(lr){2-4}\cmidrule(lr){5-7}
     \hd{Model}     & \hd{train} & \hd{val} & \hd{val/train} & \hd{train} & \hd{val} & \hd{val/train} \\
     \midrule
-    Convex SCM     & 0.109 & 0.127 & 1.16          & 0.059 & 0.075 & 1.26 \\
-    ASCM           & 0.043 & 0.088 & \textbf{2.04} & 0.047 & 0.064 & 1.35 \\
-    Elastic-net    & 0.049 & 0.089 & 1.83          & 0.045 & 0.070 & 1.55 \\
-    XGBoost        & 0.039 & 0.117 & \textbf{3.00} & 0.044 & 0.076 & 1.72 \\
-    Bayesian Ridge & 0.031 & 0.096 & \textbf{3.07} & 0.031 & 0.066 & \textbf{2.10} \\
+    Convex SCM     & 0.059 & 0.075 & 1.26          & 0.109 & 0.127 & 1.16 \\
+    ASCM           & 0.047 & 0.064 & 1.35          & 0.043 & 0.088 & \textbf{2.04} \\
+    Elastic-net    & 0.045 & 0.070 & 1.55          & 0.049 & 0.089 & 1.83 \\
+    XGBoost        & 0.044 & 0.076 & 1.72          & 0.039 & 0.117 & \textbf{3.00} \\
+    Bayesian Ridge & 0.031 & 0.066 & \textbf{2.10} & 0.031 & 0.096 & \textbf{3.07} \\
     \bottomrule
   \end{tabular}
   \normalsize
@@ -414,15 +414,15 @@ Donors: metals, FX, equities, rates. &
   \begin{center}
   \begin{tabular}{@{}l c c c c@{}}
     \toprule
-                   & \multicolumn{2}{c}{\hd{Russia 2022}} & \multicolumn{2}{c}{\hd{Hormuz 2026}} \\
+                   & \multicolumn{2}{c}{\hd{Hormuz 2026}} & \multicolumn{2}{c}{\hd{Russia 2022}} \\
     \cmidrule(lr){2-3}\cmidrule(lr){4-5}
     \hd{Model}     & 21-donor & 33-donor & 21-donor & 33-donor \\
     \midrule
-    Convex SCM     & 0.545           & 0.500           & \textbf{0.045}  & \textbf{0.029} \\
-    ASCM           & 0.682           & 0.471           & \textbf{0.045}  & \textbf{0.029} \\
-    Elastic-net    & 0.409           & 0.412           & \textbf{0.045}  & \textbf{0.029} \\
-    XGBoost        & \textbf{0.045}  & 0.147           & \textbf{0.045}  & \textbf{0.029} \\
-    Bayesian Ridge & 0.636           & 0.529           & \textbf{0.045}  & \textbf{0.029} \\
+    Convex SCM     & \textbf{0.045}  & \textbf{0.029} & 0.545           & 0.500           \\
+    ASCM           & \textbf{0.045}  & \textbf{0.029} & 0.682           & 0.471           \\
+    Elastic-net    & \textbf{0.045}  & \textbf{0.029} & 0.409           & 0.412           \\
+    XGBoost        & \textbf{0.045}  & \textbf{0.029} & \textbf{0.045}  & 0.147           \\
+    Bayesian Ridge & \textbf{0.045}  & \textbf{0.029} & 0.636           & 0.529           \\
     \bottomrule
   \end{tabular}
   \end{center}
@@ -476,22 +476,22 @@ Donors: metals, FX, equities, rates. &
   \begin{center}
   \begin{tabular}{@{}l c c@{}}
     \toprule
-    \hd{Model}     & \hd{Russia 2022} & \hd{Hormuz 2026} \\
+    \hd{Model}     & \hd{Hormuz 2026} & \hd{Russia 2022} \\
     \midrule
-    Convex SCM         & $+29.6\%$ & $+38.6\%$ \\
-    ASCM               & $+13.3\%$ & $+43.7\%$ \\
-    Elastic-net        & $+21.7\%$ & $+49.8\%$ \\
+    Convex SCM         & $+38.6\%$ & $+29.6\%$ \\
+    ASCM               & $+43.7\%$ & $+13.3\%$ \\
+    Elastic-net        & $+49.8\%$ & $+21.7\%$ \\
     XGBoost            & $+36.8\%$ & $+36.8\%$ \\
-    Bayesian Ridge     & $+0.5\%$ \smalltext{(deg.)} & $+43.6\%$ \\
+    Bayesian Ridge     & $+43.6\%$ & $+0.5\%$ \smalltext{(deg.)} \\
     \midrule
-    \hd{Ensemble median} & \textcolor{accent}{\hd{$+21.7\%$}} & \textcolor{accent}{\hd{$+43.6\%$}} \\
-    IQR                  & $[+13.3,\ +29.6]$ & $[+38.6,\ +43.7]$ \\
+    \hd{Ensemble median} & \textcolor{accent}{\hd{$+43.6\%$}} & \textcolor{accent}{\hd{$+21.7\%$}} \\
+    IQR                  & $[+38.6,\ +43.7]$ & $[+13.3,\ +29.6]$ \\
     \bottomrule
   \end{tabular}
   \end{center}
 
   \vspace{0.5em}
-  \hd{Reading.} Russia $+21.7\%$ within $\sim$5.7 pp of STEO Feb-22 ATT (synth \$88.92 vs STEO \$84.94, $\Delta$ \$3.98/bbl); Bayesian Ridge degenerate, IQR excludes it. Hormuz $+43.6\%$ with tight IQR --- place against Dallas Fed / OIES / IEA scenarios.
+  \hd{Reading.} Hormuz $+43.6\%$ with tight IQR --- place against Dallas Fed / OIES / IEA scenarios. Russia $+21.7\%$ within $\sim$5.7 pp of STEO Feb-22 ATT (synth \$88.92 vs STEO \$84.94, $\Delta$ \$3.98/bbl); Bayesian Ridge degenerate, IQR excludes it.
   \normalsize
 \end{frame}
 % =====================================================================
@@ -587,9 +587,9 @@ Donors: metals, FX, equities, rates. &
   \vspace{0.6em}
   \hd{B. Per-event SUTVA exclusions} \smalltext{(33-donor pool $\rightarrow$ 21-donor strict-clean preferred).}
   \begin{itemize}\setlength\itemsep{0.1em}
+    \item \hd{Hormuz:} no H/M flags --- audit clean on all 33 candidates. The 21-donor intersection is used to enable cross-event weight transfer (\S5f), at the cost of 12 Hormuz-clean donors.
     \item \hd{Russia H-tier} \smalltext{(direct supply/demand)}: Wheat, Corn, Palladium, EUR, DXY, BTC.
     \item \hd{Russia M-tier} \smalltext{(terms-of-trade / secondary)}: Copper, IronOre, Soybeans, EM\_Eq, GBP, US10Y.
-    \item \hd{Hormuz:} no H/M flags --- audit clean on all 33 candidates. The 21-donor intersection is used to enable cross-event weight transfer (\S5f), at the cost of 12 Hormuz-clean donors.
   \end{itemize}
   \normalsize
 \end{frame}
@@ -621,8 +621,8 @@ Donors: metals, FX, equities, rates. &
     \toprule
                 & \hd{Permut.} & \hd{Event-wind.} & \hd{Combined} & \hd{Audit} \\
     \midrule
-    Russia 2022 & 1 / 33       & 0 / 33           & 1 / 33        & 12 / 33    \\
     Hormuz 2026 & 0 / 33       & 1 / 33           & 1 / 33        & 0 / 33     \\
+    Russia 2022 & 1 / 33       & 0 / 33           & 1 / 33        & 12 / 33    \\
     \bottomrule
   \end{tabular}
   \end{center}
@@ -647,19 +647,19 @@ Donors: metals, FX, equities, rates. &
   \begin{tabular}{@{}l r r | r r@{}}
     \toprule
                    & \multicolumn{2}{c|}{\hd{In-time gap (\%)}} & \multicolumn{2}{c}{\hd{LOO range (pp)}} \\
-    \hd{Model}     & \hd{Russia} & \hd{Hormuz} & \hd{Russia} & \hd{Hormuz} \\
+    \hd{Model}     & \hd{Hormuz} & \hd{Russia} & \hd{Hormuz} & \hd{Russia} \\
     \midrule
-    Convex SCM     & $+1.9$  & $-11.9$ & $6.6$           & $9.4$ \\
-    ASCM           & $-4.2$  & $-9.8$  & $13.4$          & $8.9$ \\
-    Elastic-net    & $+7.5$  & $-10.6$ & $15.6$          & $11.0$ \\
-    XGBoost        & $+26.4$ & $-12.4$ & $\mathbf{4.9}$  & $\mathbf{4.7}$ \\
-    Bayesian Ridge & $-5.3$  & $-12.2$ & $24.9\,\dagger$ & $13.1$ \\
+    Convex SCM     & $-11.9$ & $+1.9$  & $9.4$           & $6.6$           \\
+    ASCM           & $-9.8$  & $-4.2$  & $8.9$           & $13.4$          \\
+    Elastic-net    & $-10.6$ & $+7.5$  & $11.0$          & $15.6$          \\
+    XGBoost        & $-12.4$ & $+26.4$ & $\mathbf{4.7}$  & $\mathbf{4.9}$  \\
+    Bayesian Ridge & $-12.2$ & $-5.3$  & $13.1$          & $24.9\,\dagger$ \\
     \bottomrule
   \end{tabular}
   \end{center}
 
   \vspace{0.5em}
-  \smalltext{\hd{In-time.} Russia fake window contains late-2021 oil rally + Jan-2022 invasion runup --- partial real-effect contamination expected; XGBoost $+26\%$ low-power (training shrinks $\sim 31\%$). Hormuz $-10$ to $-12\%$ across all five models = pre-Hormuz runup donors did not absorb, not model failure.}
+  \smalltext{\hd{In-time.} Hormuz $-10$ to $-12\%$ across all five models = pre-Hormuz runup donors did not absorb, not model failure. Russia fake window contains late-2021 oil rally + Jan-2022 invasion runup --- partial real-effect contamination expected; XGBoost $+26\%$ low-power (training shrinks $\sim 31\%$).}
 
   \vspace{0.3em}
   \smalltext{\hd{LOO.} Tightest: \hd{XGBoost} ($\sim 5$ pp, bold). Widest: \hd{Bayesian Ridge Russia} ($\dagger$ range crosses zero, $-12.8$ to $+12.0$) --- LOO-fragile, consistent with its $3.07$ walk-forward overfit ratio and $0.5\%$ baseline. Ensemble median robust because Convex / ASCM / EN / XGBoost agree more closely.}

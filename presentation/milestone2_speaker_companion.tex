@@ -98,12 +98,12 @@ The two-event design is the most important methodological contribution. SCM on a
 \begin{itemize}
   \item Visual orientation: where Hormuz 2026 sits in the broader post-COVID Brent path. Roughly $\$60$/bbl in 2020, runs up through 2021--22 (Russia), declines through 2023--24, then the Hormuz spike in early 2026.
   \item Events colour-coded by category (demand, supply, policy, geopolitics) --- shows the data is event-rich, which is why donor cleanliness matters.
-  \item Highlight the two focal events visually: \highlight{Russia 2022} (calibration) and \highlight{Hormuz 2026} (focal).
+  \item Highlight the two focal events visually: \highlight{Hormuz 2026} (focal) and \highlight{Russia 2022} (calibration).
 \end{itemize}
 
 \subsection{If asked}
 \begin{itemize}
-  \item \textit{Why these two events specifically?} Both are large, well-measured, recent geopolitical disruptions. Russia 2022 is the most recent large oil shock with a long enough post-window to be well-measured; Hormuz 2026 is the focal event of interest.
+  \item \textit{Why these two events specifically?} Both are large, well-measured, recent geopolitical disruptions. Hormuz 2026 is the focal event of interest; Russia 2022 is the most recent large oil shock with a long enough post-window to be well-measured, used as a magnitude-validation case.
   \item \textit{Why not Abqaiq 2019 or others?} Discussed in donor\_catalog.md: pre-windows for older events overlap with Hormuz's, breaking the cross-event independence we exploit in $\S$5f. Russia 2022 is independent of the Hormuz pre-window.
 \end{itemize}
 
@@ -137,13 +137,13 @@ The ensemble spans key SCM regularization assumptions: simplex (convex SCM), rid
 
 \subsection{Talking points}
 \begin{itemize}
-  \item Pre-event windows: Russia 2020-07 $\to$ 2022-02 (421 obs); Hormuz 2024-06 $\to$ 2026-01 (423 obs). Post-event: 151 obs Russia / $\sim$59 obs Hormuz.
+  \item Pre-event windows: Hormuz 2024-06 $\to$ 2026-01 (423 obs); Russia 2020-07 $\to$ 2022-02 (421 obs). Post-event: $\sim$59 obs Hormuz / 151 obs Russia.
   \item \highlight{Training:} 5-fold expanding-window walk-forward CV (Hyndman \& Athanasopoulos 2018; Bergmeir \& Benítez 2012). Hyperparameters chosen by pooled val RMSE across folds; final fit refits on full pre-event window.
   \item Validation battery: model fit (walk-forward), SUTVA (donor audit), inference (in-space placebo + cross-event transfer).
 \end{itemize}
 
 \subsection{Behind the slide}
-The walk-forward CV is a recent refactor (previously was a single 80/20 hold-out, which is a time-series train-test split, not true walk-forward CV per Hyndman). The 5-fold expanding-window scheme is more robust because it averages over 5 forecast windows rather than concentrating all val mass on the last 20\%. Headline numbers shifted modestly under the refactor: Russia ensemble median 25.1\% $\to$ 21.7\%; Hormuz unchanged at 43\%.
+The walk-forward CV is a recent refactor (previously was a single 80/20 hold-out, which is a time-series train-test split, not true walk-forward CV per Hyndman). The 5-fold expanding-window scheme is more robust because it averages over 5 forecast windows rather than concentrating all val mass on the last 20\%. Headline numbers shifted modestly under the refactor: Hormuz unchanged at 43\%; Russia ensemble median 25.1\% $\to$ 21.7\%.
 
 \subsection{If asked}
 \begin{itemize}
@@ -169,7 +169,7 @@ Donor selection is the SCM-canonical SUTVA defense (Abadie 2021 $\S$3.1: substan
 \subsection{If asked}
 \begin{itemize}
   \item \textit{What's the full list of dropped donors?} See backup slide ``Excluded donors.'' 12 Russia-exposed (H or M tier): Copper, IronOre, Palladium, Soybeans, Wheat, Corn, EM\_Eq, EUR, GBP, DXY, US10Y, BTC. Plus another set of categorical exclusions (energy complex itself: WTI, NatGas, refined products; oil-currency: NOK, CAD; etc.) that never entered the candidate pool.
-  \item \textit{What if a clean donor is actually treated?} The model-agnostic battery in 01.5\_Donor\_Cleanliness checks this empirically. Russia perfectly identifies 20/33 cases between audit and tests; Hormuz 32/33. Discrepancies are concurrent macro events (CNY's China zero-COVID), not Russia-treatment.
+  \item \textit{What if a clean donor is actually treated?} The model-agnostic battery in 01.5\_Donor\_Cleanliness checks this empirically. Hormuz: 32/33 agreement between audit and tests; Russia: 20/33. Discrepancies are concurrent macro events (CNY's China zero-COVID), not Russia-treatment.
   \item \textit{Why 21 specifically and not 24 or 18?} The shared pool is the intersection of Russia-clean (21 of 33) and Hormuz-clean (33 of 33). Russia is the binding constraint.
 \end{itemize}
 
@@ -188,8 +188,8 @@ Donor selection is the SCM-canonical SUTVA defense (Abadie 2021 $\S$3.1: substan
 
 \subsection{Talking points}
 \begin{itemize}
-  \item Ensemble paths (left Russia, right Hormuz): all 5 model synthetics overlay observed Brent in the pre-event window, then fan out post-event. Visual evidence of pre-event fit AND post-event divergence.
-  \item Walk-forward CV table: \highlight{train and val RMSE per model}. Convex SCM val/train ratio is 1.16 Russia / 1.26 Hormuz (clean). ASCM 2.04 Russia (just over 2$\times$ heuristic threshold). XGBoost 3.00 Russia and Bayesian Ridge 3.07 Russia are the overfit-flagged cases.
+  \item Ensemble paths (left Hormuz, right Russia): all 5 model synthetics overlay observed Brent in the pre-event window, then fan out post-event. Visual evidence of pre-event fit AND post-event divergence.
+  \item Walk-forward CV table: \highlight{train and val RMSE per model}. Convex SCM val/train ratio is 1.26 Hormuz / 1.16 Russia (clean). On Russia, ASCM 2.04 (just over 2$\times$ heuristic threshold) and XGBoost 3.00 + Bayesian Ridge 3.07 are the overfit-flagged cases.
   \item Hormuz: 4 of 5 models clean; only Bayesian Ridge flagged.
   \item Ensemble is robust to individual model overfit because median across 5 models smooths.
 \end{itemize}
@@ -254,12 +254,12 @@ This is uniquely available for Russia: Hormuz has no equivalent pre-event struct
 \begin{itemize}
   \item \highlight{Headline numbers:}
   \begin{itemize}
-    \item Russia 2022 ensemble median: \highlight{$\sim$21--22\%} drift-adjusted Brent premium over the 7-month post-window. IQR [13.1, 23.8].
     \item Hormuz 2026 ensemble median: \highlight{$\sim$43--44\%} chokepoint premium over the 3-month post-window. IQR [40.3, 44.2].
+    \item Russia 2022 ensemble median: \highlight{$\sim$21--22\%} drift-adjusted Brent premium over the 7-month post-window. IQR [13.1, 23.8].
   \end{itemize}
   \item Hormuz IQR is tighter than Russia (4 pp vs 11 pp) --- donors are more stable in the Hormuz pre-period.
   \item Drift adjustment: subtract the pre-period slope $\times$ post-window length per Roth 2022 (pretest-with-caution framework).
-  \item Russia validation: matches EIA STEO to within \$3.98/bbl. Hormuz: validated by in-space placebo at the floor under both pools across all 5 models, plus cross-event weight transfer (appendix).
+  \item Hormuz: validated by in-space placebo at the floor under both pools across all 5 models, plus cross-event weight transfer (appendix). Russia: matches EIA STEO to within \$3.98/bbl.
 \end{itemize}
 
 \subsection{Behind the slide}
@@ -300,7 +300,7 @@ Open the floor. The appendix slides are reserve material; navigate to them on de
 \begin{itemize}
   \item \textbf{Appendix A1 --- excluded donors:} 12 Russia-treated drops with audit reasons; categorical exclusions (energy complex, oil-currencies).
   \item \textbf{Appendix A2 --- donor importance:} per-model weight heatmaps (note: weights are not identical across events, see A5 nuance).
-  \item \textbf{Appendix A3 --- donor SUTVA cleanliness:} permutation mean-shift test results (Chow 1960 hypothesis + Lehmann \& Romano 2005 permutation + Phipson \& Smyth 2010 correction). Russia 1/33 flagged (CNY); Hormuz 1/33 (IronOre). Audit agreement: Russia 20/33, Hormuz 32/33.
+  \item \textbf{Appendix A3 --- donor SUTVA cleanliness:} permutation mean-shift test results (Chow 1960 hypothesis + Lehmann \& Romano 2005 permutation + Phipson \& Smyth 2010 correction). Hormuz 1/33 flagged (IronOre); Russia 1/33 (CNY). Audit agreement: Hormuz 32/33, Russia 20/33.
   \item \textbf{Appendix A4 --- in-time placebo and LOO:} combined diagnostics table. Tightest LOO: XGBoost ($\sim$5 pp both events). Widest: Bayesian Ridge Russia (24.9 pp, range crosses zero) --- the LOO-fragile case.
   \item \textbf{Appendix A5 --- cross-event weight transfer:} the $\S$5f test. Russia weights applied to Hormuz panel: Convex SCM transfers cleanly (+8 pp), ASCM and Elastic-net transfer with attenuation, XGBoost and Bayesian Ridge transfer pathologically (transferred pre-RMSPE 22$\times$ and 314$\times$ independent). The relevant subtlety: per-donor weights aren't stable across events (e.g., JPY moves from rank 12 to rank 1 in convex SCM), but the \emph{projection onto donor space} is. Cite Abadie \& L'Hour 2021 on convex SCM weight non-uniqueness.
 \end{itemize}
@@ -319,12 +319,12 @@ Open the floor. The appendix slides are reserve material; navigate to them on de
 
 \subsection{Numbers to know cold}
 \begin{itemize}
-  \item Russia headline drift-adjusted ATT: \textbf{21--22\%} (IQR 13--24).
   \item Hormuz headline drift-adjusted ATT: \textbf{43\%} (IQR 40--44).
+  \item Russia headline drift-adjusted ATT: \textbf{21--22\%} (IQR 13--24).
   \item Actual Russia Brent mean over Feb 24 $\to$ Sep 30 2022: \$108.54/bbl.
   \item SCM ensemble median Russia counterfactual: \$88.92/bbl.
   \item EIA STEO Feb-22 forecast for the same window: \$84.94/bbl.
-  \item Russia pre-event window: 421 obs / Hormuz pre-event: 423 obs.
+  \item Hormuz pre-event window: 423 obs / Russia pre-event: 421 obs.
   \item Hormuz post-event obs: $\sim$59 (the binding constraint on in-event inference).
   \item In-space placebo floors: 1/22 = 0.045 (21-donor); 1/34 = 0.029 (33-donor).
 \end{itemize}
