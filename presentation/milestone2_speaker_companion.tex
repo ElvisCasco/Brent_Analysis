@@ -126,10 +126,83 @@ The two-event design is the most important methodological contribution. SCM on a
 \subsection{Behind the slide}
 The ensemble spans key SCM regularization assumptions: simplex (convex SCM), ridge (ASCM, BR), L1+L2 (Elastic-net), tree-based (XGBoost). Disagreement across models is itself informative: tight agreement = factor structure is well-identified; wide spread = model-uncertainty band that the headline IQR captures honestly.
 
+\subsection{Model formulas --- what each one fits}
+
+Let $y_t$ = log-Brent at time $t$ and $y_{j,t}$ = log-price of donor $j$. All models produce a synthetic counterfactual $\hat{y}_t$; the post-event gap is $100 \cdot (\exp(\bar{y}_{post} - \bar{\hat{y}}_{post}) - 1)$ in percent.
+
+\begin{itemize}
+  \item \textbf{Convex SCM.} Synthetic is a \emph{simplex-constrained weighted average} of donors:
+    \[
+      \hat{y}_t = \sum_{j=1}^{J} w_j\, y_{j,t}, \qquad w_j \geq 0, \quad \sum_j w_j = 1.
+    \]
+    Read like portfolio shares: ``synthetic Brent is $w_A$ of donor A $+ w_B$ of donor B $+ \dots$''. Cannot go outside the donor envelope. Sparse: typically $\sim$5 donors get non-trivial weight, the rest pinned to zero.
+    \emph{Feature selection:} the simplex constraint behaves like an $L_1$ ball --- the SLSQP optimizer drives most $w_j$ to exactly zero, so ``best features'' = the small set of donors whose convex combination best reproduces Brent in the pre-period (lowest pre-RMSPE). No external selection step; sparsity is mechanical.
+  \item \textbf{Augmented SCM.} Convex SCM constrains the donor weights to be non-negative and sum to 1 --- interpretable but rigid. ASCM keeps those convex weights and adds a second ridge-regression layer that \emph{extrapolates the donors' contribution beyond the simplex} --- letting the synthetic borrow more (or less) from each donor than Convex SCM allowed:
+    \[
+      \hat{y}_t = \underbrace{\sum_j w_j\, y_{j,t}}_{\text{convex base}} + \underbrace{\sum_j \eta_j\, y_{j,t}}_{\text{ridge extrapolation}}, \qquad \eta = (X^\top X + \lambda I)^{-1} X^\top r,
+    \]
+    where $r$ is the pre-period gap left over by convex SCM and $X$ is the donor matrix. The effective weight per donor is $w_j + \eta_j$ --- the $\eta_j$ are unconstrained (can be negative or exceed 1), which is what produces the extrapolation outside the donor hull. The hyperparameter $\lambda$ = \texttt{ridge\_lambda} controls how much extrapolation is permitted: large $\lambda$ shrinks the ridge layer toward zero and recovers Convex SCM; small $\lambda$ gives the ridge layer free rein.
+    \emph{Feature selection:} sparsity is inherited from the convex base ($w_j$) only; the ridge layer $\eta_j$ touches every donor (no selection). So ``best features'' = same as Convex SCM, plus every donor contributing a small ridge correction.
+  \item \textbf{Elastic-net.} Linear regression with combined $L_1 + L_2$ penalty:
+    \[
+      \hat{y}_t = \beta_0 + \sum_j \beta_j\, y_{j,t}, \qquad
+      \min_\beta \;\tfrac{1}{2N}\|y - X\beta\|_2^2 \;+\; \alpha \Big[\rho \|\beta\|_1 + \tfrac{1-\rho}{2}\|\beta\|_2^2\Big].
+    \]
+    Coefficients $\beta_j$ are signed and unconstrained; the $L_1$ term drives some to exactly zero (sparsity), the $L_2$ term shrinks the rest. $\alpha$ = overall penalty strength; $\rho$ = \texttt{l1\_ratio} (0 = pure ridge, 1 = pure lasso, 0.5 = balanced).
+    \emph{Feature selection:} explicit via the $L_1$ term --- donors with weak partial correlation against Brent's residual get $\beta_j = 0$. Higher $\rho$ $\to$ sparser selection. ``Best features'' = donors whose marginal contribution survives the L1 threshold after accounting for collinearity with already-selected donors.
+  \item \textbf{XGBoost.} Sum of $K$ shallow regression trees, fit sequentially to residuals:
+    \[
+      \hat{y}_t = \sum_{k=1}^{K} f_k(\mathbf{y}_{\cdot, t}), \qquad f_k \in \{\text{trees of depth} \leq d\},
+    \]
+    where each tree $f_k$ minimizes the residual after the previous $k-1$ trees, with $L_2$ regularization $\lambda$ on leaf weights and step size $\eta$ (learning rate). \emph{Not} a closed-form regression: a tree at each step picks the donor and threshold that best reduces the residual. Captures nonlinear interactions but cannot extrapolate outside the training range of any donor.
+    \emph{Feature selection:} greedy and built-in. At every split, the tree-builder scores every donor's best threshold by gain reduction and picks the maximum; donors that never get picked have zero importance. ``Best features'' = donors with highest cumulative split-gain across all $K$ trees (reported as XGBoost's \texttt{feature\_importances\_}).
+  \item \textbf{Bayesian Ridge.} Same regression equation as OLS, but with a Gaussian prior placed on the coefficients $\beta$ (and Gamma priors on the precisions):
+    \[
+      \underbrace{y_t = \beta_0 + \sum_j \beta_j\, y_{j,t} + \varepsilon_t, \quad \varepsilon_t \sim \mathcal{N}(0, 1/\alpha)}_{\text{data model (identical to OLS)}}
+    \]
+    \[
+      \underbrace{\beta_j \mid \lambda \sim \mathcal{N}(0,\, 1/\lambda), \qquad \lambda \sim \text{Gamma}(\cdot), \qquad \alpha \sim \text{Gamma}(\cdot)}_{\text{prior on the unknowns (what makes it Bayesian)}}
+    \]
+    The features $y_{j,t}$ enter the same way they would in OLS --- as known data inside the regression sum. The Bayesian part is purely the prior on the unknowns ($\beta$, $\alpha$, $\lambda$). Posterior over $\beta$ is closed-form (conjugate), so $\hat{y}_t$ comes with a native posterior standard deviation, no bootstrap needed. $\lambda$ (the weight-precision prior) is the regularization knob --- larger $\lambda$ $\to$ tighter prior around zero $\to$ stronger shrinkage; $\alpha$ is the noise-precision prior. MAP-equivalent to classical Ridge with penalty $\lambda/\alpha$.
+    \emph{Feature selection:} \textbf{none --- all donors retained}. The Gaussian prior shrinks coefficients smoothly toward zero but never sets any to exactly zero, unlike $L_1$ models. ``Best features'' is approximated by the PIP proxy $|\hat\beta_j| / \sigma_{\hat\beta_j}$ (the posterior $z$-score), which ranks donors by how confidently their coefficient differs from zero. To get \emph{actual} variable selection in a Bayesian framework, you would need spike-and-slab priors (the full BSTS of Brodersen 2015), which this implementation does not include.
+\end{itemize}
+
+\subsection{Tuned hyperparameters --- chosen by walk-forward CV val RMSE}
+
+Grids tightened per Cawley \& Talbot (2010) to limit winner's-curse on val RMSE. Values below are the \emph{chosen} settings per event after the 5-fold walk-forward search.
+
+\begin{itemize}
+  \item \textbf{Convex SCM} --- no tuned hparams. Fixed: 120 random $V$ matrices drawn from a Dirichlet, weights re-fit per $V$, best by pre-period RMSPE retained. Same for both events.
+  \item \textbf{Augmented SCM} (grid: $\lambda \in \{0.01, 0.1, 1, 10, 100\}$, 5 candidates):
+  \begin{itemize}
+    \item Hormuz: \texttt{ridge\_lambda = 10.0} (heavier extrapolation control).
+    \item Russia:  \texttt{ridge\_lambda = 0.1} (light extrapolation control --- the convex residual is bigger so ridge needs more freedom).
+  \end{itemize}
+  \item \textbf{Elastic-net} (grid: $\alpha \in \{0.001, 0.01, 0.05, 0.1, 0.5\} \times \rho \in \{0.2, 0.5, 0.8\}$, 15 candidates):
+  \begin{itemize}
+    \item Hormuz: \texttt{alpha = 0.001}, \texttt{l1\_ratio = 0.8} (sparser, lasso-leaning).
+    \item Russia:  \texttt{alpha = 0.001}, \texttt{l1\_ratio = 0.2} (denser, ridge-leaning).
+  \end{itemize}
+  \item \textbf{XGBoost} (grid: \texttt{max\_depth} $\in \{2,3,4\}$ $\times$ \texttt{learning\_rate} $\in \{0.001, 0.005, 0.01, 0.03, 0.1\}$ $\times$ \texttt{reg\_lambda} $\in \{1, 10\}$, 30 candidates; \texttt{n\_estimators=1000} with early stopping after 20 rounds):
+  \begin{itemize}
+    \item Hormuz: \texttt{max\_depth=2}, \texttt{learning\_rate=0.1}, \texttt{reg\_lambda=10.0}.
+    \item Russia:  \texttt{max\_depth=2}, \texttt{learning\_rate=0.1}, \texttt{reg\_lambda=1.0}.
+  \end{itemize}
+  Both events stay at depth 2 --- only second-order interactions, consistent with the small-data regime.
+  \item \textbf{Bayesian Ridge} (grid: $\lambda \in \{10^{-8}, 10^{-6}, 10^{-4}, 10^{-2}, 1\} \times \alpha \in \{10^{-8}, 10^{-6}, 10^{-4}\}$, 15 candidates):
+  \begin{itemize}
+    \item Hormuz: $\lambda_1=\lambda_2=1.0$, $\alpha_1=\alpha_2=10^{-8}$ (strong weight shrinkage, near-flat noise prior).
+    \item Russia:  $\lambda_1=\lambda_2=1.0$, $\alpha_1=\alpha_2=10^{-8}$ (same).
+  \end{itemize}
+  Both events converge on the strongest prior in the grid --- the donor regression is high-variance at $N \approx 420$ and shrinkage helps both.
+\end{itemize}
+
 \subsection{If asked}
 \begin{itemize}
   \item \textit{Why not include BSTS proper?} The implementation in lib/models.py is \texttt{sklearn.linear\_model.BayesianRidge} --- Bayesian linear regression on donor levels, not the full state-space BSTS with trend + seasonal + spike-and-slab. Documented honestly in methodology.md $\S$4 ``Bayesian Ridge vs full BSTS.''
   \item \textit{Why not include simpler models like OLS?} OLS without regularization overfits at $N \approx 420$ obs and 21 donors. Elastic-net at low $\alpha$ approximates OLS while preventing overfit.
+  \item \textit{Why does ASCM pick very different $\lambda$ across the two events?} Russia has a larger convex-residual to absorb (Brent's pre-period $RMSPE \approx 0.106$ vs Hormuz's $\sim$0.066), so the ridge fix-up needs more freedom (lower $\lambda$) to fit it. Hormuz's convex fit is tight enough that a heavy $\lambda$ doesn't hurt and protects against extrapolation.
+  \item \textit{Why does Elastic-net pick opposite \texttt{l1\_ratio} across events?} Hormuz's signal is concentrated in a few donors (sparser fit preferred $\to$ $\rho{=}0.8$); Russia's signal is spread across many correlated donors (ridge-leaning $\to$ $\rho{=}0.2$).
 \end{itemize}
 
 % =====================================================================
@@ -189,15 +262,74 @@ Donor selection is the SCM-canonical SUTVA defense (Abadie 2021 $\S$3.1: substan
 \subsection{Talking points}
 \begin{itemize}
   \item Ensemble paths (left Hormuz, right Russia): all 5 model synthetics overlay observed Brent in the pre-event window, then fan out post-event. Visual evidence of pre-event fit AND post-event divergence.
-  \item Walk-forward CV table: \highlight{train and val RMSE per model}. Convex SCM val/train ratio is 1.26 Hormuz / 1.16 Russia (clean). On Russia, ASCM 2.04 (just over 2$\times$ heuristic threshold) and XGBoost 3.00 + Bayesian Ridge 3.07 are the overfit-flagged cases.
+  \item Walk-forward CV table: \highlight{train RMSE / val RMSE / val-train ratio per model, both events}. Numbers are in \textbf{log-Brent units} (the fit target is log-price levels, not log-returns).
+  \item Convex SCM val/train ratio is 1.26 Hormuz / 1.16 Russia (clean). On Russia, ASCM 2.04 (just over 2$\times$ heuristic threshold), XGBoost 3.00, and Bayesian Ridge 3.07 are the overfit-flagged cases.
   \item Hormuz: 4 of 5 models clean; only Bayesian Ridge flagged.
   \item Ensemble is robust to individual model overfit because median across 5 models smooths.
 \end{itemize}
+
+\subsection{Hormuz vs Russia --- the headline distinction}
+
+\textbf{Hormuz is the focal causal estimate.} Clean post-period with no concurrent macro confounder; all 5 models converge in the 38--50\% range; in-space placebo hits the floor for every cell. Identification holds.
+
+\textbf{Russia is the methodology-validation case.} Identification is partially weakened because the post-window (Feb--Sep 2022) overlaps a major macro regime shift:
+\begin{itemize}\setlength\itemsep{0.05em}
+  \item Fed liftoff March 2022 (+25 bp), then +75 bp $\times$ 3 consecutive hikes.
+  \item DXY surged $\sim$95 $\to$ $\sim$115.
+  \item JPY collapsed $\sim$115 $\to$ $\sim$145 (BoJ stayed on YCC, carry trade unwound).
+  \item Bond crash (TLT $-30\%$), global risk-off, credit-spread widening.
+\end{itemize}
+These hit the donor pool (JPY, KRW, MXN, TLT, HYG, WorldEq, $\dots$) even though the qualitative audit certified them ``Russia-clean.'' They moved for \emph{macro} reasons, not Russia-spillover.
+
+\textbf{The cleanest read of the Russia premium is in the first 2--3 weeks post-invasion}: Brent went \$95 (Feb 23) $\to$ \$130+ (Mar 8), well before Fed hiking became dominant. A shorter post-window would isolate the Russia effect more cleanly --- one-line config change in \texttt{lib/config.py} if a reviewer asks.
+
+\textbf{Defense for the Russia case in spite of weakened identification:} (a) EIA STEO agreement within \$3.98/bbl on the matched window, (b) sparse-model convergence around 22--30\% (which exclude the macro-confounded donors via $L_1$/simplex sparsity), (c) well-documented historical magnitude. The Russia ATT is \emph{not} a clean point estimate; it's a credibility check that the methodology recovers a believable magnitude on a known disruption.
+
+\subsection{Why Bayesian Ridge's Russia synthetic ``always increases''}
+
+The visible failure mode: BR's Russia synthetic tracks Brent's post-event rally rather than staying flat, eating the Russia premium and giving a degenerate $+0.5\%$ ATT. Three stacked reasons:
+\begin{itemize}\setlength\itemsep{0.05em}
+  \item \textbf{Dense regression, no feature selection.} BR retains all 21 donors with non-zero coefficients (unlike Convex SCM / Elastic-net, which zero out most). When the macro-confounded donors moved up post-event, BR's synthetic moved up with them.
+  \item \textbf{Russia's macro confounder pushes those donors in the same direction as Brent.} Fed hiking $\to$ dollar surge $\to$ JPY collapse, bond crash, equity drawdown. Dense weights pick all that up; sparse weights drop most of it.
+  \item \textbf{BR is overfit on Russia} (val/train ratio 3.07). Overfit models amplify input-feature movements at test time.
+\end{itemize}
+Hormuz post-period has no comparable macro shock, so BR's Hormuz synthetic stays flat alongside the other models and the ATT is in line ($+43.6\%$).
+
+\subsection{Interpreting the RMSE numbers --- log-Brent to dollars}
+
+The fit target is log-Brent (not log-returns), so RMSE is in log-price units. Conversion: a residual $\sigma$ in log-units $\to$ multiplicative error $e^\sigma$; for small $\sigma$, $e^\sigma - 1 \approx \sigma$, so \textbf{log-RMSE $\approx$ fractional error to first order}.
+
+\begin{center}
+\begin{tabular}{@{}c c c c c@{}}
+  \toprule
+  Log RMSE & $e^\sigma - 1$ & \% typical err. & at Brent \$70/bbl & at Brent \$100/bbl \\
+  \midrule
+  0.031 & 3.15\%  & $\sim$3\%  & $\pm$\$2.20/bbl  & $\pm$\$3.10/bbl \\
+  0.059 & 6.08\%  & $\sim$6\%  & $\pm$\$4.25/bbl  & $\pm$\$6.10/bbl \\
+  0.075 & 7.79\%  & $\sim$8\%  & $\pm$\$5.45/bbl  & $\pm$\$7.80/bbl \\
+  0.109 & 11.52\% & $\sim$12\% & $\pm$\$8.10/bbl  & $\pm$\$11.50/bbl \\
+  0.127 & 13.55\% & $\sim$14\% & $\pm$\$9.50/bbl  & $\pm$\$13.50/bbl \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+Reading the slide table with this:
+\begin{itemize}\setlength\itemsep{0.05em}
+  \item Convex SCM Hormuz train 0.059 $\to$ $\sim$6\% typical pre-period error ($\sim$\$4--5/bbl at Hormuz prices).
+  \item Convex SCM Russia val 0.127 $\to$ $\sim$14\% val error ($\sim$\$9--11/bbl at Russia prices). The widest fit gap on the board, reflecting that the simplex constraint cannot span Brent's 2020--22 range with the audited donor set.
+  \item Bayesian Ridge train 0.031 / val 0.096 $\to$ $\sim$3\% in training but $\sim$10\% in val. The gap between training-period precision and val-period error is the overfit signature.
+\end{itemize}
+
+\subsection{Behind the slide}
+The synthetic represents ``what Brent would have done given how the donors moved.'' If donors moved a lot (Russia post-period) the synthetic naturally moves too; sparse models drop the macro-driven donors and the synthetic stays flatter. BR keeps them in and the synthetic rises with Brent. The model spread on Russia (0.5\% to 36.8\%) is itself diagnostic --- it tells you the macro confounder is generating model-specific identification problems, not just numerical noise.
 
 \subsection{If asked}
 \begin{itemize}
   \item \textit{Why don't you exclude the overfit models?} The heuristic threshold (val/train $>2$) is just a flag, not a gate. Auto-excluding would impose a literature-unsupported cutoff and would tighten the IQR artificially. Defense is the IQR-as-uncertainty-band convention.
   \item \textit{Is the validation downward biased by hyperparameter selection?} Yes; documented. Magnitude: the bias is small ($\sim$10\% on val RMSE) because grids are tight per Cawley \& Talbot.
+  \item \textit{Doesn't the 2022 macro confounder invalidate the Russia SCM?} Weakens, doesn't fully invalidate. Identification claim becomes ``Russia premium + asymmetric macro impact'' rather than pure Russia ATT. Defended by (a) EIA STEO agreement within \$3.98/bbl, (b) convergence of sparse models 22--30\%, (c) historical record \$95 $\to$ \$130, (d) Hormuz works cleanly as the methodology validation. We use Russia as a magnitude-credibility check, not as a clean causal ATT.
+  \item \textit{Why is RMSE in log-Brent and not absolute Brent?} Standard SCM practice (Abadie 2010 fits log-levels). Log scale makes the relative error comparable across price regimes (a \$5/bbl miss at \$30 is much worse than at \$120). Also makes the SCM gap interpretable as a percentage directly.
+  \item \textit{Why log-levels and not log-returns?} SCM is about counterfactual \emph{paths} (where would Brent's level be), not about return prediction. Fitting returns and then integrating compounds errors; fitting levels directly produces the path you want to report.
 \end{itemize}
 
 % =====================================================================
