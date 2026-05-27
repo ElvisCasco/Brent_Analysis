@@ -45,54 +45,101 @@
 \end{tcolorbox}
 
 % =====================================================================
-\section{Title slide \timetag{10s}}
+\section{Slide 1 --- Title \timetag{10s}}
 
 Open with the title. The framing is causal estimation of one specific event, not forecasting and not the network-topology project from the previous milestone. Mention that today is Part 1 of a two-part thesis.
 
 % =====================================================================
-\section{From the previous presentation \timetag{45s}}
+\section{Slide 2 --- From the previous presentation \timetag{45s}}
 
 \subsection{Talking points}
 \begin{itemize}
-  \item State the original framing: maritime trade network topology shaping oil prices, with a forecasting question and a propagation question.
-  \item Pivot reason: feedback to focus on \highlight{causal estimation} rather than forecasting. Forecasting is hard and crowded; a credible counterfactual for one specific disruption is more tractable and policy-relevant.
-  \item Reviewed several causal methods (event studies, structural VARs, DiD, network-shock propagation, SCM).
-  \item SCM chosen for two reasons: \emph{inferential machinery} (in-space placebo, cross-event transfer) and \emph{interpretable result} (donor-weighted counterfactual on the observed price), and it produces an ATT directly rather than a shock decomposition.
+  \item \highlight{Original framing} (as on the slide): \emph{How does the topology of the global maritime oil trade network shape the dynamics of oil prices?}
+  \begin{itemize}
+    \item \textbf{Q1:} Can network topology improve oil-price forecasts beyond classical time-series baselines?
+    \item \textbf{Q2:} How does a maritime disruption propagate into oil prices across horizons, and how long does its effect linger?
+  \end{itemize}
+  \item \highlight{Why the pivot to causal SCM}:
+  \begin{itemize}
+    \item Focus on \emph{causal} estimation rather than forecasting --- forecasting is crowded and hard to falsify; a credible counterfactual on one specific disruption is more tractable and policy-relevant.
+    \item Reviewed candidate causal methods: event studies, DiD, network-shock propagation, synthetic control.
+    \item SCM selected for the combination of \emph{inferential machinery} (in-space placebo) and \emph{interpretable result} (donor-weighted counterfactual on the observed price), plus it produces an ATT directly rather than a shock decomposition.
+  \end{itemize}
 \end{itemize}
 
 \subsection{Behind the slide}
-The maritime-network framing was scoped down rather than abandoned. The structural-VAR alternative (Kilian-style) was the most natural competitor but requires identification restrictions that are themselves contested and that have no standard precedent for chokepoint events. Event studies don't produce a continuous counterfactual; DiD needs a clear treated/control structure that doesn't exist for a single global commodity.
+The maritime-network framing was scoped down rather than abandoned. Event studies don't produce a continuous counterfactual; DiD needs a clear treated/control structure that doesn't exist for a single global commodity; network-shock propagation would require strong identification assumptions on the network itself. Structural VAR (Kilian-style) is mentioned in the Lit-overview slide as the field default but was ruled out here because its identification restrictions are contested for chokepoint events.
 
 \subsection{If asked}
 \begin{itemize}
   \item \textit{Why not just stick with the network framing?} Network propagation on oil prices is interesting but very hard to identify from observational data; the network-as-donor approach we considered ends up looking similar to SCM with engineered features. SCM gives a cleaner identification story now.
-  \item \textit{Could the network framing come back in Part 2?} Yes --- network centrality or routing-disruption features could enter the donor pool, or layered as a propagation model on top of the ATT. Part 2 is open.
+  \item \textit{Could the network framing come back in Part 2?} Yes --- network centrality or routing-disruption features could enter the donor pool, or be layered as a propagation model on top of the ATT. Part 2 is open.
+  \item \textit{Why drop Local Projection / structural VAR from the candidate list?} LP and SVAR appear on the Lit-overview slide (slide 4) as the field-default approaches we are positioned against. They're not in the candidate list on slide 2 because they're not what we ultimately chose; we mention them on slide 4 to show we're aware of the literature.
 \end{itemize}
 
 % =====================================================================
-\section{Problem statement \timetag{60s}}
+\section{Slide 3 --- Research question (Part 1) \timetag{60s}}
 
 \subsection{Talking points}
 \begin{itemize}
-  \item \highlight{The question (highlighted in red box):} What was the Brent price impact of the 2026-02-01 Strait of Hormuz disruption?
-  \item Estimand: ATT over a defined post-event window. Method: SCM on the observed price series.
-  \item Part 2 is open; come back to it at the end.
-  \item What is new: SCM-on-price design is rare (closest precedent is Becker, Pfeifer \& Schweikert 2021 on Austrian retail fuel); field default is structural VAR or scenario models.
-  \item Method extensions vs the precedent: crude benchmark (not retail fuel), cross-asset donors (not cross-country), exogenous geopolitical treatment (not endogenous policy).
-  \item \highlight{Two-event robustness design}: Russia 2022 used as a magnitude-validation case. SCM Russia counterfactual lands within \$3.98/bbl of EIA STEO's last pre-invasion structural forecast on the matched 151-day window ($\sim$5.7 pp on implied ATT).
+  \item \highlight{The question (in the red box):} \emph{What was the causal effect of the 2026 Strait of Hormuz disruption on the Brent crude price?}
+  \item \highlight{Estimand:} average treatment effect on the treated (ATT) over a defined post-event window. One treated unit (Brent) $\to$ effect \emph{for that unit}, not a population average.
+  \item \highlight{Approach (left column):} SCM on the observed Brent price series. Ensemble of five model specifications to span the SCM regularization design space.
+  \item \highlight{Answer today (right column):} Brent traded at a \highlight{$\sim$44\%} premium above the donor-weighted counterfactual over the March--May 2026 post-event window. IQR across the five models: $[40\%, 44\%]$.
+  \item \highlight{Part 2} is open --- come back to it on slide 15.
 \end{itemize}
 
 \subsection{Behind the slide}
-The two-event design is the most important methodological contribution. SCM on a global benchmark price is structurally different from SCM on a country-level outcome --- there's only one Brent. The Russia case validates that the design produces magnitudes consistent with an independent structural forecast, before applying it to the focal Hormuz case where no such external anchor exists (Hormuz is too recent).
+This is the slide where you state the punchline up front: the headline number ($\sim$44\%) and the IQR. The audience then knows what to evaluate as you walk through the methodology slides. Don't yet defend the number --- just say it.
+
+The Part 2 placeholder is intentional --- it tells the audience the second half of the thesis is open to direction, which softens the methodology focus of Part 1.
 
 \subsection{If asked}
 \begin{itemize}
-  \item \textit{Why is there no peer-reviewed SCM precedent on crude?} A combination of recency (price-impact SCM applications are mostly post-2020), data availability (good donor pools for global commodities are non-obvious), and convention (the oil literature defaults to structural VAR for identified shock decomposition; SCM is more common in policy-evaluation settings). We don't claim "no peer-reviewed work has tried it," just that the closest mechanical precedent is regulated retail fuel.
-  \item \textit{What's the policy use?} SPR sizing, central-bank reaction function (oil shocks pass through to headline inflation), fiscal buffers, sovereign hedging.
+  \item \textit{Why ATT and not ATE?} One treated unit (Brent). There is no population to average over; the estimand is the effect on the realized series.
+  \item \textit{Why is there no peer-reviewed SCM precedent on crude?} Combination of recency (price-impact SCM is mostly post-2020), data availability (good cross-asset donor pools for commodities are non-obvious), and convention (the oil literature defaults to structural VAR; SCM is more common in policy-evaluation settings). Closest mechanical precedent is Becker et al.\ 2021 on regulated Austrian retail fuel, covered on slide 4.
+  \item \textit{What's the policy use of $\sim$44\%?} SPR sizing, central-bank reaction function (oil shocks pass through to headline inflation), fiscal buffers, sovereign hedging.
 \end{itemize}
 
 % =====================================================================
-\section{Brent spot price, post-COVID --- curated event timeline \timetag{45s}}
+\section{Slide 4 --- How the field estimates oil-price impacts \timetag{30s}}
+
+\subsection{Talking points}
+\begin{itemize}
+  \item Three field-default approaches, briefly: \textbf{Structural VAR} (Kilian 2009; identification restrictions contested for chokepoint events, no continuous counterfactual path); \textbf{Event study} (no path beyond a few days, persistence not captured); \textbf{Scenario models} (Dallas Fed, OIES, Kiel, IEA; counterfactual is assumed, not read from observed prices).
+  \item Two SCM-on-price precedents: \textbf{Becker, Pfeifer \& Schweikert 2021} on Austrian retail fuel (closest mechanical design); \textbf{Gharehgozli 2017} on Iran GDP under sanctions (establishes SCM for geopolitical disruptions but on GDP, not market price).
+  \item \highlight{Gap we fill (red box):} no published study applies SCM to a globally traded crude benchmark under an exogenous geopolitical disruption.
+\end{itemize}
+
+\subsection{Behind the slide}
+Move quickly through this slide --- it's positioning, not the contribution itself. The point is to show we know the landscape and to set up slide 5 where we say what we do differently.
+
+% =====================================================================
+\section{Slide 5 --- What we do differently \timetag{45s}}
+
+\subsection{Talking points}
+\begin{itemize}
+  \item \highlight{Three design extensions} vs the Becker et al.\ precedent:
+  \begin{itemize}
+    \item Retail fuel $\to$ \emph{crude benchmark}. Brent underpins retail fuel, CPI, and sovereign hedging.
+    \item Cross-country $\to$ \emph{cross-asset donors}. No crude benchmark is Hormuz-clean (every crude benchmark inherits the shock), so donors must come from metals, FX, equities, rates.
+    \item Regulatory $\to$ \emph{geopolitical} treatment. Treatment is exogenous and unannounced; SUTVA reasoning is about asset-class routing, not policy endogeneity.
+  \end{itemize}
+  \item \highlight{Two-event validation design} (own contribution; no canonical SCM precedent): Hormuz 2026 is the focal estimate, Russia 2022 is run as a magnitude validation. SCM Russia counterfactual lands within \$3.98/bbl of EIA STEO's last pre-invasion structural forecast on the matched 151-day window ($\sim$5.7 pp on implied ATT).
+  \item \highlight{Complement, not substitute}: scenario models ask ``what price does an \emph{assumed} shortfall imply?''; SCM asks ``what gap does \emph{observed market data} imply?'' Agreement $\to$ independent validation. Disagreement $\to$ reveals what structural assumptions miss.
+  \item \highlight{Additional value} SCM provides over the field defaults: full price path (integrates persistence), auditable identification (donor pool open to challenge), no structural stance (total reduced-form effect, no prior on supply vs.\ risk premium split).
+\end{itemize}
+
+\subsection{Behind the slide}
+This is where the contribution lives. Spend the most time on the two-event design --- it's the methodological novelty and the easiest target for committee questions.
+
+\subsection{If asked}
+\begin{itemize}
+  \item \textit{Why is Russia validation credible if it has macro confounders?} Weakened but not invalidated --- detailed defense on slide 11 (model fit) and in the "Hardest critiques" section below.
+\end{itemize}
+
+% =====================================================================
+\section{Slide 6 --- Brent spot price, post-COVID, curated event timeline \timetag{45s}}
 
 \subsection{Talking points}
 \begin{itemize}
@@ -108,7 +155,7 @@ The two-event design is the most important methodological contribution. SCM on a
 \end{itemize}
 
 % =====================================================================
-\section{Methodology --- ensemble of 5 models \timetag{60s}}
+\section{Slide 7 --- Methodology: ensemble of 5 models \timetag{60s}}
 
 \subsection{Talking points}
 \begin{itemize}
@@ -206,7 +253,7 @@ Grids tightened per Cawley \& Talbot (2010) to limit winner's-curse on val RMSE.
 \end{itemize}
 
 % =====================================================================
-\section{Model training and validation \timetag{75s}}
+\section{Slide 8 --- Model training and validation \timetag{75s}}
 
 \subsection{Talking points}
 \begin{itemize}
@@ -226,7 +273,7 @@ The walk-forward CV is a recent refactor (previously was a single 80/20 hold-out
 \end{itemize}
 
 % =====================================================================
-\section{Donor selection \timetag{75s}}
+\section{Slide 9 --- Donor selection \timetag{75s}}
 
 \subsection{Talking points}
 \begin{itemize}
@@ -247,7 +294,7 @@ Donor selection is the SCM-canonical SUTVA defense (Abadie 2021 $\S$3.1: substan
 \end{itemize}
 
 % =====================================================================
-\section{Donor co-movement with Brent --- audited pool \timetag{30s}}
+\section{Slide 10 --- Donor co-movement with Brent (audited pool) \timetag{30s}}
 
 \subsection{Talking points}
 \begin{itemize}
@@ -257,7 +304,7 @@ Donor selection is the SCM-canonical SUTVA defense (Abadie 2021 $\S$3.1: substan
 \end{itemize}
 
 % =====================================================================
-\section{Validation results --- model fit \timetag{60s}}
+\section{Slide 11 --- Validation results: model fit \timetag{60s}}
 
 \subsection{Talking points}
 \begin{itemize}
@@ -333,7 +380,7 @@ The synthetic represents ``what Brent would have done given how the donors moved
 \end{itemize}
 
 % =====================================================================
-\section{Validation results --- in-space placebo \timetag{90s}}
+\section{Slide 12 --- Validation results: in-space placebo \timetag{90s}}
 
 \subsection{Talking points}
 \begin{itemize}
@@ -357,7 +404,7 @@ The Russia weakness is the known limitation of in-space placebo at pre-periods w
 \end{itemize}
 
 % =====================================================================
-\section{External validation --- EIA STEO pre-invasion forecasts (Russia only) \timetag{75s}}
+\section{Slide 13 --- External validation: EIA STEO pre-invasion forecasts (Russia only) \timetag{75s}}
 
 \subsection{Talking points}
 \begin{itemize}
@@ -381,7 +428,7 @@ This is uniquely available for Russia: Hormuz has no equivalent pre-event struct
 \end{itemize}
 
 % =====================================================================
-\section{Headline result --- ATT estimate \timetag{90s}}
+\section{Slide 14 --- Headline result: ATT estimate \timetag{90s}}
 
 \subsection{Talking points}
 \begin{itemize}
@@ -408,34 +455,94 @@ If asked for a single number for Hormuz: 43\%. If asked for a range: 38--50\% ac
 \end{itemize}
 
 % =====================================================================
-\section{Part 2 --- ideas for the second half \timetag{45s}}
+\section{Slide 15 --- Part 2: future directions \timetag{45s}}
 
 \subsection{Talking points}
 \begin{itemize}
-  \item Currently a placeholder for discussion. Possible directions (per the muted footnote):
-  \begin{itemize}
-    \item Pass-through of the Brent ATT to retail fuel prices and headline CPI.
-    \item Direct comparison: SCM ATT vs scenario-model price paths (Dallas Fed, OIES, Kiel) on the same window.
-    \item Severity-dependent extrapolation: the SCM gives one ATT for the realized disruption; what about counterfactual closure intensities?
-    \item Alternative donor pool designs or maritime-network features re-entering as donor candidates.
-  \end{itemize}
-  \item \highlight{Open to suggestions from the audience.}
+  \item Three directions build directly on the Brent SCM result established in Part 1. State each in one sentence; do not over-commit to any.
+  \item \highlight{Direction 1 --- LNG market causal estimation (JKM, TTF).} Change the treated asset rather than the methodology: apply the same SCM design to JKM Asian LNG spot and/or TTF European LNG spot. Identifies the Hormuz LNG premium paid by Asian buyers vs a cross-asset counterfactual. \emph{First causal estimate of the Hormuz effect on Asian LNG pricing.} Same machinery, different treated asset.
+  \item \highlight{Direction 2 --- Local projections (LP) across horizons.} Estimate the Brent treatment effect at $h = 1, 5, 14, 30$ days. Produces a horizon-by-horizon impulse response: how fast the effect builds and how long it persists. SCM gives the \emph{average} ATT over a window; LP gives the \emph{shape} of the path --- different and complementary information.
+  \item \highlight{Direction 3 --- Retail fuel and CPI pass-through.} Estimate what share of the $\sim$44\% Brent premium passed through to retail gasoline and headline CPI in oil-importing economies. Converts the upstream ATT into a consumer-price impact estimate. The Brent ATT is the upstream input; pass-through delivers the policy-relevant inflation number.
+  \item Closing (red box): we are currently considering these three options, and are open to discussing further options/suggestions.
 \end{itemize}
 
 \subsection{Behind the slide}
-The Part 2 slide is deliberately under-specified. The intent is to elicit feedback from the committee on direction. Have one or two preferred directions ready in case nobody pushes back: the most natural is the SCM vs scenario-model comparison (slide reuses the STEO machinery from Part 1).
+The Part 2 slide is intentionally a menu rather than a commitment. Present the three directions evenly; if asked to rank, the LNG-spot extension is the most natural next step because it reuses the entire SCM machinery with a different treated asset. The LP extension complements Part 1's average ATT with a horizon-decomposed impulse response. The pass-through extension is the most policy-relevant but adds an entirely new dataset (retail prices, CPI) and identification challenge (incomplete pass-through, country heterogeneity).
+
+\subsection{If asked}
+\begin{itemize}
+  \item \textit{Which direction would you actually pick?} Honest answer: LNG-spot SCM is the easiest path to a clean second result (same methodology, new treated asset). LP is the most rigorous extension methodologically. Pass-through is the most policy-impactful but requires more data engineering.
+  \item \textit{Could you do all three?} Time-budget concern; one is realistic for the thesis timeline. Multiple would dilute depth.
+  \item \textit{Would the network framing reappear in Part 2?} Possible: maritime-routing features could enter the donor pool, or a separate propagation model could layer on top of the ATT. Not in the current shortlist but open to suggestion.
+\end{itemize}
 
 % =====================================================================
-\section{Thank you / Q\&A}
+\section{Slide 20 --- Appendix A3: in-time placebo and LOO}
 
-Open the floor. The appendix slides are reserve material; navigate to them on demand:
+This is reserve material; do not budget time. Use only if asked about robustness of the headline. The slide shows two diagnostic tests side-by-side --- both refit the SCM under a deliberate perturbation and report how the headline ATT moves.
+
+\subsection{Procedure: in-time placebo (Abadie, Diamond \& Hainmueller 2015)}
+
+Pretend the treatment happened 6 months \emph{earlier} than the actual $T_0$, with everything else held identical. If the SCM produces a large ``effect'' at the fake date --- where we know nothing happened --- the procedure is fragile.
+
+\textbf{Formula.}
+\begin{align*}
+T_0^{\text{fake}} &= T_0 - 6\text{ months} \\
+\text{(re-fit SCM with pre-period truncated at } & T_0^{\text{fake}} \text{; default hparams, no re-tuning)}\\
+\text{gap}^{\text{fake}}_t &= y_t - \hat{y}^{\text{fake}}_t \quad \text{for } t \in [T_0^{\text{fake}},\, T_0) \\
+\textbf{in-time gap (\%)} &= 100 \cdot \big(\exp(\overline{\text{gap}^{\text{fake}}_t}) - 1\big)
+\end{align*}
+where $\overline{\text{gap}^{\text{fake}}_t}$ is the mean log-gap over the fake post-period (the stretch of pre-event data we're pretending is post-event).
+
+\textbf{Unit:} \highlight{percent} --- the same unit as the headline ATT.
+
+\textbf{Reading the numbers.}
+\begin{itemize}
+  \item \textbf{Hormuz} fake window: late 2025 $\to$ Feb 2026. In-time gaps are $-10$ to $-12\%$ across all 5 models, all in the same direction. Interpretation: the donor pool was running slightly hotter than Brent in late 2025, so any SCM fit produces a small \emph{negative} placebo gap. This is not a model failure --- it tells us the pre-Hormuz runup was concentrated in donors, not Brent.
+  \item \textbf{Russia} fake window: Aug 2021 $\to$ Feb 2022. In-time gaps span $-5\%$ to $+26\%$ with mixed signs. This window contains both the late-2021 oil rally and the Jan-2022 invasion runup, so partial real-effect contamination is \emph{expected}. The XGBoost $+26\%$ is low-power (training period shrinks $\sim 31\%$ when 6 months are sliced off).
+  \item Rule of thumb: a fake-period gap with absolute value $\lesssim$ the pre-period noise floor (a few \%) is reassuring; a fake-period gap comparable in magnitude to the real ATT would be alarming.
+\end{itemize}
+
+\subsection{Procedure: leave-one-donor-out (LOO; Abadie, Diamond \& Hainmueller 2015)}
+
+Sensitivity check: re-fit the SCM with each ``weight-bearing'' donor dropped in turn, and look at how much the headline ATT moves across the drops. If one donor is silently carrying the whole estimate, the SCM is fragile.
+
+\textbf{Formula.} For each donor $j$ with non-trivial weight (e.g.\ $w_j > 0.05$, or top-$K=5$ for nonlinear models):
+\begin{align*}
+\text{pool}^{(-j)} &= \text{donors} \setminus \{j\} \quad \text{(20-donor pool with } j \text{ removed)}\\
+\text{ATT}^{(-j)} &= 100 \cdot \big(\exp(\overline{\text{gap}^{(-j)}_t}) - 1\big) \quad \text{re-fit SCM on the 20-donor pool}\\
+\textbf{LOO range (pp)} &= \max_j \text{ATT}^{(-j)} - \min_j \text{ATT}^{(-j)}
+\end{align*}
+where the max and min are taken across the leave-out runs (typically 5--10 per model, depending on how many donors carry weight).
+
+\textbf{Unit:} \highlight{percentage points (pp)} --- the spread of the leave-one-out ATT distribution. \emph{Not} a percent. ``5 pp'' means the ATT could be 5 percentage points lower or higher depending on which donor you drop, e.g.\ a $40\%$ headline could become anywhere in $[37.5\%, 42.5\%]$ under leave-one-out.
+
+\textbf{Reading the numbers.}
+\begin{itemize}
+  \item \textbf{Tightest (good): XGBoost} at $\sim 5$ pp for both events. No single donor's removal moves the ATT meaningfully --- the result is robust to the donor pool composition.
+  \item \textbf{Widest (bad): Bayesian Ridge Russia} at 24.9 pp, with the $\dagger$ flag indicating the range \emph{crosses zero} (min $-12.8\%$ to max $+12.0\%$). The headline can flip sign just by dropping one donor --- the model is LOO-fragile, consistent with its overfit signature (walk-forward val/train ratio 3.07) and degenerate $+0.5\%$ baseline ATT.
+  \item Hormuz LOO ranges are mostly 5--13 pp across models, narrower than Russia. The ensemble median is robust because four of five models (Convex SCM, ASCM, Elastic-net, XGBoost) agree closely.
+  \item Rule of thumb: LOO range $< 10$ pp = robust; $10$--$20$ pp = sensitive but acceptable; $> 20$ pp or crosses zero = fragile, flag for narrative discussion.
+\end{itemize}
+
+\subsection{If asked}
+\begin{itemize}
+  \item \textit{Why 6 months for the in-time placebo offset?} Standard convention from Abadie 2015; long enough that any fake gap is not contaminated by anticipation of the real $T_0$, short enough not to halve the training window. Six months is the typical choice in applied SCM papers.
+  \item \textit{Why not bootstrap the LOO range for a CI?} The LOO range is already a robustness statistic, not an SE; it captures donor-composition sensitivity rather than sampling variability. The in-space placebo (slide 12) handles the sampling-style inference question.
+  \item \textit{Why does Bayesian Ridge fail LOO so badly?} BR is the only dense (no-feature-selection) model in the ensemble; dropping any one donor reshuffles the entire coefficient vector. Sparse models (Convex SCM, Elastic-net) pin to a small donor set and stay stable.
+\end{itemize}
+
+% =====================================================================
+\section{Slide 16 --- Thank you / Q\&A}
+
+Open the floor. The five appendix slides (17--21) are reserve material; navigate to them on demand:
 
 \begin{itemize}
-  \item \textbf{Appendix A1 --- excluded donors:} 12 Russia-treated drops with audit reasons; categorical exclusions (energy complex, oil-currencies).
-  \item \textbf{Appendix A2 --- donor importance:} per-model weight heatmaps (note: weights are not identical across events, see A5 nuance).
-  \item \textbf{Appendix A3 --- donor SUTVA cleanliness:} permutation mean-shift test results (Chow 1960 hypothesis + Lehmann \& Romano 2005 permutation + Phipson \& Smyth 2010 correction). Hormuz 1/33 flagged (IronOre); Russia 1/33 (CNY). Audit agreement: Hormuz 32/33, Russia 20/33.
-  \item \textbf{Appendix A4 --- in-time placebo and LOO:} combined diagnostics table. Tightest LOO: XGBoost ($\sim$5 pp both events). Widest: Bayesian Ridge Russia (24.9 pp, range crosses zero) --- the LOO-fragile case.
-  \item \textbf{Appendix A5 --- cross-event weight transfer:} the $\S$5f test. Russia weights applied to Hormuz panel: Convex SCM transfers cleanly (+8 pp), ASCM and Elastic-net transfer with attenuation, XGBoost and Bayesian Ridge transfer pathologically (transferred pre-RMSPE 22$\times$ and 314$\times$ independent). The relevant subtlety: per-donor weights aren't stable across events (e.g., JPY moves from rank 12 to rank 1 in convex SCM), but the \emph{projection onto donor space} is. Cite Abadie \& L'Hour 2021 on convex SCM weight non-uniqueness.
+  \item \textbf{Slide 17 --- Appendix: excluded donors.} 12 Russia-treated drops with audit reasons; categorical exclusions (energy complex, oil-currencies). Lists Russia H-tier (Wheat, Corn, Palladium, EUR, DXY, BTC) and M-tier (Copper, IronOre, Soybeans, EM\_Eq, GBP, US10Y).
+  \item \textbf{Slide 18 --- Appendix: donor importance.} Per-model donor importance heatmap, normalised within each column to sum to 1 (so colour scale is comparable across models). Convex weights for SCM/ASCM; $|\hat\beta_j|$ for Elastic-net/Bayesian Ridge; feature importance (gain-based) for XGBoost.
+  \item \textbf{Slide 19 --- Appendix: donor SUTVA cleanliness.} Permutation mean-shift test results (Chow 1960 hypothesis + Lehmann \& Romano 2005 permutation + Phipson \& Smyth 2010 correction). Hormuz 1/33 flagged (IronOre); Russia 1/33 (CNY). Audit agreement: Hormuz 32/33, Russia 20/33.
+  \item \textbf{Slide 20 --- Appendix: in-time placebo \& LOO.} Combined diagnostics table. See dedicated section above for the formulas, units, and reading. Headline: Hormuz in-time gaps $-10$ to $-12\%$ uniform across models (background donor drift, not model failure); Russia in-time gaps mixed sign (fake window contains pre-invasion runup, contamination expected). LOO ranges 5--13 pp for Hormuz, 5--25 pp for Russia; Bayesian Ridge Russia is the LOO-fragile case (24.9 pp, range crosses zero).
+  \item \textbf{Slide 21 --- Appendix: cross-event weight transfer.} Russia-fitted weights applied to Hormuz panel: Convex SCM transfers cleanly (+8 pp drift), ASCM and Elastic-net transfer with magnitude attenuation, XGBoost and Bayesian Ridge transfer pathologically (transferred pre-RMSPE 22$\times$ and 314$\times$ independent). The relevant subtlety: per-donor weights are not literally stable across events (JPY moves from rank 12 to rank 1 in convex SCM), but the \emph{projection onto donor space} is. Cite Abadie \& L'Hour 2021 on convex SCM weight non-uniqueness.
 \end{itemize}
 
 % =====================================================================
