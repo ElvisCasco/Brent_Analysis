@@ -324,6 +324,7 @@ Donors: metals, FX, equities, rates. &
 % 6. Donor selection
 % =====================================================================
 \begin{frame}{Donor selection}
+  \footnotesize
   \hd{21 audited donors (of 33 candidates).} The full 33-donor catalog was audited for SUTVA and pre-event co-movement; 12 were dropped for event-specific exposure (Russia/Ukraine or Persian Gulf channels), leaving 21 in the shared pool used for both events --- so we know the full scope of what was excluded and why. Inclusion requires \emph{both}: \hd{pre-treatment} co-movement with Brent through a common global factor, \emph{and} \hd{treatment} cleanliness (SUTVA).
 
   \vspace{0.4em}
@@ -343,7 +344,6 @@ Donors: metals, FX, equities, rates. &
   \normalsize
 
   \vspace{0.4em}
-  \smalltext{Categorical exclusions and per-event flag table: docs/donor\_catalog.md.}
 \end{frame}
 
 % =====================================================================
@@ -389,7 +389,7 @@ Donors: metals, FX, equities, rates. &
 % =====================================================================
 \begin{frame}[shrink=10]{Validation results --- in-space placebo}
   \footnotesize
-  \hd{Procedure} \src{Abadie 2010 \S3.3}: refit the SCM treating each donor as treated. Rank Brent's post/pre RMSPE ratio against the $N$ placebos (Brent $+$ donors). \hd{Permutation $p$-value $= $ rank $/\, N$.} Rank 1 $=$ Brent's break beats every placebo $\rightarrow$ strongest possible signal; floor $p = 1/N$ ($0.045$ at 21-donor, $0.029$ at 33-donor).
+  \hd{Procedure} \src{Abadie 2010}: refit the SCM treating each donor as treated. Rank Brent's post/pre RMSPE ratio against the $N$ placebos (Brent $+$ donors). \hd{Permutation $p$-value $= $ rank $/\, N$.} Rank 1 $=$ Brent's break beats every placebo $\rightarrow$ strongest possible signal; floor $p = 1/N$ ($0.045$ at 21-donor, $0.029$ at 33-donor).
 
   \vspace{0.3em}
   \begin{center}
@@ -412,10 +412,9 @@ Donors: metals, FX, equities, rates. &
   \end{center}
 
   \vspace{0.3em}
-  \hd{How to read.}
   \begin{itemize}\setlength\itemsep{0.05em}
     \item \hd{Hormuz:} Brent ranks 1 in \hd{every cell} $\rightarrow$ strongest possible signal across all 5 models and both pools.
-    \item \hd{Russia:} mid-pack (rank 9--18) for the linear models; only XGBoost at 21-donor reaches rank 1 (slips to 5 at 33-donor). Feb-22 macro shift inflates the placebo tail; Russia case carried by historical \$95--\$130 record, EIA STEO cross-check, and \S5f transfer.
+    \item \hd{Russia:} mid-pack (rank 9--18) for the linear models; only XGBoost at 21-donor reaches rank 1 (slips to 5 at 33-donor). 
   \end{itemize}
 
 \end{frame}
