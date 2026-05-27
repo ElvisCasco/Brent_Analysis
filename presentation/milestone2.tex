@@ -50,6 +50,8 @@
 \usepackage{array}
 \usepackage{amsmath}
 \usepackage{xcolor}
+% hyperref is auto-loaded by beamer; just override URL colours.
+\hypersetup{colorlinks=true,urlcolor=black,linkcolor=black}
 
 \definecolor{accent}{HTML}{8B0000}      % dark red — used very sparingly
 \definecolor{muted}{HTML}{777777}
@@ -682,6 +684,35 @@ Donors: metals, FX, equities, rates. &
     \item Factor structure has shifted between 2020--22 and 2024--26, but the \hd{sign and order of magnitude} of the Hormuz effect are robust under the linear-convex models.
   \end{itemize}
   \normalsize
+\end{frame}
+
+% ---------------------------------------------------------------------
+% A5. Interactive figures (GitHub Pages links)
+% ---------------------------------------------------------------------
+\begin{frame}{Appendix --- interactive figures online}
+  \footnotesize
+  Five interactive HTML versions of the EDA figures (zoom, hover, toggle traces) are hosted on GitHub Pages at \href{https://elviscasco.github.io/Brent_Analysis/}{\texttt{elviscasco.github.io/Brent\_Analysis}}. Data embedded inline; only the Plotly rendering library loads from CDN.
+
+  \vspace{0.6em}
+  \begin{tabular}{@{}p{0.36\textwidth} p{0.58\textwidth}@{}}
+    \toprule
+    \hd{Figure} & \hd{URL} \\
+    \midrule
+    Brent + curated events, 2000--2026 &
+      \href{https://elviscasco.github.io/Brent_Analysis/plots/eda_brent_events_timeline.html}{\texttt{plots/eda\_brent\_events\_timeline.html}} \\[0.4em]
+    Donors vs Brent, Hormuz panel &
+      \href{https://elviscasco.github.io/Brent_Analysis/plots/eda_donors_audited_hormuz.html}{\texttt{plots/eda\_donors\_audited\_hormuz.html}} \\[0.4em]
+    Donors vs Brent, Russia panel &
+      \href{https://elviscasco.github.io/Brent_Analysis/plots/eda_donors_audited_russia.html}{\texttt{plots/eda\_donors\_audited\_russia.html}} \\[0.4em]
+    Event-window response heatmap &
+      \href{https://elviscasco.github.io/Brent_Analysis/plots/eda_event_window_response_heatmap.html}{\texttt{plots/eda\_event\_window\_response\_heatmap.html}} \\[0.4em]
+    Brent + Geopolitical Risk overlay &
+      \href{https://elviscasco.github.io/Brent_Analysis/plots/eda_brent_gpr.html}{\texttt{plots/eda\_brent\_gpr.html}} \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{0.6em}
+  \smalltext{Source code: notebooks/01\_EDA.ipynb cells 7, 12, 17, 19; outputs regenerated on every notebook run.}
 \end{frame}
 
 \end{document}
