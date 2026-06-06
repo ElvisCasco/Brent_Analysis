@@ -274,6 +274,288 @@ def regime_stability_test(panel, treated, donors, t_pre_start, t_pre_end, n_thir
     return df
 
 
+# ===== §5c (ii) Bai-Perron multiple structural-break dating =====
+
+def _prefix_ssr(y, x):
+    """Closed-form SSR matrix for OLS of y on [1, x] over every segment i..j inclusive.
+
+    Returns an (n, n) upper-triangular matrix where ``SSR[i, j]`` is the residual
+    sum of squares of regressing ``y[i:j+1]`` on a constant and ``x[i:j+1]``.
+    Computed from prefix sums in O(n^2) with O(1) arithmetic per entry — only the
+    simple-regression case (intercept + one regressor) is supported, which is all
+    the trend and Brent-relationship specs in §5c (ii) need. Segments shorter than
+    two observations are set to ``np.inf``.
+    """
+    y = np.asarray(y, dtype=float)
+    x = np.asarray(x, dtype=float)
+    n = len(y)
+    z = np.zeros(1)
+    Sx = np.concatenate([z, np.cumsum(x)])
+    Sy = np.concatenate([z, np.cumsum(y)])
+    Sxx = np.concatenate([z, np.cumsum(x * x)])
+    Sxy = np.concatenate([z, np.cumsum(x * y)])
+    Syy = np.concatenate([z, np.cumsum(y * y)])
+
+    SSR = np.full((n, n), np.inf)
+    for i in range(n):
+        j = np.arange(i, n)
+        m = (j - i + 1).astype(float)
+        sx = Sx[j + 1] - Sx[i]
+        sy = Sy[j + 1] - Sy[i]
+        sxx = Sxx[j + 1] - Sxx[i]
+        sxy = Sxy[j + 1] - Sxy[i]
+        syy = Syy[j + 1] - Syy[i]
+        sxx_c = sxx - sx * sx / m
+        sxy_c = sxy - sx * sy / m
+        syy_c = syy - sy * sy / m
+        beta = np.where(sxx_c > 1e-12, sxy_c / np.where(sxx_c > 1e-12, sxx_c, 1.0), 0.0)
+        ssr = syy_c - beta * sxy_c
+        SSR[i, j] = np.where(m >= 2, np.maximum(ssr, 0.0), np.inf)
+    return SSR
+
+
+def bai_perron_breaks(y, x, min_size_frac=0.10, max_breaks=5):
+    """Bai & Perron (1998, 2003) multiple structural-break dating for a simple
+    regression ``y_t = a_s + b_s * x_t + e_t`` allowing up to ``max_breaks`` breaks.
+
+    Globally minimises total SSR over all admissible partitions (minimum segment
+    length ``h = ceil(min_size_frac * n)``) by dynamic programming, then selects
+    the number of breaks by BIC. Restricted to one regressor plus an intercept —
+    the two specifications used in §5c (ii):
+
+    - **trend spec**: ``x`` = a linear time index, ``y`` = donor log-level →
+      breaks in level / trend slope (a "change in trend" test on the donor's own path).
+    - **relationship spec**: ``x`` = Brent log-returns, ``y`` = donor log-returns →
+      breaks in the donor-Brent co-movement (the formal upgrade to the §5c
+      distance-correlation regime-stability test).
+
+    This is the *known-form, unknown-date* counterpart to §5d's
+    ``permutation_mean_shift_test`` (known date, mean only): Bai-Perron searches
+    for the break dates rather than assuming them, so it can place a break at an
+    arbitrary point and report *when* a donor's behaviour shifted.
+
+    Args:
+        y, x: aligned pandas Series (same DatetimeIndex, NaNs already dropped).
+        min_size_frac: minimum segment length as a fraction of the sample.
+        max_breaks: maximum number of breaks to search for.
+
+    Returns dict with keys:
+        n_breaks: BIC-selected number of breaks
+        break_dates: Timestamps that *start* each post-break segment
+        break_idx: integer positions of those break dates
+        bic, ssr: BIC and global-min SSR for m = 0..max_breaks
+        segments: per-segment (start, end, intercept, slope, n) for selected m
+        n: sample size
+    """
+    if len(y) != len(x):
+        raise ValueError('y and x must be aligned (equal length)')
+    idx = y.index
+    yv = np.asarray(y, dtype=float)
+    xv = np.asarray(x, dtype=float)
+    n = len(yv)
+    h = max(2, int(np.ceil(min_size_frac * n)))
+    max_m = min(max_breaks, n // h - 1)
+    if max_m < 1:
+        # Sample too short for even one break at this min segment size.
+        X = np.column_stack([np.ones(n), xv])
+        coef, *_ = np.linalg.lstsq(X, yv, rcond=None)
+        ssr0 = float(np.sum((yv - X @ coef) ** 2))
+        return {
+            'n_breaks': 0, 'break_idx': [], 'break_dates': [],
+            'bic': [np.nan], 'ssr': [ssr0],
+            'segments': [{'start': idx[0], 'end': idx[-1],
+                          'intercept': float(coef[0]), 'slope': float(coef[1]), 'n': n}],
+            'n': n,
+        }
+
+    SSR = _prefix_ssr(yv, xv)
+
+    # DP: cost[m, j] = min SSR partitioning obs 0..j into (m+1) segments, each >= h.
+    cost = np.full((max_m + 1, n), np.inf)
+    bptr = np.full((max_m + 1, n), -1, dtype=int)
+    for j in range(n):
+        if j + 1 >= h:
+            cost[0, j] = SSR[0, j]
+    for m in range(1, max_m + 1):
+        for j in range((m + 1) * h - 1, n):
+            lo = m * h - 1          # earliest admissible end of the previous block
+            hi = j - h              # latest end leaving the final segment >= h
+            if hi < lo:
+                continue
+            tot = cost[m - 1, lo:hi + 1] + SSR[lo + 1:hi + 2, j]
+            k = int(np.argmin(tot))
+            cost[m, j] = tot[k]
+            bptr[m, j] = lo + k
+
+    # BIC over m = 0..max_m. p = 2*(m+1) regression coefficients + m break fractions.
+    bic, ssr_path = [], []
+    for m in range(max_m + 1):
+        s = cost[m, n - 1]
+        ssr_path.append(float(s))
+        if not np.isfinite(s) or s <= 0:
+            bic.append(np.inf)
+        else:
+            p = 2 * (m + 1) + m
+            bic.append(float(n * np.log(s / n) + np.log(n) * p))
+    m_star = int(np.argmin(bic))
+
+    # Backtrack the selected partition.
+    breaks, j, m = [], n - 1, m_star
+    while m > 0:
+        i = int(bptr[m, j])
+        breaks.append(i)
+        j, m = i, m - 1
+    break_idx = sorted(breaks)
+    break_dates = [idx[i + 1] for i in break_idx]
+
+    bounds = [0] + [i + 1 for i in break_idx] + [n]
+    segments = []
+    for a, b in zip(bounds[:-1], bounds[1:]):
+        X = np.column_stack([np.ones(b - a), xv[a:b]])
+        coef, *_ = np.linalg.lstsq(X, yv[a:b], rcond=None)
+        segments.append({'start': idx[a], 'end': idx[b - 1],
+                         'intercept': float(coef[0]), 'slope': float(coef[1]),
+                         'n': int(b - a)})
+
+    return {
+        'n_breaks': m_star, 'break_idx': break_idx, 'break_dates': break_dates,
+        'bic': bic, 'ssr': ssr_path, 'segments': segments, 'n': n,
+    }
+
+
+# ===== §5c (iii) Harvey-Leybourne-Taylor I(0)/I(1)-robust trend-break test =====
+
+# HLT (2009, Econometric Theory 25(4):995-1029) Table 1, Model A (trend break only),
+# unknown break date, 10% trimming. (critical value, m_xi) per significance level.
+_HLT_TABLE_A = {'10%': (2.284, 0.835), '5%': (2.563, 0.853), '1%': (3.135, 0.890)}
+_HLT_G1, _HLT_G2 = 500.0, 2.0
+
+
+def _bartlett_lr_var(resid, bandwidth):
+    """Bartlett-kernel long-run variance of a residual series (HLT 2009 eq. 6/7).
+
+    omega^2 = gamma_0 + 2 * sum_{j=1}^{l} (1 - j/(l+1)) * gamma_j, with
+    gamma_j = m^{-1} sum resid_t resid_{t-j} (the T^{-1} convention, m = len(resid)).
+    """
+    r = np.asarray(resid, dtype=float)
+    m = len(r)
+    g0 = float(np.mean(r * r))
+    s = g0
+    for j in range(1, int(bandwidth) + 1):
+        if j >= m:
+            break
+        s += 2.0 * (1.0 - j / (bandwidth + 1.0)) * float(np.mean(r[j:] * r[:-j]))
+    return max(s, 1e-12)
+
+
+def hlt_trend_break(y, trim=0.10, sig='5%'):
+    """Harvey, Leybourne & Taylor (2009) trend-break test, robust to I(0)/I(1) errors.
+
+    Tests H0: no break in the linear trend of `y` against a single break at an
+    unknown date, with size asymptotically invariant to whether the shocks are
+    I(0) or I(1) — the right tool for near-unit-root price levels, where a naive
+    trend-break regression over-detects (see §5c (ii) trend-spec caveat).
+
+    Model A (trend break only, HLT eq. 1):  y_t = a + b*t + g*DT_t(tau) + u_t,
+    DT_t(tau) = 1(t > floor(tau*T)) * (t - floor(tau*T)).
+
+    Construction (HLT eqs. 3, 5, 9, 10, 13):
+      - t0* = sup_{tau in [trim, 1-trim]} |t-ratio on g| in the levels regression,
+        with a Bartlett long-run-variance denominator (I(0)-optimal); tau_hat = argmax.
+      - t1* = sup |t-ratio on g| in the differenced regression
+        dy_t = b + g*DU_t(tau) + du_t, DU_t = 1(t > floor(tau*T)) (I(1)-optimal).
+      - S0, S1 = KPSS stationarity stats on the two residual series at tau_hat.
+      - lambda = exp(-(g1 * S0 * S1)^g2), g1=500, g2=2  -> 1 if I(0), 0 if I(1).
+      - t_lambda = lambda*t0* + m_xi*(1-lambda)*t1*  (m_xi from Table 1 per `sig`).
+    Reject H0 (a trend break exists) if t_lambda > the Table 1 critical value.
+
+    t-ratios are invariant to regressor scaling, so time and DT are scaled by T
+    internally for numerical conditioning. Bandwidth ell = floor(4*(T/100)^0.25).
+
+    Args:
+        y: pandas Series (DatetimeIndex), the donor's log-level. NaNs dropped.
+        trim: end trimming for the break-fraction search (HLT use 0.10).
+        sig: significance level for the (m_xi, critical value) pair: '10%','5%','1%'.
+
+    Returns dict: t_lambda, t0_star, t1_star, lam, S0, S1, break_date, break_idx,
+        reject (at `sig`), reject_10/reject_5/reject_1, crit_value, m_xi, T, bandwidth.
+    """
+    s = y.dropna()
+    idx = s.index
+    yv = np.asarray(s, dtype=float)
+    T = len(yv)
+    if T < 50:
+        return {'error': f'series too short (T={T})', 'T': T}
+
+    ell = int(np.floor(4.0 * (T / 100.0) ** 0.25))
+    tn = np.arange(1, T + 1, dtype=float) / T          # scaled time (conditioning only)
+    lo = max(int(np.floor(trim * T)), 2)
+    hi = min(int(np.ceil((1 - trim) * T)), T - 2)
+
+    dy = np.diff(yv)                                   # length T-1, aligned to t = 2..T
+    tt2 = np.arange(2, T + 1)
+
+    # --- t0(tau): levels regression, sup over candidate breaks ---
+    t0_star, tau_hat, resid0_hat, omega0_hat = -np.inf, lo, None, None
+    one_T = np.ones(T)
+    for Tb in range(lo, hi + 1):
+        DTn = np.where(np.arange(1, T + 1) > Tb, (np.arange(1, T + 1) - Tb) / T, 0.0)
+        X = np.column_stack([one_T, tn, DTn])
+        beta, *_ = np.linalg.lstsq(X, yv, rcond=None)
+        resid = yv - X @ beta
+        omega2 = _bartlett_lr_var(resid, ell)
+        XtX_inv = np.linalg.inv(X.T @ X)
+        se_g = np.sqrt(omega2 * XtX_inv[2, 2])
+        t0 = abs(beta[2]) / se_g if se_g > 0 else 0.0
+        if t0 > t0_star:
+            t0_star, tau_hat, resid0_hat, omega0_hat = t0, Tb, resid, omega2
+
+    # --- t1(tau): differenced regression, sup over candidate breaks ---
+    t1_star = -np.inf
+    one_d = np.ones(T - 1)
+    for Tb in range(lo, hi + 1):
+        DU = (tt2 > Tb).astype(float)
+        X = np.column_stack([one_d, DU])
+        beta, *_ = np.linalg.lstsq(X, dy, rcond=None)
+        resid = dy - X @ beta
+        omega2 = _bartlett_lr_var(resid, ell)
+        XtX_inv = np.linalg.inv(X.T @ X)
+        se_g = np.sqrt(omega2 * XtX_inv[1, 1])
+        t1 = abs(beta[1]) / se_g if se_g > 0 else 0.0
+        if t1 > t1_star:
+            t1_star = t1
+
+    # --- S0, S1 (KPSS) at tau_hat ---
+    DU_hat = (tt2 > tau_hat).astype(float)
+    Xd = np.column_stack([one_d, DU_hat])
+    betad, *_ = np.linalg.lstsq(Xd, dy, rcond=None)
+    residd_hat = dy - Xd @ betad
+    omega1_hat = _bartlett_lr_var(residd_hat, ell)
+    S0 = float(np.sum(np.cumsum(resid0_hat) ** 2) / (T ** 2 * omega0_hat))
+    S1 = float(np.sum(np.cumsum(residd_hat) ** 2) / ((T - 1) ** 2 * omega1_hat))
+    lam = float(np.exp(-((_HLT_G1 * S0 * S1) ** _HLT_G2)))
+
+    def _tlam(level):
+        cv, m = _HLT_TABLE_A[level]
+        return lam * t0_star + m * (1.0 - lam) * t1_star, cv
+
+    rej = {}
+    for level in ('10%', '5%', '1%'):
+        tl, cv = _tlam(level)
+        rej[level] = tl > cv
+    t_lambda, crit = _tlam(sig)
+    cv_sig, m_sig = _HLT_TABLE_A[sig]
+
+    return {
+        't_lambda': float(t_lambda), 't0_star': float(t0_star), 't1_star': float(t1_star),
+        'lam': lam, 'S0': S0, 'S1': S1,
+        'break_idx': int(tau_hat), 'break_date': idx[tau_hat - 1],
+        'reject': bool(rej[sig]),
+        'reject_10': bool(rej['10%']), 'reject_5': bool(rej['5%']), 'reject_1': bool(rej['1%']),
+        'crit_value': float(cv_sig), 'm_xi': float(m_sig), 'T': T, 'bandwidth': ell,
+    }
+
+
 # ===== §5d Donor SUTVA / cleanliness battery =====
 
 def event_window_return_test(series, event_date, pre_days=EVENT_WINDOW_PRE_DAYS,

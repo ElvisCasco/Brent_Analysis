@@ -1,0 +1,34 @@
+,donor,n_breaks,break_dates,break_in_prewindow,break_near_T0,audit,audit_says_treated
+0,Copper,1,2013-05-10,False,False,C,False
+1,IronOre,0,none,False,False,C,False
+2,Silver,2,2011-12-23; 2024-09-13,True,False,C,False
+3,Platinum,1,2024-09-13,True,False,C,False
+4,Palladium,1,2012-01-06,False,False,C,False
+5,Gold,1,2013-09-20,False,False,C,False
+6,Soybeans,0,none,False,False,C,False
+7,Wheat,2,2021-02-12; 2022-10-07,False,False,C,False
+8,Corn,0,none,False,False,C,False
+9,Coffee,0,none,False,False,C,False
+10,Sugar,0,none,False,False,C,False
+11,Cotton,0,none,False,False,C,False
+12,LiveCattle,0,none,False,False,C,False
+13,SP500,1,2020-03-27,False,False,C,False
+14,WorldEq,2,2018-10-12; 2020-03-27,False,False,C,False
+15,Nikkei,1,2020-03-27,False,False,C,False
+16,EM_Eq,2,2012-01-06; 2024-09-13,True,False,C,False
+17,EUR,1,2015-06-05,False,False,C,False
+18,GBP,1,2020-03-27,False,False,C,False
+19,AUD,1,2012-02-10,False,False,C,False
+20,JPY,0,none,False,False,C,False
+21,CHF,0,none,False,False,C,False
+22,CNY,0,none,False,False,C,False
+23,INR,1,2012-09-21,False,False,C,False
+24,KRW,1,2011-10-21,False,False,C,False
+25,ZAR,0,none,False,False,C,False
+26,MXN,1,2020-03-27,False,False,C,False
+27,DXY,1,2011-12-23,False,False,C,False
+28,US10Y,0,none,False,False,C,False
+29,TLT,0,none,False,False,C,False
+30,HYG,1,2020-03-27,False,False,C,False
+31,VIX,1,2022-01-07,False,False,C,False
+32,BTC,0,none,False,False,C,False

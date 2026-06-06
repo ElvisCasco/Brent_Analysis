@@ -50,6 +50,8 @@ The truncation at 2022-09-30 keeps the symbolic 2022-09-05 cut (100 kbd, minimal
 
 **Sensitivity available but not in main results:** running with an extended Russia post-event window (e.g. to 2023-10-31, the original specification) is one config-line change (`POST_END['russia']` in `lib/config.py`). If a reviewer asks for the longer-window estimate, it can be produced trivially.
 
+**Within-window horizon sensitivity (implemented).** Independently of where `POST_END` is set, [06_Ensemble_Final.ipynb](../notebooks/06_Ensemble_Final.ipynb) re-summarises each fit's gap at 1/2/3/6-month and full horizons. This is the **delayed-contamination diagnostic** of [donor_catalog.md §Temporal dimension](donor_catalog.md): a gap that attenuates with horizon flags donors acquiring a focal-event component over the post-window (bias toward zero), while a flat or rising profile rules it out. Empirically the Russia gap declines from ~32% (1 month) to ~22% (full) — the headline is the conservative end — whereas the Hormuz gap rises (~7% → ~44%), i.e. the premium builds in rather than donors contaminating.
+
 **Why 2020-07-01 specifically:** the March-May 2020 cluster combined a Brent-specific OPEC+ collapse (2020-03-08), a global demand shock (WHO pandemic declaration 2020-03-11), and a Brent-specific storage failure (WTI front-month negative 2020-04-20). These overlapping shocks created abnormal factor loadings — Brent fell ~75% peak-to-trough while donors fell 30-35%. Including this period would teach the SCM that "when global growth falls, Brent collapses 75%" — *not* Brent's normal factor loading, and the SCM would extrapolate this bias to post-event projections.
 
 **Honest caveat:** the extended-window robustness specification deliberately *includes* the March-May 2020 collapse, as a stress test. If the gap estimate is similar across narrow / preferred / extended windows, the asymmetry concern is less important in practice than in theory.
@@ -218,6 +220,7 @@ The main results table reports only the **preferred specification** for each dim
 | Dimension | Variants reported in appendix |
 |---|---|
 | Pre-window | Preferred, extended, narrow (§2 above) |
+| Post-window | Gap re-summarised at 1 / 2 / 3 / 6-month and full horizons (delayed-contamination sensitivity; see [donor_catalog.md §Temporal dimension](donor_catalog.md) and [06_Ensemble_Final.ipynb](../notebooks/06_Ensemble_Final.ipynb)) |
 | Donor pool | Russia: 21 / 27 / 33 (preferred / permissive / full). Hormuz: 21 / 33 (preferred / full). |
 | Model | Each of the 5 individual estimates + ensemble median |
 

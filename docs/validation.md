@@ -17,7 +17,9 @@ The six sub-sections below cover each level. Every test is run **per model in th
 | 5a (i) | Walk-forward CV | Model fit / generalization | Hyndman & Athanasopoulos 2018; Bergmeir & Benítez 2012 | Heuristic `val/train > 2` flag; winner's-curse bias noted (§5a). |
 | 5a (ii) | Moment matching (mean, SD, min, max, AR(1)) | Pre-period distributional coverage | Abadie 2010 | Hard threshold on mean ($\|\Delta\| < 0.01$ log); softer on SD / extrema / AR(1). |
 | 5b | Pre-period parallel-fit (gap-series mean / SD / AR(1) / OLS slope) | Parallel-trends analog | Abadie 2010, 2015, 2021; Roth 2022 | No formal threshold (SCM-literature convention); drift-correction recipe in text. |
-| 5c | Pre-period regime-stability (distance correlation across thirds) | Donor-Brent factor stability | Székely & Rizzo 2007; Stock & Watson 1996, 2002 | Model-agnostic; no canonical SCM precedent; `max_shift > 0.30` is a narrative flag, not exclusion. |
+| 5c (i) | Pre-period regime-stability (distance correlation across thirds) | Donor-Brent factor stability | Székely & Rizzo 2007; Stock & Watson 1996, 2002 | Model-agnostic; no canonical SCM precedent; `max_shift > 0.30` is a narrative flag, not exclusion. |
+| 5c (ii) | Bai-Perron multiple structural-break dating (donor-Brent return relationship, full history) | Donor-Brent loading stability over time ("treated over time") | Bai & Perron 1998, 2003 | Model-agnostic; dates breaks (vs assuming them); `break_in_prewindow` is a narrative flag, not exclusion. Russia: 2/33 in-pre-window (Wheat, VIX); Hormuz: 3/33 (Silver, Platinum, EM_Eq). |
+| 5c (iii) | Harvey-Leybourne-Taylor trend-break test (donor's own log-level, full history) | Own-trend stability, I(0)/I(1)-robust ("change in trend") | Harvey, Leybourne & Taylor 2009 | Model-agnostic; Brent-free, so a break at $T_0$ is unambiguous donor-treatment. `break_near_T0` is the focal flag. Result: 33/33 I(1)-classified, 1/33 reject (Gold, 2018), 0 breaks near either $T_0$. |
 | 5d | Permutation mean-shift test at known $T_0$ | Donor SUTVA (model-agnostic) | Chow 1960 (hypothesis); Lehmann & Romano 2005 (permutation reference dist.) | Enters BH-FDR ($\alpha = 0.10$) combined flag. |
 | 5d | Wilcoxon event-window | Donor SUTVA (model-agnostic) | Brown & Warner 1985 | Enters BH-FDR combined flag. |
 | 5d | KS distribution shift | Regime-shift diagnostic | Two-sample KS | Reported only; **excluded** from flag rule (over-rejects under regime shift). |
@@ -116,11 +118,13 @@ The strict thresholds previously imposed here were imported from a DiD-style par
 
 **Future consideration — Rambachan-Roth (2023) drift bounds.** Rather than point-estimating drift and subtracting it, formally bound the *maximum drift* consistent with the pre-period gap series; the post-event gap then carries a corresponding bound on the share attributable to drift versus treatment. **Rambachan & Roth (2023, *Review of Economic Studies*) — "A more credible approach to parallel trends"** is the canonical reference; their `HonestDiD` package is the practical implementation. Not implemented here; noted for a more rigorous future iteration.
 
-## 5c. Pre-period regime-stability test
+## 5c. Pre-period regime-stability tests
 
-Distinct from the parallel-fit defence: parallel-fit tests whether the *synthetic tracks the treated*; regime-stability tests whether the *donor-Brent factor structure itself* is stable within the pre-period.
+Distinct from the parallel-fit defence: parallel-fit tests whether the *synthetic tracks the treated*; regime-stability tests whether the *donor-Brent factor structure itself* is stable. Two complementary tests: **(i)** distance correlation across pre-period thirds (does the dependence vary *within* the fitting window?) and **(ii)** Bai-Perron break dating over the full history (does the loading break, and *when*?).
 
-This test is **model-agnostic** (uses only donor and Brent return series, no SCM model). It is therefore implemented in [01.5_Donor_Cleanliness.ipynb](../notebooks/01.5_Donor_Cleanliness.ipynb) under **Battery B**, alongside the model-agnostic SUTVA cleanliness tests, so that all pre-modeling data diagnostics live in one place.
+Both are **model-agnostic** (they use only donor and Brent return series, no SCM model) and are implemented in [01.5_Donor_Cleanliness.ipynb](../notebooks/01.5_Donor_Cleanliness.ipynb) — **(i)** under Battery B, **(ii)** under Battery C — alongside the model-agnostic SUTVA cleanliness tests, so that all pre-modeling data diagnostics live in one place.
+
+### 5c (i) — Distance-correlation regime stability
 
 **Procedure:** split pre-period into three sub-periods (early, middle, late thirds). For each Brent-donor pair, compute **distance correlation** (Székely & Rizzo 2007 *Annals of Statistics*) in each sub-period; report `max_shift = max − min` across the three sub-periods.
 
@@ -128,7 +132,41 @@ This test is **model-agnostic** (uses only donor and Brent return series, no SCM
 
 **Honest framing.** Large within-pre-period shifts in donor-Brent distance correlation signal either factor-structure drift or sampling noise at the ~140-obs sub-period scale (the two are confounded). Small shifts (e.g., max_shift < 0.15) are uninformative given estimator variance. Large shifts (max_shift > 0.30) are *narrative flags* warranting discussion, not automatic donor exclusion.
 
-**Future consideration.** A more rigorous alternative is a formal structural-break test on the rolling Brent-donor correlation: Bai-Perron (2003) *J. Applied Econometrics* with bootstrap critical values, or Andrews-Ploberger (1994) sup-Wald. Not implemented in the current pipeline; noted for a future iteration.
+### 5c (ii) — Bai-Perron structural-break dating
+
+The formal upgrade to the distance-correlation test. Where (i) asks whether the dependence *varies* across three fixed sub-periods, **Bai & Perron (1998, 2003)** *search for the break dates*: for each donor the regression SSR is globally minimised over all admissible partitions by dynamic programming, and the number of breaks is selected by BIC. This converts the ad-hoc thirds into a dated test that answers the two criticisms the distance-correlation test and the qualitative audit cannot:
+
+- **"Treated over time."** Run over the **full available history** (weekly, Brent back to 2000 intersected with each donor's series), it dates *every* regime change in a donor, not just one at $T_0$ — so a donor whose loading is unstable *inside a pre-window* is caught regardless of the focal event.
+- **"Change in trend."** Each break partitions the relationship regression $r^{donor}_t = \alpha_s + \beta_s\,r^{Brent}_t + \varepsilon_t$ into segments with their own co-movement slope $\beta_s$ and relative-drift intercept $\alpha_s$; a break in either is a change in the donor's trend relative to the market.
+
+**Headline spec — relationship (returns).** $y =$ donor weekly log-returns, $x =$ Brent weekly log-returns. Stationary by construction, so the break dating is statistically sound. The implementation is `bai_perron_breaks` in [lib/validation.py](../lib/validation.py) — a dependency-free prefix-sum / dynamic-program solver for the simple-regression (intercept + one regressor) case; settings (`BP_MIN_FRAC=0.10`, `BP_MAX_BREAKS=5`) are in the notebook.
+
+**Per-event flags.** Breaks are dated once per donor (event-independent); two event-specific flags are derived:
+- `break_in_prewindow` — a break **strictly inside** that event's preferred pre-window → the donor-Brent loading is not stable across the fitting window. A narrative flag (caution / down-weighting), **not** an automatic exclusion.
+- `break_near_T0` — a break within ±8 weeks of $T_0$. **Reported but not used to flag:** the relationship spec regresses on Brent, which is itself treated at $T_0$, so a break there is ambiguous (it may reflect Brent's move, not the donor's).
+
+**Empirical findings.**
+- **Most donor breaks predate both pre-windows** — clustering at 2011-2013 (post-GFC normalization) and the 2020-03 COVID crash. The COVID break sits *before* the Russia pre-window start (2020-07-01) and is therefore correctly not flagged, empirically vindicating that start date ([methodology.md §2](methodology.md)).
+- **Russia: 2 of 33 break inside the pre-window** — **Wheat** (audit-H; the break test *independently corroborates* the qualitative audit) and **VIX** (2022-01-07, the pre-invasion risk-off run-up).
+- **Hormuz: 3 of 33 break inside the pre-window** — Silver, Platinum, EM_Eq, all on a 2024-09-13 precious-metals / Fed-pivot shift; flagged for regime-aware reading of their Hormuz weights.
+
+**Honest limitations.** BIC selection of the break count is the simplest defensible rule; Bai & Perron's sequential supF($\ell+1\mid\ell$) test with bootstrap critical values is the more rigorous alternative, noted for a future iteration. The relationship spec is also intentionally Brent-based, so a break *at* $T_0$ is ambiguous (Brent is itself treated) — the §5c (iii) own-trend test below resolves that.
+
+### 5c (iii) — Harvey-Leybourne-Taylor trend-break test
+
+The Bai-Perron relationship spec answers "did the donor-Brent *co-movement* break, and when." The complementary **"change in trend"** question is whether the donor's **own** price trend breaks. This matters for two reasons the relationship spec cannot address: it is **Brent-free**, so a break at $T_0$ is *unambiguous* evidence the donor itself was treated (not a reflection of Brent's own move); and it targets the trend (level path), not the return co-movement.
+
+The obstacle is that donor price *levels* are near-unit-root (I(1)), and a naive trend-break regression over-detects on integrated series (a random walk has no trend to break, yet OLS finds many spurious ones — empirically a levels Bai-Perron returns ~5 breaks/donor, hitting the search cap). **Harvey, Leybourne & Taylor (2009, *Econometric Theory* 25(4):995-1029)** solve this with a statistic whose asymptotic size is the *same* whether the shocks are I(0) or I(1):
+
+$$t_\lambda = \lambda\,t_0^* + m_\xi\,(1-\lambda)\,t_1^*, \qquad \lambda = \exp\!\big(-(g_1 S_0 S_1)^{g_2}\big)$$
+
+where (Model A, trend break only): $t_0^* = \sup_{\tau}|t\text{-ratio on }\gamma|$ in the levels regression $y_t = \alpha + \beta t + \gamma\,DT_t(\tau) + u_t$ (I(0)-optimal), $t_1^*$ the same in the differenced regression $\Delta y_t = \beta + \gamma\,DU_t(\tau) + \Delta u_t$ (I(1)-optimal), both with a Bartlett long-run-variance denominator and a sup over 10%-trimmed break fractions; $S_0, S_1$ are KPSS stationarity statistics on the two residual series at the estimated break, so the weight $\lambda \to 1$ under I(0) and $\to 0$ under I(1). Constants are HLT's recommended $g_1=500$, $g_2=2$, bandwidth $\ell = \lfloor 4(T/100)^{1/4}\rfloor$, with the $(m_\xi, \text{critical value})$ pairs from HLT Table 1, Model A: (0.835, 2.284) at 10%, (0.853, 2.563) at 5%, (0.890, 3.135) at 1%. Implemented as `hlt_trend_break` in [lib/validation.py](../lib/validation.py); validated on synthetic I(0)+break, I(1)+break, and I(1)-null DGPs.
+
+**Empirical findings (weekly own log-levels, full history).**
+- **33 of 33 donors are classified I(1)-like** ($\lambda \approx 0$), so HLT switches to the unit-root branch and does **not** spuriously flag trend breaks. Only **Gold** rejects at 5% ($t_\lambda = 2.66$), with a 2018 break far from both events. This is the over-detection problem *correctly* avoided — a naive levels trend-regression would have flagged a break in essentially every donor.
+- **No donor's own trend breaks within ±8 weeks of either $T_0$** — the cleanest possible "change in trend" result: no evidence that any retained donor was itself trend-treated by Russia 2022 or Hormuz 2026.
+
+**Honest limitation.** HLT is mildly **over-sized for I(1) shocks in finite samples** (HLT Table 2 reports empirical sizes ~0.10-0.16 at $T=150$-$300$ for a nominal 5% test; our weekly $T \approx 600$-$1370$ is larger, so the distortion is smaller but non-zero). Borderline rejections should be read with that in mind; the test is used here as a *narrative* trend-stability flag, not a hard exclusion rule.
 
 ## 5d. Donor SUTVA / cleanliness battery
 
@@ -273,16 +311,20 @@ The progression Convex SCM < ASCM < Elastic-net in transfer fidelity (transferre
 - Abadie, A., & L'Hour, J. (2021). A penalized synthetic control estimator for disaggregated data. *Journal of Business & Economic Statistics*. (Cited for the non-uniqueness of convex SCM weights under correlated donors; verify exact volume/issue against the publication record.)
 - Andrews, D. W. K. (1993). Tests for parameter instability and structural change with unknown change point. *Econometrica*, 61(4), 821-856.
 - Andrews, D. W. K., & Ploberger, W. (1994). Optimal tests when a nuisance parameter is present only under the alternative. *Econometrica*, 62(6), 1383-1414.
+- Bai, J., & Perron, P. (1998). Estimating and testing linear models with multiple structural changes. *Econometrica*, 66(1), 47-78.
+- Bai, J., & Perron, P. (2003). Computation and analysis of multiple structural change models. *Journal of Applied Econometrics*, 18(1), 1-22.
 - Bergmeir, C., & Benítez, J. M. (2012). On the use of cross-validation for time series predictor evaluation. *Information Sciences*, 191, 192-213.
 - Brown, S. J., & Warner, J. B. (1985). Using daily stock returns: The case of event studies. *Journal of Financial Economics*, 14(1), 3-31.
 - Canay, I. A., Romano, J. P., & Shaikh, A. M. (2017). Randomization tests under an approximate symmetry assumption. *Econometrica*, 85(3), 1013-1030.
 - Chen, Q., & Yan, G. (2023). A mixed placebo test for synthetic control method. *Economics Letters*, 224, 111004. https://doi.org/10.1016/j.econlet.2023.111004
 - Goodfellow, I., Bengio, Y., & Courville, A. (2016). *Deep Learning*. MIT Press.
 - Hahn, J., & Shi, R. (2017). Synthetic control and inference. *Econometrics*, 5(4), 52.
+- Harvey, D. I., Leybourne, S. J., & Taylor, A. M. R. (2009). Simple, robust, and powerful tests of the breaking trend hypothesis. *Econometric Theory*, 25(4), 995-1029. (The I(0)/I(1)-robust trend-break test implemented in §5c (iii); constants $g_1=500$, $g_2=2$ and the Model A critical values / $m_\xi$ scaling constants are from the paper's Table 1.)
 - Chow, G. C. (1960). Tests of equality between sets of coefficients in two linear regressions. *Econometrica*, 28(3), 591-605.
 - Hastie, T., Tibshirani, R., & Friedman, J. (2009). *The Elements of Statistical Learning: Data Mining, Inference, and Prediction* (2nd ed.). Springer.
 - Hyndman, R. J., & Athanasopoulos, G. (2018). *Forecasting: Principles and Practice* (2nd ed.). OTexts.
 - Kohavi, R. (1995). A study of cross-validation and bootstrap for accuracy estimation and model selection. *Proceedings of IJCAI* 1995, 1137-1143.
+- Kwiatkowski, D., Phillips, P. C. B., Schmidt, P., & Shin, Y. (1992). Testing the null hypothesis of stationarity against the alternative of a unit root. *Journal of Econometrics*, 54(1-3), 159-178. (The KPSS stationarity statistic used in the HLT weight function, §5c (iii).)
 - Lehmann, E. L., & Romano, J. P. (2005). *Testing Statistical Hypotheses* (3rd ed.). Springer.
 - Phipson, B., & Smyth, G. K. (2010). Permutation p-values should never be zero: calculating exact p-values when permutations are randomly drawn. *Statistical Applications in Genetics and Molecular Biology*, 9(1), Article 39.
 - Politis, D. N., & Romano, J. P. (1994). The stationary bootstrap. *Journal of the American Statistical Association*, 89(428), 1303-1313.
