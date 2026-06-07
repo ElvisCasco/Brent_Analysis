@@ -303,6 +303,119 @@ This is consistent with the test passing for two reasons:
 
 The progression Convex SCM < ASCM < Elastic-net in transfer fidelity (transferred pre-RMSPE ratios 1.65, 2.18, 3.85 vs. independent) matches the progression in solution-space dimensionality: convex SCM lives on the simplex (sparsest); ASCM's ridge augmentation uses the full donor space; Elastic-net uses signed dense regression. The more degrees of freedom the model has in fitting donor coefficients, the less stable the projection across events, even though all three pass the heuristic threshold of "transferred RMSPE within 4× independent."
 
+
+## 5g. Sign and bound of contamination bias (directional signed-divergence test)
+
+§5c–§5d establish *whether* a donor is contaminated; the horizon sweep
+([donor_catalog.md §Temporal](donor_catalog.md), [06_Ensemble_Final.ipynb](../notebooks/06_Ensemble_Final.ipynb))
+establishes whether the gap *attenuates*. Neither signs the **direction** of the resulting bias
+in the ATT. This section does. It is the formal answer to the supervisor critique that the donor
+pool is "influenced by the war" (immediate channel) and that high prices "crowd out demand" so
+demand-sensitive donors are "negatively affected" (the opposing channel) — i.e. that contamination
+could bias the estimate in *either* direction, not only toward zero.
+
+### The bias identity
+
+Let $Y_t^N$ be the true no-event counterfactual and $\hat Y_t^N=\sum_j w_j X_{jt}$ the synthetic.
+The ATT bias is exactly
+
+$$\hat\tau_t-\tau_t \;=\; Y_t^N-\hat Y_t^N \;=\; -\sum_j w_j\,\delta_{jt},\qquad
+\delta_{jt}\equiv X_{jt}-X_{jt}^{N},$$
+
+where $\delta_{jt}$ is the **event-induced component** of donor $j$'s post-window value (the part
+that would be absent without the focal event). The sign of the bias is therefore *minus the
+weight-averaged donor contamination* — an empirical quantity, not a sign that can be assumed.
+
+| Donor contamination | $\delta_j$ | Effect on synthetic | Bias $-\sum w_j\delta_j$ | ATT estimate |
+|---|---|---|---|---|
+| Abnormally **high** (oil-linked terms-of-trade, inflation→rates) | $>0$ | pulled up | $<0$ | **underestimate** (conservative) |
+| Abnormally **low** (demand crowd-out, risk-off recession fear) | $<0$ | pulled down | $>0$ | **overestimate** |
+
+### Estimating $\delta_j$ — Brent-free, with a reliability split
+
+For each donor we form a **leave-one-out common factor** (equal-weighted mean of the *other*
+donors' pre-standardised returns — never Brent, never the donor itself), fit the donor's
+pre-window loading on it, project into the post-window, and accumulate the abnormal divergence.
+Its post-window mean is $\delta_j$ in log units, comparable to the synthetic's log-level
+contribution. Implemented as Battery D in [01.5_Donor_Cleanliness.ipynb](../notebooks/01.5_Donor_Cleanliness.ipynb);
+the weight-aggregation $B=-\sum_j w_j\delta_j$ per model × horizon in [06_Ensemble_Final.ipynb](../notebooks/06_Ensemble_Final.ipynb).
+
+The pre-window factor $R^2$ separates two sources of divergence, and we report the bias split
+additively, $B_{\text{full}} = B_{\text{high-}R^2} + B_{\text{low-}R^2}$:
+
+- **High-$R^2$ ($\geq 0.08$)** — the factor explains the donor, so a post-window divergence is
+  plausibly *event contamination* (SUTVA-relevant).
+- **Low-$R^2$** — the donor is a noisy proxy decoupled from the macro factor, so its divergence is
+  mostly *idiosyncratic* (e.g. Coffee's 2022 Brazil supply cycle, not Russia) — a donor-fragility /
+  over-reliance problem rather than contamination.
+
+The bias is exact only for the four **linear** models (synthetic $=\sum_j w_j X_{jt}$); XGBoost is
+nonlinear and its importances are unsigned, so it is reported elsewhere but excluded from $B$.
+
+### Empirical findings
+
+**Reliable donors agree on direction.** Restricting to $R^2\geq 0.08$ (the top 8 donors per event):
+
+- **Russia: 8 / 8 reliable donors diverge *down*** ($\delta_j<0$): VIX (−0.18), Silver (−0.20),
+  Platinum (−0.21), WorldEq (−0.12), SP500 (−0.10), HYG (−0.07), Gold (−0.06), AUD (−0.03). The
+  cyclical / risk basket was uniformly depressed post-invasion — the demand-crowd-out / risk-off
+  signature. The direction does **not** depend on the low-$R^2$ soft commodities.
+- **Hormuz: 6 down / 2 up**, all small ($|\delta_j|\leq 0.08$ except VIX +0.21), i.e. roughly
+  balanced and an order of magnitude weaker than Russia.
+
+**Per-model, full-window decomposition** (positive = overestimate; share = bias / that model's gap):
+
+| Event | Model | Gap % | $B_{\text{full}}$ % | high-$R^2$ % | low-$R^2$ % | reliable-wt coverage | bias / gap |
+|---|---|---|---|---|---|---|---|
+| Russia | Convex SCM | 29.6 | +16.4 | 0.0 | +16.4 | 0.00 | 0.59 |
+| Russia | ASCM | 13.3 | +11.0 | +2.7 | +8.1 | 0.27 | 0.83 |
+| Russia | Elastic-net | 21.7 | +16.7 | +3.5 | +12.7 | 0.33 | 0.79 |
+| Russia | Bayesian Ridge | 0.5 | −0.1 | +4.7 | −4.6 | 0.37 | — (gap ≈ 0) |
+| Hormuz | Convex SCM | 38.6 | −2.7 | −1.2 | −1.6 | 0.40 | −0.09 |
+| Hormuz | ASCM | 43.7 | −3.7 | −0.9 | −2.9 | 0.42 | −0.11 |
+| Hormuz | Elastic-net | 49.8 | −0.6 | +0.5 | −1.0 | 0.83 | −0.01 |
+| Hormuz | Bayesian Ridge | 43.6 | +1.3 | +2.3 | −0.9 | 0.51 | +0.04 |
+
+### Interpretation
+
+1. **The Hormuz focal estimate is robust to contamination bias.** Across all four linear models the
+   bias is at most ~11% of the gap, and conservative (negative) for three of four. The fits also lean
+   on reliable donors (coverage 0.40–0.83), so what little bias exists is well-identified. The large
+   positive Hormuz premium is not a contamination artefact.
+
+2. **The Russia *full-window* gap is heavily contamination-biased — upward.** Three of four models
+   overestimate by most of their reported gap (share 0.59–0.83), and Bayesian Ridge collapses the gap
+   to ≈ 0 entirely. This is **not** the "toward zero, conservative" direction the temporal-contamination
+   audit anticipated; for Russia the demand-crowd-out channel dominates. The bias also *grows with
+   horizon* (e.g. Convex SCM +4.2% at 1 month → +16.4% at full), and the 1-month gap (~32%) is far less
+   contaminated — consistent with the magnitude-validation claim resting on the early/peak window, where
+   the well-documented \$95→\$130 move is recovered, while the small *true* full-window average premium
+   reflects Brent's round-trip back to ~pre-invasion levels by September 2022. Russia therefore still
+   validates the method on the window that matters; the full-window number is where contamination bites.
+
+3. **This dates and explains the cross-model dispersion** the supervisor asked us to resolve rather than
+   shrug at. Models split by *which donors they lean on*: Convex SCM and Elastic-net concentrate on
+   low-$R^2$ soft commodities (Coffee, Cotton, Sugar) that drifted down idiosyncratically — hence Convex
+   SCM's bias is **100% low-$R^2$** (zero reliable coverage); ASCM's ridge spreads weight, diluting it;
+   Bayesian Ridge's near-zero gap is two large opposing unconstrained coefficients (JPY +1.29, KRW +1.77
+   vs SP500 −1.28) cancelling. The dispersion is a donor-reliance fingerprint, not noise.
+
+4. **Refined claim.** "Contamination is conservative" holds for the **focal Hormuz estimate** but **not**
+   for the Russia full-window gap. We state this asymmetry explicitly rather than claiming a universal sign.
+
+### Honest limitations
+
+- The leave-one-out factor **differences out contamination common to the whole pool**, so $\delta_j$
+  captures *relative* (cross-donor) contamination; a uniform pool-wide level shift is invisible here and
+  is instead addressed by the horizon sweep ([donor_catalog.md §Temporal](donor_catalog.md)).
+- $\delta_j$ on **low-$R^2$ donors conflates** event contamination with idiosyncratic drift, which is
+  precisely why the bias is reported split by reliability rather than as a single number.
+- $\delta_j$ is a cumulative-divergence mean, so magnitudes **scale with horizon**; signs and the
+  reliable/idiosyncratic split are the load-bearing outputs, not the absolute percentages.
+- XGBoost is excluded from $B$ (nonlinear); the equal-weighted factor is a deliberately simple,
+  sign-unambiguous choice over PCA.
+
+  
 ## References (full citations)
 
 - Abadie, A., Diamond, A., & Hainmueller, J. (2010). Synthetic control methods for comparative case studies: Estimating the effect of California's Tobacco Control Program. *Journal of the American Statistical Association*, 105(490), 493-505.
