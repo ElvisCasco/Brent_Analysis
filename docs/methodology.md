@@ -230,6 +230,62 @@ For Russia, this is 3 × 3 × 6 = **54 cells**. For Hormuz, 3 × 2 × 6 = **36 c
 
 A robust estimate is one where the central tendency does not shift materially across most cells.
 
+
+### 7a. Naïve pre-trend benchmark — the deliberately-contaminated comparison
+
+The robustness grid above varies the SCM's own choices. This subsection instead benchmarks the SCM
+against a class of **univariate counterfactuals built from Brent's own pre-window series, with no
+donors**: a random walk (`rw_flat`, carry the last pre-event level), a random-walk-with-drift
+(`rw_drift`), and a linear pre-trend extrapolation (`lin_trend`). These are "contaminated" by
+construction — they cannot remove the common macro factors the SCM strips out, and they mechanically
+project whatever trend Brent happened to be on before $T_0$. They are reported not as competing
+estimates but as (i) an added-value floor for the SCM, (ii) a transparent reference a reviewer can
+reproduce by hand, and (iii) an independent, donor-free read on the bias-direction question of
+[validation.md §5g](validation.md). An AIC-selected ARIMA is omitted from the table because it collapses
+to the driftless random walk (order $(0,1,0)$ for both events) and is therefore identical to `rw_flat` —
+itself a finding: log-Brent carries no exploitable linear time-series structure beyond a unit root, so the
+"old-school time series" counterfactual is just the random-walk null. Implemented in
+[06_Ensemble_Final.ipynb](../notebooks/06_Ensemble_Final.ipynb) → `data/validation/naive_baseline_comparison.csv`.
+
+**Headline gaps (%), preferred window:**
+
+| Event | Horizon | SCM median | rw_flat | rw_drift | lin_trend |
+|---|---|---|---|---|---|
+| Russia | 1m | 32.1 | 16.0 | 13.4 | 17.1 |
+| Russia | full | 21.7 | 8.7 | −6.9 | −4.2 |
+| Hormuz | 1m | 8.0 | −1.5 | −1.4 | 14.1 |
+| Hormuz | full | 43.6 | 29.6 | 30.2 | 51.9 |
+
+**The central finding — the naïve bias flips sign across events.** The trend-extrapolating benchmarks
+behave oppositely for the two events purely because the pre-window trend sign differs. Russia's pre-window
+is a steep recovery rally ($\sim\$40\to\$95$); `lin_trend` extrapolates that rally upward to $\sim\$130$ by
+September 2022, lands the counterfactual *above* observed Brent (which had reverted to $\sim\$88$), and
+returns a **negative** full-window gap ($-4\%$) — an obviously non-causal result, since the invasion did not
+*lower* oil. Hormuz's pre-window is a mild decline ($\sim\$80\to\$65$); the same method extrapolates
+*downward*, the counterfactual is too low, and the gap *inflates* to $52\%$. The naïve answer is thus driven
+by a pre-window trend that has no causal meaning, whereas the SCM — anchored to donor co-movement rather than
+to Brent's own momentum — is far more stable across the two regimes. This is the concrete demonstration of why
+a univariate counterfactual is not credible, and why the donor-based design is necessary.
+
+**The trend-free read (`rw_flat`).** Stripped of any trend assumption, the "absent the event, Brent stays at
+its pre-event level" null gives Russia $+8.7\%$ and Hormuz $+29.6\%$, with the SCM $\sim 13$–$14$ pp above it
+in both. For **Russia**, the *entire* naïve family ($+8.7\%$ down to $-6.9\%$) sits below the SCM's $+21.7\%$:
+every donor-free construction says the SCM over-states the full-window gap, corroborating the upward bias found
+in [validation.md §5g](validation.md) from a completely independent direction. The SCM (biased up) and the
+trend-extrapolations (biased down by rally extrapolation) **bracket** a true value neither pins down; `rw_flat`
+is the most defensible point and it agrees with §5g. For **Hormuz**, the SCM ($43.6\%$) sits between the
+trend-free null ($29.6\%$) and the downtrend extrapolation ($51.9\%$). The SCM exceeds the flat null because the
+donor pool itself drifted down over the post-window ([validation.md §5g](validation.md), 6 of 8 reliable donors
+mildly negative), so the SCM's counterfactual is below a flat carry and the implied premium is *larger* than a
+naïve flat comparison — a legitimate adjustment for the softening macro backdrop, and consistent with §5g
+finding the Hormuz estimate mildly conservative.
+
+**Honest limitations.** The naïve baselines carry no inference (they are point benchmarks, with no placebo
+distribution). They are sensitive to the pre-window length through the estimated slope/drift. And the
+trend-extrapolating versions are themselves badly biased — the comparison's value is in the *spread* and its
+sign, not in treating any naïve number as a truth to validate against.
+
+
 ## 8. What this methodology does *not* do
 
 Honest framing of what is **out of scope** for this pipeline:
