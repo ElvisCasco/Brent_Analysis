@@ -15,7 +15,7 @@
 13,SP500,1,2020-03-27,False,False,C,False
 14,WorldEq,2,2018-10-12; 2020-03-27,False,False,C,False
 15,Nikkei,1,2020-03-27,False,False,C,False
-16,EM_Eq,2,2012-01-06; 2024-09-13,True,False,C,False
+16,EM_Eq,2,2012-01-06; 2024-09-27,True,False,C,False
 17,EUR,1,2015-06-05,False,False,C,False
 18,GBP,1,2020-03-27,False,False,C,False
 19,AUD,1,2012-02-10,False,False,C,False
@@ -23,7 +23,7 @@
 21,CHF,0,none,False,False,C,False
 22,CNY,0,none,False,False,C,False
 23,INR,1,2012-09-21,False,False,C,False
-24,KRW,1,2011-10-21,False,False,C,False
+24,KRW,2,2011-10-21; 2023-01-27,False,False,C,False
 25,ZAR,0,none,False,False,C,False
 26,MXN,1,2020-03-27,False,False,C,False
 27,DXY,1,2011-12-23,False,False,C,False

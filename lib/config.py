@@ -15,13 +15,13 @@ VALIDATION = DATA / 'validation'      # 03-05 write here; 06 reads
 # ===== Focal events =====
 T0 = {
     'russia': pd.Timestamp('2022-02-24'),
-    'hormuz': pd.Timestamp('2026-02-01'),
+    'hormuz': pd.Timestamp('2026-02-28'),   # strike date (Sat); Brent reprices Mon 2026-03-02
 }
 
 # Fake T_0 for in-time placebo (docs/validation.md §5e (ii) — 6 months before real T_0)
 T0_FAKE = {
     'russia': pd.Timestamp('2021-08-24'),
-    'hormuz': pd.Timestamp('2025-08-01'),
+    'hormuz': pd.Timestamp('2025-08-28'),
 }
 
 
@@ -33,9 +33,9 @@ PRE_WINDOWS = {
         'narrow':    (pd.Timestamp('2021-01-01'), pd.Timestamp('2022-02-23')),
     },
     'hormuz': {
-        'preferred': (pd.Timestamp('2024-06-01'), pd.Timestamp('2026-01-31')),
-        'extended':  (pd.Timestamp('2023-12-01'), pd.Timestamp('2026-01-31')),
-        'narrow':    (pd.Timestamp('2025-01-01'), pd.Timestamp('2026-01-31')),
+        'preferred': (pd.Timestamp('2024-06-01'), pd.Timestamp('2026-02-27')),
+        'extended':  (pd.Timestamp('2023-12-01'), pd.Timestamp('2026-02-27')),
+        'narrow':    (pd.Timestamp('2025-01-01'), pd.Timestamp('2026-02-27')),
     },
 }
 
@@ -50,7 +50,7 @@ PRE_WINDOWS = {
 # Hormuz: extends to latest data available (~3 months post-event).
 POST_END = {
     'russia': pd.Timestamp('2022-09-30'),   # before OPEC+ October 2022 cut
-    'hormuz': pd.Timestamp('2026-05-01'),   # latest data
+    'hormuz': pd.Timestamp('2026-05-31'),   # end May (panel caps at Brent's last obs, currently 2026-04-27)
 }
 
 

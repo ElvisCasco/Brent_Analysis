@@ -34,6 +34,71 @@ def load_events():
     return pd.read_csv(DATA / 'historical_events.csv', parse_dates=['date'])
 
 
+# ===== Self-contained data fetchers (no sibling-project dependency) =====
+
+def fetch_brent_spot(write_to=None, fallback_csv=None, timeout=60):
+    """Download EIA 'Europe Brent Spot Price FOB' daily series (RBRTEd) directly
+    from eia.gov.
+
+    This is the exact same series the project used historically (back to 1987),
+    now self-sourced so the analysis no longer depends on the sibling
+    'Global port supply-chains' export. Returns DataFrame[Date, Price] sorted by
+    date. On network failure, falls back to `fallback_csv` if provided so cached
+    re-runs stay offline-safe.
+    """
+    import io
+    import urllib.request
+
+    url = 'https://www.eia.gov/dnav/pet/hist_xls/RBRTEd.xls'
+    try:
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        raw = urllib.request.urlopen(req, timeout=timeout).read()
+        df = pd.read_excel(io.BytesIO(raw), sheet_name='Data 1', skiprows=2)
+        df.columns = ['Date', 'Price']
+        df = df.dropna(subset=['Price'])
+        df['Date'] = pd.to_datetime(df['Date'])
+        df = df.sort_values('Date').reset_index(drop=True)
+    except Exception as e:  # noqa: BLE001 — offline fallback is intentional
+        if fallback_csv and Path(fallback_csv).exists():
+            print(f'  [fetch_brent_spot] download failed ({e!r}); using cached {fallback_csv}')
+            df = pd.read_csv(fallback_csv, parse_dates=['Date']).sort_values('Date')
+        else:
+            raise
+    if write_to:
+        df.to_csv(write_to, index=False)
+    return df
+
+
+def fetch_gpr_daily(write_to=None, fallback_parquet=None, timeout=60):
+    """Download the Caldara & Iacoviello daily Geopolitical Risk index (GPRD)
+    directly from matteoiacoviello.com (full history from 1985).
+
+    Self-sourced replacement for the sibling 'gpr_daily.xls' export. Returns a
+    DataFrame indexed by date with a single 'GPRD' column. Falls back to
+    `fallback_parquet` on network failure.
+    """
+    import io
+    import urllib.request
+
+    url = 'https://www.matteoiacoviello.com/gpr_files/data_gpr_daily_recent.xls'
+    try:
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        raw = urllib.request.urlopen(req, timeout=timeout).read()
+        g = pd.read_excel(io.BytesIO(raw))
+        g = g.dropna(subset=['DAY', 'GPRD'])
+        g['date'] = pd.to_datetime(g['DAY'].astype(int).astype(str), format='%Y%m%d')
+        g = g.set_index('date')[['GPRD']].sort_index()
+    except Exception as e:  # noqa: BLE001 — offline fallback is intentional
+        if fallback_parquet and Path(fallback_parquet).exists():
+            print(f'  [fetch_gpr_daily] download failed ({e!r}); using cached {fallback_parquet}')
+            g = pd.read_parquet(fallback_parquet)
+        else:
+            raise
+    if write_to:
+        g.to_parquet(write_to)
+    return g
+
+
 # ===== Per-event donor pools =====
 
 def get_donor_pool(event='russia', variant='strict_clean'):
