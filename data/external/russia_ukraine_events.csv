@@ -1,0 +1,86 @@
+date,label,category,source,notes
+# Curated Russia-Ukraine event list for the Hormuz in-time placebo audit
+# (scripts/audit_intime_placebo_hormuz.py).
+#
+# Rows whose `source` column contains the string USER_VERIFY are dropped by
+# the audit script. Replace each PLACEHOLDER row below with a verified entry
+# from one of the sources listed and remove USER_VERIFY from `source`.
+#
+# WINDOW THAT MATTERS FOR THIS AUDIT: 2025-08-28 -> 2026-02-27 (the Hormuz
+# in-time-placebo fake-post window). Events outside this window are kept here
+# for completeness (useful for the broader pre-window contamination check)
+# but they will never be flagged "russia_proximate" since no trading day in
+# the audit window lies within +/-3 days of them.
+#
+# SOURCES TO CONSULT for the 2025-08-28 -> 2026-02-27 window:
+#   - ISW daily campaign assessments  (understandingwar.org)
+#   - Reuters Russia/Ukraine wire     (reuters.com/world/europe)
+#   - EU Council sanctions register   (consilium.europa.eu/en/policies/sanctions)
+#   - US Treasury OFAC press releases (home.treasury.gov/news)
+#   - Bruegel Russia sanctions tracker (bruegel.org)
+#   - S&P Platts Russia oil flows     (spglobal.com/commodityinsights)
+#
+# CATEGORIES to look for in that window:
+#   refinery_strike       - Ukrainian deep-strike campaign waves
+#   energy_infrastructure - Russian attacks on Ukrainian grid / oil terminals
+#   sanctions             - new EU/US/UK packages or enforcement actions
+#   ceasefire_news        - negotiation milestones (proposals, breakdowns)
+#   escalation            - territorial gains/losses, new weapons systems
+#   diplomacy             - high-profile bilateral meetings
+#
+# --- Pre-fake-post-window events (kept for the wider pre-window audit) ---
+# All entries below have public attribution but you should still cross-check
+# the date against your preferred source before citing in the thesis.
+2024-06-24,EU adopts 14th sanctions package (LNG transhipment ban; tanker measures),sanctions,EU Council,Cross-check EU Council press release of 2024-06-24
+2024-08-06,Ukrainian incursion into Kursk Oblast begins,escalation,Reuters/ISW,Cross-check ISW assessment 2024-08-06
+2024-11-17,Biden authorises ATACMS use inside Russian territory,escalation,Reuters/NYT,Cross-check NYT report mid-November 2024
+2024-11-19,First reported ATACMS strike on Bryansk Oblast,escalation,Reuters,Cross-check
+2024-11-21,Russia launches Oreshnik IRBM at Dnipro,escalation,Reuters/ISW,Cross-check Putin televised address 2024-11-21
+2024-12-16,EU adopts 15th sanctions package (shadow-fleet expansion),sanctions,EU Council,Cross-check EU Council press release of 2024-12-16
+2025-01-10,US Treasury OFAC sanctions Gazprom Neft Surgutneftegas + 183 vessels,sanctions,US Treasury OFAC,Major Russian-oil-export action late in Biden admin; cross-check OFAC press release
+2025-01-20,US presidential transition (changes Western support posture),diplomacy,Public record,Anchor date for regime shift in US Russia/Ukraine policy
+#
+# --- Fake-post-window events (2025-08-28 -> 2026-02-27) ---
+# Cross-checked against the source URL listed; you should still open each link
+# and confirm the date before citing in the thesis. Where a date is approximate
+# (week of, "early Feb", etc.) the `notes` column flags it.
+2025-11-15,US-backed Russia-Ukraine peace plan unveiled (approximate date),ceasefire_news,https://www.bbc.com/news/articles/c0l0k4389g2o,BBC overview Feb 2026 references a Nov 2025 US-backed plan; confirm exact date
+2025-12-17,OFAC amends Russia-related General Licenses + publishes updated FAQs,sanctions,https://ofac.treasury.gov/recent-actions/20251217,Sanctions-relaxation action; potentially bearish for oil if it eased export constraints
+2025-12-18,OFAC issues Russia-related Designations Removals,sanctions,https://ofac.treasury.gov/recent-actions/20251218,Removals = de-listing; also FSE Determination Removal same day
+2026-02-11,Ukrainian drone attack on Volzhsky (Volgograd region),refinery_strike,https://www.bbc.com/news/articles/c0l0k4389g2o,BBC describes as massive attack reported 11 Feb
+2026-02-05,Ukrainian deep-strike on Russian nuclear-capable long-range bombers across 5 regions (approx date),escalation,https://www.bbc.com/news/articles/c0l0k4389g2o,Murmansk Irkutsk Ivanovo Ryazan Amur; BBC says ~100 drones; date is approximate (early Feb 2026) - pinpoint exact day from source
+2026-02-18,Geneva US-Russia-Ukraine talks conclude without breakthrough on territory,ceasefire_news,https://www.bbc.com/news/articles/c0l0k4389g2o,BBC reports progress on military issues but no territorial agreement
+2026-02-22,Major Russian air attack on Kyiv energy infrastructure,energy_infrastructure,https://www.bbc.com/news/articles/c0l0k4389g2o,BBC reports overnight strikes targeting energy infrastructure across Kyiv region
+2026-02-24,Fourth anniversary of full-scale invasion (symbolic anchor date),escalation,Public record,No specific event required - inserted as anchor for proximity tagging
+#
+# --- Hormuz POST-window events (2026-02-28 -> 2026-05-31) ---
+# These events OVERLAP the actual Hormuz post-treatment window, so they are
+# the primary contamination concern (not just the placebo audit). Every OFAC
+# Russia-related action below is sanctions RELAXATION (general-license
+# amendments, designations removals, FAQ expansions) - i.e., bearish for oil
+# in sign, the OPPOSITE direction of the 2022 invasion contamination story.
+# ISW Special Report 2026-06-04 ("Gasoline Shortages in Occupied Ukraine")
+# documents sustained Ukrainian strikes on Tuapse, Volgograd, Saratov,
+# Yaroslavl, Afipsky and Ilsky refineries throughout Q1-Q2 2026, with
+# Russian refining output in April 2026 at its lowest daily average since
+# Dec 2009 per Bloomberg (cited in ISW report). Exact daily-strike dates
+# would need to be pulled from individual ISW Russian Offensive Campaign
+# Assessments - the campaign-level signal is captured here as the May 8
+# mid-range strike intensification anchor.
+2026-03-27,OFAC Global Magnitsky + Russia-related Designations Removals,sanctions,https://ofac.treasury.gov/recent-actions/20260327,Sanctions-relaxation: first material Russia de-listing batch of the Hormuz post-window
+2026-03-30,OFAC Amended Russia-related GL + amended Russia-related FAQs,sanctions,https://ofac.treasury.gov/recent-actions/20260330,Sanctions-relaxation; administrative GL/FAQ refresh following Mar 27 de-listings
+2026-03-31,OFAC Counter Narcotics + Russia-related Designations Removals,sanctions,https://ofac.treasury.gov/recent-actions/20260331,Sanctions-relaxation; second Russia de-listing tranche within 5 days
+2026-04-14,OFAC Russia-related GL + Amended Russia-related GLs and FAQ,sanctions,https://ofac.treasury.gov/recent-actions/20260414,Sanctions-relaxation; substantial Russia GL package
+2026-04-29,OFAC Amended Russia-related GL and FAQs,sanctions,https://ofac.treasury.gov/recent-actions/20260429,Sanctions-relaxation
+2026-05-08,Ukrainian mid-range strike campaign intensifies (M-14/H-20 GLOCs near Mariupol),refinery_strike,https://understandingwar.org/research/russia-ukraine/gasoline-shortages-in-occupied-ukraine-show-the-synergy-of-ukraines-long-range-and-mid-range-strike-campaigns/,Per ISW Jun 4 2026 special report - mid-range strikes on highways/fuel-trucks supplying occupied Ukraine begin in earnest from May 8
+2026-05-18,OFAC Issuance of Russia-related General License,sanctions,https://ofac.treasury.gov/recent-actions/20260518_33,Sanctions-relaxation
+2026-05-28,OFAC Russia-related GL + Amended FAQs,sanctions,https://ofac.treasury.gov/recent-actions/20260528_33,Sanctions-relaxation
+2026-05-30,Crimea announces 20-liter gasoline rationing,energy_infrastructure,https://understandingwar.org/research/russia-ukraine/gasoline-shortages-in-occupied-ukraine-show-the-synergy-of-ukraines-long-range-and-mid-range-strike-campaigns/,Crimea occupation head Aksyonov; first public rationing announcement (ISW Jun 4 2026)
+2026-05-31,Sevastopol gasoline sold out; coupon-only sales imposed,energy_infrastructure,https://understandingwar.org/research/russia-ukraine/gasoline-shortages-in-occupied-ukraine-show-the-synergy-of-ukraines-long-range-and-mid-range-strike-campaigns/,Sevastopol occupation governor Razvozhaev; coupon-only restriction same day (ISW Jun 4 2026)
+#
+# --- Post-Hormuz-post-window context (>= 2026-06-01, kept for completeness) ---
+# Outside the audit windows but useful narrative anchors for the docs/results
+# section. Will NEVER be tagged russia_proximate by the audit script since
+# they fall after both the fake-post and the true Hormuz post-windows.
+2026-06-04,ISW Special Report: Gasoline Shortages in Occupied Ukraine (synthesis),analysis,https://understandingwar.org/research/russia-ukraine/gasoline-shortages-in-occupied-ukraine-show-the-synergy-of-ukraines-long-range-and-mid-range-strike-campaigns/,ISW analysis - not a discrete event - documents the synergistic strike campaign
+2026-06-05,ISW Briefing: Ukraines Strike Campaign Marks a New Phase of the War,analysis,https://understandingwar.org/research/russia-ukraine/ukraines-strike-campaign-marks-a-new-phase-of-the-war/,ISW Briefing Room S2E2; data cutoff May 28 2026
