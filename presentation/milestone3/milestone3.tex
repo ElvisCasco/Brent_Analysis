@@ -260,44 +260,37 @@
 \end{frame}
 
 % =====================================================================
-% COMMENT 2 --- PREFACE: the question and our two-step answer
+% COMMENT 2 --- PREFACE: the question and our three-step answer
 % =====================================================================
 \begin{frame}{Comment 2 --- why the models behaved as they did}
-  \footnotesize
-  \hd{The question:}
-  \vspace{0.3em}
+  \vspace{0.25em}
   \begin{center}
   \fcolorbox{accent!50}{accent!5}{\begin{minipage}{0.93\textwidth}
-    \vspace{0.25em}
+    \vspace{0.2em}
     \begin{center}
       {\normalsize\itshape Why did the five models move (and disagree) the way they did during the event ---
       and does that behaviour \textcolor{accent}{inflate} the premium?}
     \end{center}
-    \vspace{0.1em}
+    \vspace{0.08em}
   \end{minipage}}
   \end{center}
 
-  \vspace{0.8em}
-  \hd{How we answer it --- two steps:}
   \vspace{0.3em}
-  \begin{itemize}\setlength\itemsep{0.55em}
-    \item[\textcolor{accent}{\hd{1}}] \hd{Behaviour $=$ donor weights.} Read which donors each model leans on.
-      This explains \emph{why} there is a gap at all (the weighted donors track common factors, \emph{not} the
-      oil-specific shock) and \emph{why} the models diverge on Russia (different donors; one degenerate model).
-    \item[\textcolor{accent}{\hd{2}}] \hd{Sign the contamination.} The natural worry --- are those donors
-      themselves moved by the treatment (demand destruction)? We split each gap into a clean part and a
-      donor-contamination part and \emph{sign} it: conservative for Hormuz (a \hd{lower bound}), positive for
-      Russia (why Russia is only a \hd{magnitude check}).
+  \hd{Approaches:}
+  \vspace{0.2em}
+  \begin{itemize}\setlength\itemsep{0.35em}
+    \item[\textcolor{accent}{\hd{1}}] \hd{Behaviour via donor weights.} Which donors each model leans on ---
+      explains the gap (donors miss the oil-specific shock) and the Russia divergence (different donors).
+    \item[\textcolor{accent}{\hd{2}}] \hd{Signed contamination bias.} Are those donors themselves moved by the
+      treatment (demand destruction)? Decompose each gap into a clean part and a donor-contamination part, and \emph{sign} it.
+    \item[\textcolor{accent}{\hd{3}}] \hd{Leave-one-out robustness.} Does any single donor drive the gap?
   \end{itemize}
-
-  \vspace{0.5em}
-  \smalltext{Take-away: the behaviour is interpretable (donor-driven), and the residual contamination is signed --- it does not inflate the headline.}
 \end{frame}
 
 % =====================================================================
 % COMMENT 2 --- importance heatmap, tied to model behaviour
 % =====================================================================
-\begin{frame}{Comment 2 --- how the donor weights drive model behaviour}
+\begin{frame}{Behaviour via donor weights}
   \begin{columns}[c]
     \begin{column}{0.71\textwidth}
       \centering
@@ -322,7 +315,7 @@
 % COMMENT 2 (cont.) --- contamination bias is SIGNED and BOUNDED
 % Directly answers the supervisor's demand-destruction critique.
 % =====================================================================
-\begin{frame}{Comment 2 --- the contamination bias is signed, and it makes us \emph{conservative}}
+\begin{frame}{Signed contamination bias}
   \footnotesize
   \hd{The critique.} If high oil \emph{crowds out demand}, activity-proxy donors are pushed \emph{down},
   dragging the synthetic down $\rightarrow$ contamination in the gap. \hd{Which way, and how big?}
@@ -354,42 +347,9 @@
 \end{frame}
 
 % =====================================================================
-% STATISTICAL TESTS --- (a) in-space placebo
+% COMMENT 2 (cont.) --- robustness: leave-one-out
 % =====================================================================
-\begin{frame}{Statistical test 1 --- in-space placebo}
-  \footnotesize
-  \hd{Procedure} \src{Abadie 2010}: refit the SCM treating each donor as treated; rank Brent's post/pre RMSPE
-  ratio against the $N{=}20$ units (Brent $+$ 19 donors). \hd{Permutation $p = $ rank $/\,N$}; floor $p = 1/20 = 0.05$
-  $\rightarrow$ rank 1 is the strongest signal the 19-donor pool can produce.
-
-  \vspace{0.4em}
-  \begin{center}
-  \begin{tabular}{@{}l c c@{}}
-    \toprule
-                   & \hd{Hormuz 2026} & \hd{Russia 2022} \\
-    \hd{Model}     & rank\,$\rightarrow$\,$p$ & rank\,$\rightarrow$\,$p$ \\
-    \midrule
-    Convex SCM     & \textbf{1\,$\rightarrow$\,0.05} & 10\,$\rightarrow$\,0.50 \\
-    ASCM           & \textbf{1\,$\rightarrow$\,0.05} & 12\,$\rightarrow$\,0.60 \\
-    Elastic-net    & \textbf{1\,$\rightarrow$\,0.05} & 8\,$\rightarrow$\,0.40  \\
-    XGBoost        & \textbf{1\,$\rightarrow$\,0.05} & 4\,$\rightarrow$\,0.20  \\
-    Bayesian Ridge & \textbf{1\,$\rightarrow$\,0.05} & 12\,$\rightarrow$\,0.60 \\
-    \bottomrule
-  \end{tabular}
-  \end{center}
-  \smalltext{Source: data/validation/inference\_inspace\_brent\_summary.csv (19-donor shared pool).}
-
-  \vspace{0.4em}
-  \begin{itemize}\setlength\itemsep{0.05em}
-    \item \hd{Hormuz:} Brent ranks 1 for \hd{all five models} $\rightarrow$ its break beats every placebo; strongest signal the pool allows.
-    \item \hd{Russia:} mid-pack (rank 8--12) for the linear models; XGBoost is best at rank 4 ($p{=}0.20$) but still not significant --- consistent with Russia as a magnitude check, not a clean inferential case.
-  \end{itemize}
-\end{frame}
-
-% =====================================================================
-% STATISTICAL TESTS --- (b) leave-one-out
-% =====================================================================
-\begin{frame}{Statistical test 2 --- leave-one-out (LOO)}
+\begin{frame}{Leave-one-out robustness}
   \footnotesize
   \hd{Procedure.} Drop one influential donor ($w > 5\%$) at a time, refit, recompute the ATT. Report the
   \hd{range} (max $-$ min, pp) across the leave-one-donor-out refits --- a small range means no single donor
@@ -423,41 +383,52 @@
 % (Breakpoint SUTVA test moved up into the Comment 1 section.)
 
 % =====================================================================
+% COMMENT 3 --- PREFACE: the question and our approach
+% =====================================================================
+\begin{frame}{Comment 3 --- what does the SCM buy us over naive baselines?}
+  \footnotesize
+  \vspace{0.3em}
+  \begin{center}
+  \fcolorbox{accent!50}{accent!5}{\begin{minipage}{0.93\textwidth}
+    \vspace{0.25em}
+    \begin{center}
+      {\normalsize\itshape If you \textcolor{accent}{ignore the donor pool} and just extrapolate Brent's own past,
+      what counterfactual do you draw --- and how far off is the premium?}
+    \end{center}
+    \vspace{0.1em}
+  \end{minipage}}
+  \end{center}
+
+  \vspace{0.8em}
+  \hd{Appraoches:}
+  \vspace{0.3em}
+  \begin{itemize}\setlength\itemsep{0.5em}
+    \item[\textcolor{accent}{\hd{1}}] \hd{Donor-free baselines.} Build univariate counterfactuals on Brent alone ---
+      random walk (flat / drift), linear pre-trend, ARIMA and variants
+    \item[\textcolor{accent}{\hd{2}}] \hd{Benchmark the premium.} Project each over the treatment window and compare
+      its implied gap to the donor-informed SCM --- exposing baselines that freeze or extrapolate blindly.
+  \end{itemize}
+\end{frame}
+
+% =====================================================================
 % COMMENT 3 --- naive counterfactual comparison
 % =====================================================================
-\begin{frame}{Comment 3 --- naive counterfactual baselines}
+\begin{frame}{Donor-free naive baselines}
   \footnotesize
-  \hd{Question.} What does the donor-informed SCM buy us over baselines that ignore the donor pool entirely?
-  We compare the ensemble-median SCM premium against four naive counterfactuals at the full post-window.
+  \hd{What does the donor-informed SCM buy us over baselines that ignore the donors?}
 
-  \vspace{0.4em}
-  \begin{center}
-  \scriptsize
-  \begin{tabular}{@{}l r r r r r@{}}
-    \toprule
-    \hd{Counterfactual}              & \hd{Hormuz \%} & \hd{Russia \%} & & & \\
-    \midrule
-    \hd{SCM ensemble (donor-informed)} & \textcolor{accent}{\hd{58.9}} & \textcolor{accent}{\hd{22.0}} & & & \\
-    \midrule
-    Random walk --- flat             & 51.9          & 8.7            & & & \\
-    Random walk --- drift            & 52.6          & $-6.9$         & & & \\
-    Linear trend                     & 73.8          & $-4.2$         & & & \\
-    Interrupted time series (ITS)    & 73.8          & $-4.2$         & & & \\
-    \bottomrule
-  \end{tabular}
-  \normalsize
-  \end{center}
-  \smalltext{Source: data/validation/naive\_baseline\_comparison.csv (full-window horizon).}
+  \vspace{0.6em}
+  \centering
+  \includegraphics[width=0.96\textwidth,height=0.42\textheight,keepaspectratio]{../../plots/milestone3/naive_baselines.png}
 
-  \vspace{0.5em}
-  \hd{Reading.}
-  \begin{itemize}\setlength\itemsep{0.1em}
-    \item \hd{Random walks understate} the premium --- they freeze the counterfactual at the last pre-event level
-      and miss the donor-implied path the rest of the market was on.
-    \item \hd{Linear trend / ITS overstate} Hormuz (74\%) and \emph{flip sign} on Russia ($-4\%$) --- naive
-      extrapolation of a pre-trend is spurious when the donor factor itself turned.
-    \item The SCM sits \hd{between} the two failure modes: anchored to a \emph{data-driven} counterfactual that
-      tracks the global factor without freezing or blindly extrapolating it.
+  \vspace{0.6em}
+  \raggedright
+  \begin{itemize}\setlength\itemsep{0.12em}
+    \item \hd{Freeze / revert baselines} (flat \& AR random walks, mean-reversion) \emph{understate} ---
+      Hormuz $\sim$52\%, Russia $\sim$9\%.
+    \item \hd{Trend extrapolation} overshoots --- linear pre-trend gives Hormuz \hd{73.8\%} (overstate); on
+      Russia the extrapolated rally \emph{flips the gap negative} (linear $-4.2$\%, RW$+$drift $-6.9$\%).
+    \item \hd{SCM} alone tracks the donor-implied path: \textcolor{accent}{\hd{58.9\%}} Hormuz, \textcolor{accent}{\hd{22.0\%}} Russia.
   \end{itemize}
 \end{frame}
 
@@ -468,13 +439,13 @@
   \footnotesize
   \begin{enumerate}\setlength\itemsep{0.1em}
     \item[\textcolor{accent}{\hd{1}}] \hd{SUTVA} --- audit (oil-supply / disruption path), corroborated by the breakpoint test.
-    \item[\textcolor{accent}{\hd{2}}] \hd{Model behaviour} --- weight on risk donors explains the gap; contamination bias signed (Hormuz conservative).
-    \item[\textcolor{accent}{\hd{3}}] \hd{Naive baselines} --- random walks understate, trend / ITS over-extrapolate; the SCM sits between.
+    \item[\textcolor{accent}{\hd{2}}] \hd{Model behaviour} --- weight on risk donors explains the gap; contamination bias signed (Hormuz conservative); robust to leave-one-out.
+    \item[\textcolor{accent}{\hd{3}}] \hd{Naive baselines} --- random walks understate, trend; the SCM sits between.
   \end{enumerate}
 
   \vspace{0.2em}
   \begin{center}
-    \includegraphics[width=0.78\textwidth,height=0.55\textheight,keepaspectratio]{../../plots/milestone3/postwindow_sensitivity.png}
+    \includegraphics[width=0.74\textwidth,height=0.50\textheight,keepaspectratio]{../../plots/milestone3/postwindow_sensitivity.png}
   \end{center}
 
   \vspace{-0.3em}
@@ -491,10 +462,42 @@
   \begin{center}
     {\Large Thank you}\\[1em]
     {\normalsize Questions and discussion}\\[2em]
-    \smalltext{github.com/ElvisCasco/Brent\_Analysis}
   \end{center}
   \vfill
 \end{frame}
 }
+
+% =====================================================================
+% APPENDIX --- reserve material for Q&A
+% =====================================================================
+\begin{frame}{Appendix --- in-space placebo (treated-unit inference)}
+  \footnotesize
+  \hd{Procedure} \src{Abadie 2010}: refit the SCM treating each donor as treated; rank Brent's post/pre RMSPE
+  ratio against the $N{=}20$ units (Brent $+$ 19 donors). \hd{Permutation $p = $ rank $/\,N$}; floor $p = 1/20 = 0.05$
+  $\rightarrow$ rank 1 is the strongest signal the 19-donor pool can produce.
+
+  \vspace{0.4em}
+  \begin{center}
+  \begin{tabular}{@{}l c c@{}}
+    \toprule
+                   & \hd{Hormuz 2026} & \hd{Russia 2022} \\
+    \hd{Model}     & rank\,$\rightarrow$\,$p$ & rank\,$\rightarrow$\,$p$ \\
+    \midrule
+    Convex SCM     & \textbf{1\,$\rightarrow$\,0.05} & 10\,$\rightarrow$\,0.50 \\
+    ASCM           & \textbf{1\,$\rightarrow$\,0.05} & 12\,$\rightarrow$\,0.60 \\
+    Elastic-net    & \textbf{1\,$\rightarrow$\,0.05} & 8\,$\rightarrow$\,0.40  \\
+    XGBoost        & \textbf{1\,$\rightarrow$\,0.05} & 4\,$\rightarrow$\,0.20  \\
+    Bayesian Ridge & \textbf{1\,$\rightarrow$\,0.05} & 12\,$\rightarrow$\,0.60 \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \smalltext{Source: data/validation/inference\_inspace\_brent\_summary.csv (19-donor shared pool).}
+
+  \vspace{0.4em}
+  \begin{itemize}\setlength\itemsep{0.05em}
+    \item \hd{Hormuz:} Brent ranks 1 for \hd{all five models} $\rightarrow$ its break beats every placebo; strongest signal the pool allows.
+    \item \hd{Russia:} mid-pack (rank 8--12) for the linear models; XGBoost is best at rank 4 ($p{=}0.20$) but still not significant --- consistent with Russia as a magnitude check, not a clean inferential case.
+  \end{itemize}
+\end{frame}
 
 \end{document}
