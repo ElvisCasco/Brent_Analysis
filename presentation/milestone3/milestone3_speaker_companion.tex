@@ -167,9 +167,9 @@ $+0.6$ pp (Hormuz). Audit-vs-test agreement overall: Russia 18 / 32, Hormuz 31 /
 \section{Comment 2 --- why the models behaved (donor weights) \timetag{$\sim$3 min, preface + 3 slides}}
 
 \subsection{Spine (preface slide)}
-\emph{Behaviour = donor weights} (which donors each model leans on) $\to$ \emph{sign the contamination}
-(are those donors themselves moved by the treatment?) $\to$ \emph{stress-test} (does any single donor
-drive the gap?). The preface states the method only; the conclusions come on the three content slides.
+\emph{Behaviour = donor weights} (which donors each model leans on) $\to$ \emph{stress-test} (does any
+single donor drive the gap?) $\to$ \emph{sign the contamination} (are those donors themselves moved by
+the treatment?). The preface states the method only; the conclusions come on the three content slides.
 
 \subsection{Talking points}
 \begin{itemize}
@@ -178,16 +178,16 @@ drive the gap?). The preface states the method only; the conclusions come on the
     shock $\Rightarrow$ the synthetic undershoots Brent $\Rightarrow$ the positive gap. \highlight{Russia:}
     the model spread is donor-driven --- Convex/ASCM lean on Coffee \& Platinum, XGBoost on SP500, and
     Bayesian Ridge degenerates ($w \approx 1.8$--$2.4$, outside the simplex) $\Rightarrow$ dropped from the IQR.
-  \item \highlight{Signed contamination bias.} Demand-destruction critique: high oil crowds out activity,
-    so activity-proxy donors are pushed down $\Rightarrow$ residual contamination. We decompose each linear
-    model's gap (net bias $=-\sum_j w_j\,\delta_j$) and \emph{sign} it. \highlight{Hormuz: negative}
-    ($-1.3$ to $-7.6$\%) $\Rightarrow$ conservative, the $\sim$59\% is a \emph{lower bound}.
-    \highlight{Russia: positive} ($+12.7$ to $+21.4$\%; Bayesian Ridge $-7.1$) $\Rightarrow$ overstate
-    $\Rightarrow$ Russia is a magnitude check.
   \item \highlight{Leave-one-out robustness.} Drop each $>$5\%-weight donor, refit, report the ATT range.
     \highlight{Hormuz tight} ($\sim$6--10 pp on a $\sim$59\% effect) --- no single donor flips it.
     \highlight{Russia wide} (14--27 pp); Bayesian Ridge crosses zero (LOO-fragile, consistent with its
     degenerate fit). Reinforces Russia-as-magnitude-check.
+  \item \highlight{Signed contamination bias} (closing approach). Demand-destruction critique: high oil
+    crowds out activity, so activity-proxy donors are pushed down $\Rightarrow$ residual contamination. We
+    decompose each linear model's gap (net bias $=-\sum_j w_j\,\delta_j$) and \emph{sign} it.
+    \highlight{Hormuz: negative} ($-1.3$ to $-7.6$\%) $\Rightarrow$ conservative, the $\sim$59\% is a
+    \emph{lower bound}. \highlight{Russia: positive} ($+12.7$ to $+21.4$\%; Bayesian Ridge $-7.1$)
+    $\Rightarrow$ overstate $\Rightarrow$ Russia is a magnitude check.
 \end{itemize}
 
 \subsection{Behind the slide}
@@ -222,9 +222,8 @@ would imply a negative bias, the opposite of what we report.)
     RW$+$drift $-6.9$\%).
   \item \highlight{The SCM} alone tracks the data-driven, donor-implied path: \textbf{58.9\%} Hormuz,
     \textbf{22.0\%} Russia.
-  \item \highlight{Plot note:} the slide cuts the pre-window to $\sim$3 months so the treatment period
-    dominates; the full pre-window version (showing the whole rally the trend baselines extrapolate) is
-    the thesis/appendix view.
+  \item \highlight{Plot note:} the slide shows the \emph{entire} pre+post window --- so the audience sees
+    the full Russia COVID-recovery rally that the linear-trend / drift baselines extrapolate (and overshoot).
 \end{itemize}
 
 \subsection{If asked}
