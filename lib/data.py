@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from .config import DATA, RESULTS, VALIDATION, T0, PRE_WINDOWS, POST_END
+from .config import DATA, RESULTS, VALIDATION, T0, PRE_WINDOWS, POST_END, BREAKPOINT_EXCLUDE
 
 
 # ===== Raw data loaders =====
@@ -109,17 +109,20 @@ def get_donor_pool(event='russia', variant='strict_clean'):
     audit = load_audit()
     col = {'russia': 'Russia_2022', 'hormuz': 'Hormuz_2026'}[event]
     if variant == 'strict_clean':
-        return audit.loc[audit[col] == 'C', 'donor'].tolist()
+        pool = audit.loc[audit[col] == 'C', 'donor'].tolist()
     elif variant == 'permissive':
-        return audit.loc[audit[col].isin(['C', 'M']), 'donor'].tolist()
+        pool = audit.loc[audit[col].isin(['C', 'M']), 'donor'].tolist()
     elif variant == 'full':
-        return audit['donor'].tolist()
+        return audit['donor'].tolist()   # no-exclusions contamination diagnostic
     else:
         raise ValueError(f'unknown variant: {variant!r}')
+    # Apply the breakpoint-rule exclusion layer on top of the audit (config.BREAKPOINT_EXCLUDE).
+    return [d for d in pool if d not in BREAKPOINT_EXCLUDE]
 
 
 def shared_pool():
-    """The 21-donor intersection (Russia strict-clean = subset of Hormuz strict-clean).
+    """The shared clean pool (Russia strict-clean, a subset of Hormuz strict-clean),
+    after the breakpoint-rule exclusion (config.BREAKPOINT_EXCLUDE) -- 18 donors.
 
     PREFERRED specification per methodology §3. Required by the cross-event
     weight-transfer validation (§5f) which needs both events to share the input vector.

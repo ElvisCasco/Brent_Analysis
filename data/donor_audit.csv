@@ -10,10 +10,9 @@ Wheat,H,C,Russia+Ukraine ~30% world exports; ZW=F +80% Mar2022
 Corn,H,C,Ukraine ~13% world corn exports
 Coffee,C,C,Brazil/Vietnam concentrated
 Sugar,C,C,Brazil/India; clean
-Cotton,C,C,US/China/India; clean
+Cotton,M,M,oil-price rise -> polyester (synthetic-fibre) cost -> cotton substitution demand; indirect oil/SUTVA channel (both events)
 LiveCattle,C,C,N.America domestic; clean
 SP500,C,C,risk-premium channel = intended SCM co-movement
-WorldEq,C,C,same
 Nikkei,C,C,Japan equity; clean
 EM_Eq,M,C,broad EM ETF; some Russia weight pre-exclusion
 EUR,H,C,European energy-import crisis hit EUR specifically

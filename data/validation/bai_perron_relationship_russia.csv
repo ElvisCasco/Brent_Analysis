@@ -10,25 +10,24 @@
 8,Corn,0,none,False,False,H,True
 9,Coffee,0,none,False,False,C,False
 10,Sugar,0,none,False,False,C,False
-11,Cotton,0,none,False,False,C,False
+11,Cotton,0,none,False,False,M,True
 12,LiveCattle,0,none,False,False,C,False
 13,SP500,1,2020-03-27,False,False,C,False
-14,WorldEq,2,2018-10-12; 2020-03-27,False,False,C,False
-15,Nikkei,1,2020-03-27,False,False,C,False
-16,EM_Eq,2,2012-01-06; 2024-09-27,False,False,M,True
-17,EUR,1,2015-06-05,False,False,H,True
-18,GBP,1,2020-03-27,False,False,M,True
-19,AUD,1,2012-02-10,False,False,C,False
-20,JPY,0,none,False,False,C,False
-21,CHF,0,none,False,False,C,False
-22,CNY,0,none,False,False,C,False
-23,INR,1,2012-09-21,False,False,C,False
-24,KRW,2,2011-10-21; 2023-01-27,False,False,C,False
-25,ZAR,0,none,False,False,C,False
-26,MXN,1,2020-03-27,False,False,C,False
-27,DXY,1,2011-12-23,False,False,H,True
-28,US10Y,0,none,False,False,M,True
-29,TLT,0,none,False,False,C,False
-30,HYG,1,2020-03-27,False,False,C,False
-31,VIX,1,2022-01-07,True,True,C,False
-32,BTC,0,none,False,False,H,True
+14,Nikkei,1,2020-03-27,False,False,C,False
+15,EM_Eq,2,2012-01-06; 2024-09-27,False,False,M,True
+16,EUR,1,2015-06-05,False,False,H,True
+17,GBP,1,2020-03-27,False,False,M,True
+18,AUD,1,2012-02-10,False,False,C,False
+19,JPY,0,none,False,False,C,False
+20,CHF,0,none,False,False,C,False
+21,CNY,0,none,False,False,C,False
+22,INR,1,2012-09-21,False,False,C,False
+23,KRW,2,2011-10-21; 2023-01-27,False,False,C,False
+24,ZAR,0,none,False,False,C,False
+25,MXN,1,2020-03-27,False,False,C,False
+26,DXY,1,2011-12-23,False,False,H,True
+27,US10Y,0,none,False,False,M,True
+28,TLT,0,none,False,False,C,False
+29,HYG,1,2020-03-27,False,False,C,False
+30,VIX,1,2022-01-07,True,True,C,False
+31,BTC,0,none,False,False,H,True

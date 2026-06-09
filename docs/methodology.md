@@ -9,15 +9,15 @@ The SCM analysis estimates the chokepoint / geopolitical-risk premium on Brent f
 | Event | $T_0$ | Role |
 |---|---|---|
 | **Russia invades Ukraine** | 2022-02-24 | *Magnitude validation* — historical event with large, well-documented Brent move ($95 → $130+). Cross-validates the SCM design on closed data before applying it to Hormuz. |
-| **Strait of Hormuz crisis** | 2026-02-01 | *Main thesis* — out-of-sample estimate of the chokepoint premium. |
+| **Strait of Hormuz crisis** | 2026-02-28 | *Main thesis* — out-of-sample estimate of the chokepoint premium. ($T_0$ = strike date, a Saturday; Brent reprices Mon 2026-03-02.) |
 
 Red Sea 2023 was considered as a third event but rejected: no visible Brent disruption → only a *null* validation case, weaker than the magnitude validation Russia 2022 provides. Red Sea remains on the EDA event timeline as historical context. Full reasoning: [donor_catalog.md](donor_catalog.md) §Focal events.
 
-**Data-availability constraint on event eligibility.** The donor pool is fetched from Yahoo Finance starting **2010-01-01** (see `TICKERS` in [00_Data_Fetching.ipynb](../notebooks/00_Data_Fetching.ipynb)). The bulk of the 33-donor pool — industrial metals, precious metals, agricultural commodities, S&P 500, FX majors, US rates, VIX — has continuous data from January 2010. A few series start later: **WorldEq (URTH) from 2012-01-12**, **Iron Ore (TIO=F) from 2010-10-14**, **Nikkei from 2010-01-04**, **EM equities (EEM) from 2010-01-04**, and **Bitcoin (BTC-USD) from 2014-09-17**. The binding constraint for the 21-donor shared pool (used as preferred specification) is URTH at 2012-01-12, since BTC is excluded from the Russia clean pool by SUTVA. Allowing ~20 months of pre-event history before $T_0$, this means the SCM design is **only applicable to events with $T_0 \geq$ ~2013-09**.
+**Data-availability constraint on event eligibility.** The donor pool is fetched from Yahoo Finance starting **2010-01-01** (see `TICKERS` in [00_Data_Fetching.ipynb](../notebooks/00_Data_Fetching.ipynb)). The bulk of the 32-donor pool — industrial metals, precious metals, agricultural commodities, S&P 500, FX majors, US rates, VIX — has continuous data from January 2010. A few series start later: **Iron Ore (TIO=F) from 2010-10-14** and **Bitcoin (BTC-USD) from 2014-09-17** — both excluded from the Russia clean pool by SUTVA. (MSCI World / URTH, which started 2012-01-12, has been dropped as a redundant donor — see donor_catalog.md.) With URTH dropped, the latest-starting members of the 18-donor shared clean pool begin January 2010 (Iron Ore and BTC start later but are SUTVA-excluded for Russia). Allowing ~20 months of pre-event history before $T_0$, the design comfortably covers both focal events; the previous URTH-driven ~2013 eligibility floor no longer binds.
 
-This rules out as candidate events for SCM estimation: the 2003 Iraq War, the 2005 Hurricane Katrina disruption, the 2008 Brent peak / financial-crisis demand collapse, the 2011 Libyan civil war, and the early Arab Spring — all of which would require donor history extending before 2012. The two focal events (Russia 2022, Hormuz 2026) sit comfortably inside the available donor coverage window, with pre-event windows starting 2020-07-01 and 2024-06-01 respectively. The 2014 OPEC price war ($T_0$ ≈ 2014-11-27) would technically be eligible but only with a very short pre-window (~2 years from URTH start) — not used here.
+This rules out as candidate events for SCM estimation: the 2003 Iraq War, the 2005 Hurricane Katrina disruption, and the 2008 Brent peak / financial-crisis demand collapse — all of which would require donor history extending before 2010. The two focal events (Russia 2022, Hormuz 2026) sit comfortably inside the available donor coverage window, with pre-event windows starting 2020-07-01 and 2024-06-01 respectively. The 2014 OPEC price war ($T_0$ ≈ 2014-11-27) would technically be eligible but only with a very short pre-window (~2 years from URTH start) — not used here.
 
-If a future iteration of this analysis required earlier events, the donor-pool definition would need to be revised: dropping URTH (its factor coverage is largely subsumed by SP500 and Nikkei) would push the binding constraint back to 2010-01 and admit events from 2011 onwards. The 21-donor pool is therefore a deliberate choice — broader factor coverage at the cost of an effective 2013 floor on event eligibility.
+URTH (its factor coverage largely subsumed by SP500) has been dropped as redundant, which pushes the binding constraint back to ~2010-01; the 18-donor pool’s effective eligibility floor is therefore ~2011, comfortably below both focal events.
 
 ## 2. Pre-event period selection
 
@@ -60,9 +60,9 @@ The truncation at 2022-09-30 keeps the symbolic 2022-09-05 cut (100 kbd, minimal
 
 | Specification | Window | Length | Excludes | Includes |
 |---|---|---|---|---|
-| **Preferred** | 2024-06-01 → 2026-01-31 | ~20 mo / ~415 obs | Russia 2022 + early Israel-Hamas + early Red Sea diversion | Mature Red Sea-rerouted regime + Iran-Israel exchange Apr 2024 |
-| Robustness — extended | 2023-12-01 → 2026-01-31 | ~26 mo | Russia 2022 | Israel-Hamas (Oct 2023), Red Sea diversion (Nov 2023) — within-window noise |
-| Robustness — narrow | 2025-01-01 → 2026-01-31 | ~13 mo | All of 2024 | Most-recent regime only — minimal contamination but few obs |
+| **Preferred** | 2024-06-01 → 2026-02-27 | ~21 mo / ~440 obs | Russia 2022 + early Israel-Hamas + early Red Sea diversion | Mature Red Sea-rerouted regime + Iran-Israel exchange Apr 2024 |
+| Robustness — extended | 2023-12-01 → 2026-02-27 | ~27 mo | Russia 2022 | Israel-Hamas (Oct 2023), Red Sea diversion (Nov 2023) — within-window noise |
+| Robustness — narrow | 2025-01-01 → 2026-02-27 | ~14 mo | All of 2024 | Most-recent regime only — minimal contamination but few obs |
 
 Same convention as Russia: only the **preferred specification** appears in the main results; the extended and narrow specifications go in the appendix robustness table.
 
@@ -84,7 +84,7 @@ Three reasons:
 
 2. **Different treatments, different counterfactuals.** Russia 2022 estimates "Brent without geopolitical-risk premium from the invasion"; Hormuz 2026 estimates "Brent without chokepoint supply premium." These are distinct causal estimands. One SCM model produces one counterfactual line — you need two.
 
-3. **Donor pool differs across events.** Russia uses 21 clean donors after SUTVA exclusions; Hormuz uses 33. Pooling forces either the 21-donor intersection (losing factor coverage for Hormuz) or violates SUTVA for Russia.
+3. **Donor pool differs across events.** Russia uses 18 clean donors after SUTVA exclusions; Hormuz uses 31 (Cotton is M). Pooling forces either the 18-donor intersection (losing factor coverage for Hormuz) or violates SUTVA for Russia.
 
 The right cross-event design is **same methodology, separate training, validated via cross-event weight transfer** (see [validation.md §5f](validation.md)).
 
@@ -94,19 +94,21 @@ Full details: [donor_catalog.md](donor_catalog.md). Three pool variants per even
 
 | Pool variant | Russia 2022 size | Hormuz 2026 size | Where reported |
 |---|---|---|---|
-| **Preferred (shared 21-donor intersection)** | 21 donors | 21 donors | Main results, both events |
-| Permissive | 27 donors | n/a | Russia appendix only |
-| Full | 33 donors | 33 donors | Both events appendix |
+| **Preferred (shared 18-donor intersection)** | 18 donors | 18 donors | Main results, both events |
+| Permissive | 26 donors | n/a | Russia appendix only |
+| Full | 32 donors | 32 donors | Both events appendix |
 
-**Why a shared 21-donor pool for both events.** The cross-event weight-transfer validation ([validation.md §5f](validation.md)) is the single strongest test of methodology generalization, and it requires both events to use the *same input vector* — i.e., the same donors. The 21-donor intersection (Russia strict-clean ∩ Hormuz strict-clean = Russia strict-clean, since every Russia-clean donor is also Hormuz-clean by construction) is the natural shared pool. It also yields the cleanest like-for-like comparison: same model, same donors, same number of features → any difference in the post-event gap is attributable to the *event itself*, not to changes in inputs.
+**Why a shared 18-donor pool for both events.** The cross-event weight-transfer validation ([validation.md §5f](validation.md)) is the single strongest test of methodology generalization, and it requires both events to use the *same input vector* — i.e., the same donors. The 18-donor intersection (Russia strict-clean ∩ Hormuz strict-clean = Russia strict-clean, since every Russia-clean donor is also Hormuz-clean by construction) is the natural shared pool. It also yields the cleanest like-for-like comparison: same model, same donors, same number of features → any difference in the post-event gap is attributable to the *event itself*, not to changes in inputs.
 
-**Cost of sharing.** Hormuz loses 12 donors that are Hormuz-clean but Russia-contaminated: Wheat, Corn, Palladium, EUR, DXY, BTC *(heavily treated by Russia)* + Copper, IronOre, Soybeans, EM_Eq, GBP, US10Y *(mildly treated by Russia)*. Factor coverage thins slightly but all six categories (metals, agri, equities, FX, rates, vol/crypto) remain represented in the 21. The full-pool Hormuz fit is reported in the appendix to quantify what is lost — typically modest because convex-SCM weights are sparse (~5–10 donors get non-trivial weight regardless of pool size).
+**Cost of sharing.** Hormuz loses 12 donors that are Hormuz-clean but Russia-contaminated: Wheat, Corn, Palladium, EUR, DXY, BTC *(heavily treated by Russia)* + Copper, IronOre, Soybeans, EM_Eq, GBP, US10Y *(mildly treated by Russia)*. Factor coverage thins slightly but the remaining categories (metals, agri, equities, FX, rates) stay represented in the 18 (the volatility category drops out entirely once VIX is excluded by the breakpoint rule). The full-pool Hormuz fit is reported in the appendix to quantify what is lost — typically modest because convex-SCM weights are sparse (~5–10 donors get non-trivial weight regardless of pool size).
 
-**Russia pool sensitivity is itself a diagnostic.** Re-running Russia with the permissive (27) and full (33) pools should produce *progressively smaller* gap estimates — the contaminated donors get inflated by the same Russia shock, pull the synthetic upward, and shrink the implied gap. If this monotonic pattern holds empirically, the SUTVA-driven exclusion logic is empirically supported.
+**Russia pool sensitivity is itself a diagnostic.** Re-running Russia with the permissive (26) and full (32) pools should produce *progressively smaller* gap estimates — the contaminated donors get inflated by the same Russia shock, pull the synthetic upward, and shrink the implied gap. If this monotonic pattern holds empirically, the SUTVA-driven exclusion logic is empirically supported.
 
-**Selection methodology.** Hand-curated based on SUTVA reasoning + factor coverage (see [donor_catalog.md](donor_catalog.md)); the same 21 donors are fed to *all five models* in the ensemble (model-agnostic candidate pool). Each model assigns its own internal donor importance via convex weights, regression coefficients, permutation importance, or posterior inclusion probability — but the candidate pool is shared, preserving cross-model and cross-event comparability of gap estimates.
+**Selection methodology.** Hand-curated based on SUTVA reasoning + factor coverage (see [donor_catalog.md](donor_catalog.md)); the same 18 donors are fed to *all five models* in the ensemble (model-agnostic candidate pool). Each model assigns its own internal donor importance via convex weights, regression coefficients, permutation importance, or posterior inclusion probability — but the candidate pool is shared, preserving cross-model and cross-event comparability of gap estimates.
 
-**Alternative considered but not pursued — Di Stefano & Mellace's inclusive SCM (iSCM).** A recent alternative to a priori donor exclusion is the **inclusive Synthetic Control Method (iSCM)** of Di Stefano & Mellace (2024, *arXiv* 2403.17624). iSCM retains "potentially affected" donors in the pool and algebraically removes their post-intervention spillover contribution: fit one SCM per potentially-affected donor (treating each in turn as if treated), obtain a system of $m$ equations in $m$ unknowns (the main treatment effect plus $m-1$ spillover effects), and solve via Cramer's rule. For Russia 2022 with 12 audit-flagged donors, iSCM would require solving a 12-equation system per post-event observation. We do not pursue iSCM for three reasons: (i) the cross-event weight-transfer design ([validation.md §5f](validation.md)) requires both events to use the same shared donor pool, which iSCM-Russia (33 donors with spillover correction) and standard-Hormuz (33 donors clean) would not preserve in a like-for-like way; (ii) the system inversion adds estimator variance that the small post-event windows (~7 months Russia, ~3 months Hormuz) can ill afford; (iii) iSCM is an arXiv working paper without peer-reviewed validation. The a priori exclusion of the 12 Russia-contaminated donors remains the more defensible choice for this thesis; iSCM could be added as an appendix robustness specification in a future iteration.
+**Breakpoint-rule exclusion (statistical layer on top of the audit).** Beyond the hand audit, a donor is removed from the clean pools if it **fails the Bai-Perron relationship breakpoint test** ([validation.md §5c ii](validation.md)) — a structural break in the donor↔Brent weekly-return relationship dated *inside* the pre-window (before $T_0$, so not confounded by Brent's own treatment-date move). This is configured in `config.BREAKPOINT_EXCLUDE` and applied to the strict-clean / permissive / shared pools (the *full* pool keeps everything as a contamination diagnostic). Currently it removes **VIX** (relationship break 2022-01-07, ~7 weeks before the Russia invasion — the early-January Fed hawkish pivot plus nascent Ukraine-risk repricing shifted equity-vol's loading on oil), taking the shared pool from **19 to 18 donors**. The rule is event-shared: a donor failing for *either* event is dropped from *both*, preserving the single shared input vector that §5f requires. The complementary at-$T_0$ mean-shift test (which flags **CNY**) is retained as a flag for economic discussion rather than an automatic exclusion, because it cannot separate treatment contamination from coincident macro drift and tests the donor in isolation rather than its Brent relationship.
+
+**Alternative considered but not pursued — Di Stefano & Mellace's inclusive SCM (iSCM).** A recent alternative to a priori donor exclusion is the **inclusive Synthetic Control Method (iSCM)** of Di Stefano & Mellace (2024, *arXiv* 2403.17624). iSCM retains "potentially affected" donors in the pool and algebraically removes their post-intervention spillover contribution: fit one SCM per potentially-affected donor (treating each in turn as if treated), obtain a system of $m$ equations in $m$ unknowns (the main treatment effect plus $m-1$ spillover effects), and solve via Cramer's rule. For Russia 2022 with 12 audit-flagged donors, iSCM would require solving a 12-equation system per post-event observation. We do not pursue iSCM for three reasons: (i) the cross-event weight-transfer design ([validation.md §5f](validation.md)) requires both events to use the same shared donor pool, which iSCM-Russia (32 donors with spillover correction) and standard-Hormuz (32 donors clean) would not preserve in a like-for-like way; (ii) the system inversion adds estimator variance that the small post-event windows (~7 months Russia, ~3 months Hormuz) can ill afford; (iii) iSCM is an arXiv working paper without peer-reviewed validation. The a priori exclusion of the 12 Russia-contaminated donors remains the more defensible choice for this thesis; iSCM could be added as an appendix robustness specification in a future iteration.
 
 ## 4. Model ensemble
 
@@ -215,7 +217,7 @@ Ensemble median  <gap>%  [Q25, Q75]    <gap>%  [Q25, Q75]
 
 ## 7. Robustness / sensitivity grid
 
-The main results table reports only the **preferred specification** for each dimension (preferred pre-window, shared 21-donor pool, ensemble-median gap). The full grid below is reported as an **appendix robustness table** to demonstrate that the headline estimate does not depend on any single methodology choice.
+The main results table reports only the **preferred specification** for each dimension (preferred pre-window, shared 18-donor pool, ensemble-median gap). The full grid below is reported as an **appendix robustness table** to demonstrate that the headline estimate does not depend on any single methodology choice.
 
 | Dimension | Variants reported in appendix |
 |---|---|
@@ -226,7 +228,7 @@ The main results table reports only the **preferred specification** for each dim
 
 For Russia, this is 3 × 3 × 6 = **54 cells**. For Hormuz, 3 × 2 × 6 = **36 cells**. Each cell is a one-line summary (gap estimate + confidence/credible interval); the full appendix table is manageable.
 
-**Russia donor-pool sensitivity is especially diagnostic** (cross-reference §3). The gap estimate is expected to be *largest* with the 21-donor preferred pool (cleanest), *smaller* with the 27-donor permissive pool (mild contamination from M-tier donors pulls the synthetic up), and *smallest* with the 33-donor full pool (heavy contamination from H-tier donors). If this monotonic pattern holds empirically, the SUTVA-driven exclusion logic is empirically confirmed — a free-standing validation of the donor-audit methodology in [donor_catalog.md](donor_catalog.md).
+**Russia donor-pool sensitivity is especially diagnostic** (cross-reference §3). The gap estimate is expected to be *largest* with the 18-donor preferred pool (cleanest), *smaller* with the 26-donor permissive pool (mild contamination from M-tier donors pulls the synthetic up), and *smallest* with the 32-donor full pool (heavy contamination from H-tier donors). If this monotonic pattern holds empirically, the SUTVA-driven exclusion logic is empirically confirmed — a free-standing validation of the donor-audit methodology in [donor_catalog.md](donor_catalog.md).
 
 A robust estimate is one where the central tendency does not shift materially across most cells.
 
@@ -241,40 +243,68 @@ construction — they cannot remove the common macro factors the SCM strips out,
 project whatever trend Brent happened to be on before $T_0$. They are reported not as competing
 estimates but as (i) an added-value floor for the SCM, (ii) a transparent reference a reviewer can
 reproduce by hand, and (iii) an independent, donor-free read on the bias-direction question of
-[validation.md §5g](validation.md). An AIC-selected ARIMA is omitted from the table because it collapses
-to the driftless random walk (order $(0,1,0)$ for both events) and is therefore identical to `rw_flat` —
-itself a finding: log-Brent carries no exploitable linear time-series structure beyond a unit root, so the
-"old-school time series" counterfactual is just the random-walk null. Implemented in
-[06_Ensemble_Final.ipynb](../notebooks/06_Ensemble_Final.ipynb) → `data/validation/naive_baseline_comparison.csv`.
+[validation.md §5g](validation.md). We additionally report two **ARIMA frozen-forecast** counterfactuals
+— fit on the pre-window *only*, parameters frozen, then projected as a dynamic multi-step forecast with **no
+post-event updating** (`arima_rw`, `arima_mr`). This is an **ARIMA-based interrupted-time-series (ITS)**
+design: the frozen ARIMA forecast *is* the no-event counterfactual and the ITS effect is simply
+`observed − forecast` (we do not run a separate OLS segmented regression — its deterministic linear pre-trend
+is already covered by `lin_trend`). A full SARIMA grid selects **ARIMA$(1,0,0)$** — an AR(1) on
+log-price — for both events; no seasonal or differencing term improves AIC, and unit-root tests confirm
+log-Brent is $I(1)$ (Russia pre-window: ADF $p=0.89$, KPSS $p=0.01$ on the level; ADF $p<0.001$, KPSS $p=0.10$
+on the first difference). A *test-based* auto-ARIMA selects the differencing order $d$ from the unit-root test
+rather than by AIC — because likelihoods are not comparable across different $d$ — and would therefore choose
+$d=1$, i.e. ARIMA$(p,1,q)$, whose forecast is itself a flat random walk (or a straight line under drift).
+- **`arima_rw`** is the honest best-AIC fit with stationarity enforced ($\hat\varphi\to1.000$ Russia /
+  $0.978$ Hormuz): it is near-flat and reproduces `rw_flat` — the same finding that log-Brent carries no
+  exploitable structure beyond a unit root, so the "old-school time series" counterfactual *is* the
+  random-walk null. (With stationarity enforcement off and no intercept, the AR(1) on the rising Russian
+  pre-window instead lands a mildly *explosive* root $\hat\varphi=1.0005$ — a no-mean-term artifact, not a
+  signal; it is excluded.)
+- **`arima_mr`** instead *imposes* a 126-trading-day ($\sim$6-month) mean-reversion half-life toward the
+  pre-window mean. This is an **assumption, not a data finding** (the MLE $\hat\varphi\approx1$); it is
+  included only to expose how an assumption-laden univariate model manufactures curvature, and how sensitive
+  the implied gap is to it.
+
+Implemented in [06_Ensemble_Final.ipynb](../notebooks/06_Ensemble_Final.ipynb) →
+`data/validation/naive_baseline_comparison.csv`.
 
 **Headline gaps (%), preferred window:**
 
-| Event | Horizon | SCM median | rw_flat | rw_drift | lin_trend |
-|---|---|---|---|---|---|
-| Russia | 1m | 32.1 | 16.0 | 13.4 | 17.1 |
-| Russia | full | 21.7 | 8.7 | −6.9 | −4.2 |
-| Hormuz | 1m | 8.0 | −1.5 | −1.4 | 14.1 |
-| Hormuz | full | 43.6 | 29.6 | 30.2 | 51.9 |
+| Event | Horizon | SCM median | rw_flat | rw_drift | lin_trend | arima_rw | arima_mr |
+|---|---|---|---|---|---|---|---|
+| Russia | 1m | 31.4 | 16.0 | 13.4 | 17.1 | 16.1 | 19.2 |
+| Russia | full | 22.0 | 8.7 | −6.9 | −4.2 | 9.2 | 26.5 |
+| Hormuz | 1m | 47.4 | 41.8 | 42.1 | 60.4 | 41.5 | 41.8 |
+| Hormuz | full | 58.9 | 51.9 | 52.6 | 73.8 | 51.1 | 51.7 |
+
+`arima_rw` tracks `rw_flat` to within $\sim$0.5 pp at every horizon for both events — the frozen best-AIC
+forecast *is* the random-walk null. `arima_mr` is the only univariate line that diverges, and only because
+its imposed reversion lowers the counterfactual (Russia: toward the 2020–22 mean of $\sim\$62$, inflating the
+gap to $26.5\%$; Hormuz barely moves because the last pre-strike level $\sim\$71$ already sits at the
+pre-window mean).
 
 **The central finding — the naïve bias flips sign across events.** The trend-extrapolating benchmarks
 behave oppositely for the two events purely because the pre-window trend sign differs. Russia's pre-window
 is a steep recovery rally ($\sim\$40\to\$95$); `lin_trend` extrapolates that rally upward to $\sim\$130$ by
 September 2022, lands the counterfactual *above* observed Brent (which had reverted to $\sim\$88$), and
 returns a **negative** full-window gap ($-4\%$) — an obviously non-causal result, since the invasion did not
-*lower* oil. Hormuz's pre-window is a mild decline ($\sim\$80\to\$65$); the same method extrapolates
-*downward*, the counterfactual is too low, and the gap *inflates* to $52\%$. The naïve answer is thus driven
+*lower* oil. Hormuz's pre-window is a mild net decline (ending near $\sim\$71$); the same method extrapolates
+*downward*, the counterfactual is too low, and the gap *inflates* to $74\%$. The naïve answer is thus driven
 by a pre-window trend that has no causal meaning, whereas the SCM — anchored to donor co-movement rather than
 to Brent's own momentum — is far more stable across the two regimes. This is the concrete demonstration of why
 a univariate counterfactual is not credible, and why the donor-based design is necessary.
 
 **The trend-free read (`rw_flat`).** Stripped of any trend assumption, the "absent the event, Brent stays at
-its pre-event level" null gives Russia $+8.7\%$ and Hormuz $+29.6\%$, with the SCM $\sim 13$–$14$ pp above it
-in both. For **Russia**, the *entire* naïve family ($+8.7\%$ down to $-6.9\%$) sits below the SCM's $+21.7\%$:
-every donor-free construction says the SCM over-states the full-window gap, corroborating the upward bias found
-in [validation.md §5g](validation.md) from a completely independent direction. The SCM (biased up) and the
+its pre-event level" null gives Russia $+8.7\%$ and Hormuz $+51.9\%$, with the SCM $\sim 13$ pp above it for
+Russia and $\sim 7$ pp above for Hormuz. For **Russia**, every *frozen / trend* donor-free construction
+($+8.7\%$ `rw_flat`, $+9.2\%$ `arima_rw`, down through $-6.9\%$ `rw_drift` and $-4.2\%$ `lin_trend`) sits below
+the SCM's $+22.0\%$ — corroborating the upward bias found in [validation.md §5g](validation.md) from a
+completely independent direction. The lone exception is the assumption-driven `arima_mr` ($+26.5\%$), which
+exceeds the SCM *only* because it imposes reversion to the 2020–22 mean. The SCM (biased up) and the
 trend-extrapolations (biased down by rally extrapolation) **bracket** a true value neither pins down; `rw_flat`
-is the most defensible point and it agrees with §5g. For **Hormuz**, the SCM ($43.6\%$) sits between the
-trend-free null ($29.6\%$) and the downtrend extrapolation ($51.9\%$). The SCM exceeds the flat null because the
+is the most defensible point and it agrees with §5g. For **Hormuz**, the SCM ($58.9\%$) sits between the
+trend-free cluster ($\sim 51$–$53\%$: `rw_flat`, `rw_drift`, `arima_rw`, `arima_mr`) and the downtrend
+extrapolation ($73.8\%$ `lin_trend`). The SCM exceeds the flat null because the
 donor pool itself drifted down over the post-window ([validation.md §5g](validation.md), 6 of 8 reliable donors
 mildly negative), so the SCM's counterfactual is below a flat carry and the implied premium is *larger* than a
 naïve flat comparison — a legitimate adjustment for the softening macro backdrop, and consistent with §5g

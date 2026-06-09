@@ -61,6 +61,17 @@ POST_END = {
 # 'full'          = Russia: 33 / Hormuz: 33  (no exclusions — contamination diagnostic)
 DONOR_POOL_VARIANT = 'shared'
 
+# ===== Breakpoint-rule exclusions (SEPARATE from the SUTVA audit) =====
+# Donors removed from the clean pools (strict_clean / permissive / shared) because they
+# FAIL the Bai-Perron relationship breakpoint test (Battery C, notebooks/01.5): a structural
+# break in the donor<->Brent weekly-return relationship inside the pre-window, near T_0.
+# These donors remain audited 'C' and stay in the data and diagnostics; this is an
+# additional statistical exclusion layer on top of the hand audit (see docs/validation.md).
+#   VIX: relationship break 2022-01-07 (~7 weeks before the Russia invasion -- Fed hawkish
+#        pivot + early Ukraine-risk repricing). Applied to BOTH events (shared pool).
+# The 'full' variant is the no-exclusions contamination diagnostic and ignores this list.
+BREAKPOINT_EXCLUDE = ['VIX']
+
 
 # ===== Model ensemble (Option B from docs/methodology.md §4) =====
 MODELS = ['convex_scm', 'ascm', 'elastic_net', 'xgboost', 'bayesian_ridge']
