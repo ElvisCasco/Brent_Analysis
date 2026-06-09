@@ -1,5 +1,5 @@
-% Speaker companion for milestone3 --- SUTVA statistical-battery slides.
-% Per-slide talking points, background context, and Q&A backup material.
+% Speaker companion for milestone3 --- per-slide talking points, background, and Q&A backup.
+% Covers the three review comments + summary + appendix.
 % Compile: pdflatex milestone3_speaker_companion.tex
 
 \documentclass[11pt,a4paper]{article}
@@ -28,7 +28,7 @@
 \newcommand{\timetag}[1]{\hfill\textcolor{muted}{\small[#1]}}
 \newcommand{\highlight}[1]{\textcolor{accent}{\textbf{#1}}}
 
-\title{\bfseries Milestone 3 --- Speaker Companion: SUTVA Statistical Battery}
+\title{\bfseries Milestone 3 --- Speaker Companion}
 \author{Per-slide guidance, background, and Q\&A backup}
 \date{}
 
@@ -38,11 +38,12 @@
 \vspace{-2em}
 
 \begin{tcolorbox}[colback=lightbg,colframe=accent!40,arc=2pt]
-\textbf{One-line spine for these two slides.} \emph{The economic audit is the SUTVA defense; the
-permutation test and HLT \emph{confirm} it; the break tests are informative loading-stability
-diagnostics, not exclusion rules.} If you remember nothing else, say that sentence --- it is also
-exactly what the code now encodes (\texttt{config.BREAKPOINT\_EXCLUDE} is empty; pool membership
-follows the audit).
+\textbf{Deck spine (3 review comments).} \textbf{(1) SUTVA:} the economic audit is the defense; the
+permutation test and HLT \emph{confirm} it; break tests are informative diagnostics, not exclusion
+rules (\texttt{config.BREAKPOINT\_EXCLUDE} is empty --- pool follows the audit). \textbf{(2) Model
+behaviour:} behaviour = donor weights; sign the contamination bias (Hormuz conservative); robust to
+leave-one-out. \textbf{(3) Naive baselines:} freeze or over-extrapolate; the SCM is the data-driven
+counterfactual. \textbf{Headline:} Hormuz $\sim$59\% (holds), Russia $\sim$22\% (magnitude check).
 \end{tcolorbox}
 
 % =====================================================================
@@ -116,7 +117,7 @@ the SCM literature.
   HLT trend-break (Brent-free $\Rightarrow$ SUTVA)   & 0 / 19 & 0 / 19 \\
   Permutation mean-shift \emph{(on slides)}          & 0 / 19 & 1 / 19 (CNY) \\
   Wilcoxon event-window \emph{(run, not shown)}      & 0 / 19 & 0 / 19 \\
-  Bai--Perron (loading stability; appendix)          & 0 / 19 & 1 / 19 (VIX) \\
+  Bai--Perron (loading stability; diagnostic)        & 0 / 19 & 1 / 19 (VIX) \\
   \bottomrule
 \end{tabular}
 \end{center}
@@ -160,6 +161,113 @@ $+0.6$ pp (Hormuz). Audit-vs-test agreement overall: Russia 18 / 32, Hormuz 31 /
     well-powered and clean. A window-restricted HLT does throw a few rejections, but at off-$T_0$ dates
     (COVID, 2025 metals moves) --- volatility episodes, not focal-event treatment --- so the full-history
     result is the right one to read.
+\end{itemize}
+
+% =====================================================================
+\section{Comment 2 --- why the models behaved (donor weights) \timetag{$\sim$3 min, preface + 3 slides}}
+
+\subsection{Spine (preface slide)}
+\emph{Behaviour = donor weights} (which donors each model leans on) $\to$ \emph{sign the contamination}
+(are those donors themselves moved by the treatment?) $\to$ \emph{stress-test} (does any single donor
+drive the gap?). The preface states the method only; the conclusions come on the three content slides.
+
+\subsection{Talking points}
+\begin{itemize}
+  \item \highlight{Behaviour via donor weights} (heatmap). \highlight{Hormuz:} weight sits on safe-haven /
+    non-oil donors (Gold, JPY, Sugar) that track common risk but \emph{not} the oil-specific chokepoint
+    shock $\Rightarrow$ the synthetic undershoots Brent $\Rightarrow$ the positive gap. \highlight{Russia:}
+    the model spread is donor-driven --- Convex/ASCM lean on Coffee \& Platinum, XGBoost on SP500, and
+    Bayesian Ridge degenerates ($w \approx 1.8$--$2.4$, outside the simplex) $\Rightarrow$ dropped from the IQR.
+  \item \highlight{Signed contamination bias.} Demand-destruction critique: high oil crowds out activity,
+    so activity-proxy donors are pushed down $\Rightarrow$ residual contamination. We decompose each linear
+    model's gap (net bias $=-\sum_j w_j\,\delta_j$) and \emph{sign} it. \highlight{Hormuz: negative}
+    ($-1.3$ to $-7.6$\%) $\Rightarrow$ conservative, the $\sim$59\% is a \emph{lower bound}.
+    \highlight{Russia: positive} ($+12.7$ to $+21.4$\%; Bayesian Ridge $-7.1$) $\Rightarrow$ overstate
+    $\Rightarrow$ Russia is a magnitude check.
+  \item \highlight{Leave-one-out robustness.} Drop each $>$5\%-weight donor, refit, report the ATT range.
+    \highlight{Hormuz tight} ($\sim$6--10 pp on a $\sim$59\% effect) --- no single donor flips it.
+    \highlight{Russia wide} (14--27 pp); Bayesian Ridge crosses zero (LOO-fragile, consistent with its
+    degenerate fit). Reinforces Russia-as-magnitude-check.
+\end{itemize}
+
+\subsection{Behind the slide}
+The Russia positive bias is the \emph{same} demand/risk channel as Hormuz, just with the opposite net
+sign: the retained cyclical donors (Coffee, Platinum, SP500) were pushed \emph{down} ($\delta<0$),
+dragging the synthetic down and \emph{inflating} the gap. (Do not say donors ``drifted up'' --- that
+would imply a negative bias, the opposite of what we report.)
+
+\subsection{If asked}
+\begin{itemize}
+  \item \textit{Which way does demand destruction bias the estimate?} Hormuz: toward zero (conservative)
+    --- so the headline is a floor. Russia: away from zero (the retained risk donors fell) --- which is
+    exactly why Russia is a magnitude check, not the headline.
+  \item \textit{Why is XGBoost absent from the bias table?} The additive $w_j\,\delta_j$ decomposition is
+    only defined for the linear models; XGBoost is nonlinear, so its bias is not separable this way.
+  \item \textit{Why drop Bayesian Ridge from the IQR?} Degenerate convex weights ($w \approx 1.8$--$2.4$,
+    far outside the simplex) and LOO-fragile (Russia range crosses zero). The ensemble IQR is the
+    convex/ASCM/elastic/xgboost band; Bayesian Ridge is reported but down-weighted.
+\end{itemize}
+
+% =====================================================================
+\section{Comment 3 --- naive counterfactual baselines \timetag{$\sim$2 min, preface + 1 slide}}
+
+\subsection{Talking points}
+\begin{itemize}
+  \item \highlight{The question:} ignore the donor pool and just extrapolate Brent's own past --- what
+    counterfactual do you draw, and how far off is the premium?
+  \item \highlight{Two failure modes.} \emph{Freeze / revert} baselines (flat \& AR random walks,
+    mean-reversion) understate --- Hormuz $\sim$52\%, Russia $\sim$9\%. \emph{Trend extrapolation}
+    overshoots --- linear pre-trend gives Hormuz \textbf{73.8\%} (overstate); on Russia the extrapolated
+    COVID-recovery rally overshoots actual Brent, \emph{flipping the gap negative} (linear $-4.2$\%,
+    RW$+$drift $-6.9$\%).
+  \item \highlight{The SCM} alone tracks the data-driven, donor-implied path: \textbf{58.9\%} Hormuz,
+    \textbf{22.0\%} Russia.
+  \item \highlight{Plot note:} the slide cuts the pre-window to $\sim$3 months so the treatment period
+    dominates; the full pre-window version (showing the whole rally the trend baselines extrapolate) is
+    the thesis/appendix view.
+\end{itemize}
+
+\subsection{If asked}
+\begin{itemize}
+  \item \textit{Why does the linear trend flip negative on Russia?} It extrapolates the pre-war rally; the
+    implied counterfactual rises \emph{above} observed Brent, so the gap goes negative. Naive
+    extrapolation is spurious once the underlying factor turns.
+  \item \textit{Why is ARIMA(1,0,0) almost flat?} The best-AIC AR(1) has $\phi \approx 1$ --- effectively
+    a random walk --- so its frozen forecast is near-flat (it \emph{is} the ARIMA-based ITS counterfactual).
+\end{itemize}
+
+% =====================================================================
+\section{Summary --- headline ATT \timetag{$\sim$1 min}}
+
+\subsection{Talking points}
+\begin{itemize}
+  \item \highlight{Hormuz $\sim$59\%}: builds to its level by month 2--3 and holds (IQR $[54,60]$) --- the headline.
+  \item \highlight{Russia $\sim$22\%}: peaks $\sim$31\% (1m) and settles $\sim$22\% (full) --- the magnitude check.
+  \item Three legs hold it up: SUTVA (audit + tests), model behaviour (donor weights, signed bias, LOO),
+    and the naive-baseline contrast.
+\end{itemize}
+
+\subsection{If asked}
+\begin{itemize}
+  \item \textit{Is the Russia effect statistically significant?} The in-space placebo (appendix) is
+    \emph{not} significant for Russia (mid-pack). Russia's case rests on the documented historical move
+    (\$95 $\to$ \$130+), the audit-supported SUTVA defense, the cross-event weight transfer, and the
+    conservative signed bias --- not the single-event placebo. Hence ``magnitude check,'' not headline.
+  \item \textit{Why is Hormuz the headline and Russia the check?} Russia's pre-period (2020-07 $\to$
+    2022-02) spans COVID recovery + the reflation rally --- high donor volatility weakens in-space
+    inference; the Hormuz pre-period is calmer and the placebo is at the floor for every model.
+\end{itemize}
+
+% =====================================================================
+\section{Appendix (reserve) --- in-space placebo \timetag{only if asked}}
+\begin{itemize}
+  \item \highlight{Treated-unit inference} (Abadie 2010): refit treating each donor as treated; rank
+    Brent's post/pre RMSPE ratio against the $N=20$ units (Brent $+$ 19 donors). Floor $p = 1/20 = 0.05$.
+  \item \highlight{Hormuz:} Brent ranks 1 under \emph{all five} models $\Rightarrow$ $p = 0.05$ (floor) ---
+    the strongest signal the pool allows. \highlight{Russia:} mid-pack (rank 8--12; XGBoost best at rank 4,
+    $p = 0.20$) --- not significant, consistent with the magnitude-check framing.
+  \item \highlight{Why it is in the appendix:} it answers \emph{significance}, not ``why did the models
+    behave'' --- a different question from Comment 2 --- so it is reserve material for the significance Q.
 \end{itemize}
 
 \end{document}
