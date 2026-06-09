@@ -17,7 +17,7 @@ The SCM analysis estimates the chokepoint / geopolitical-risk premium on Brent f
 
 **Pool.** 32 donors selected across metals, agriculturals, equities, FX, rates / credit, volatility, and crypto. **MSCI World (URTH) is dropped as redundant** with the S&P 500 (a near-collinear broad-equity proxy). Categorical exclusions: the energy complex and petro-currencies (CAD, NOK, BRL, COP, MYR — SUTVA violation on any oil-supply shock); unstable / idiosyncratic FX (TRY, ARS, EGP); thin or contract-discontinuous commodities (cocoa, orange juice, lean hogs, lumber); Russia-supplied industrial metals (aluminium, nickel) for the Russia case.
 
-**Preferred specification.** A **18-donor strict-clean intersection** used for both events. Drops the Russia H-tier (Wheat, Corn, Palladium, EUR, DXY, BTC — direct exposure to the focal event) and the Russia M-tier (Copper, Iron Ore, Soybeans, EM_Eq, GBP, US10Y — secondary or terms-of-trade exposure). Hormuz audits all-C except Cotton (M — the oil→polyester substitution channel), but the same 18-donor pool is used to enable the cross-event weight-transfer validation in [validation.md §5f](validation.md). The 26-donor permissive pool and 32-donor full pool are reported as appendix robustness.
+**Preferred specification.** A **19-donor strict-clean intersection** used for both events. Drops the Russia H-tier (Wheat, Corn, Palladium, EUR, DXY, BTC — direct exposure to the focal event) and the Russia M-tier (Copper, Iron Ore, Soybeans, EM_Eq, GBP, US10Y — secondary or terms-of-trade exposure). Hormuz audits all-C except Cotton (M — the oil→polyester substitution channel), but the same 19-donor pool is used to enable the cross-event weight-transfer validation in [validation.md §5f](validation.md). The 26-donor permissive pool and 32-donor full pool are reported as appendix robustness.
 
 **Focal-event audit (SUTVA on $T_0$).** Russia 2022: **13 of 32 donors flagged** (6 H + 7 M) through identifiable causal channels — Russia / Ukraine agricultural exports, palladium supply concentration, EU energy-crisis pass-through to EUR / DXY, sanctions-evasion narrative for BTC. Hormuz 2026: **1 of 32 donors flagged** (Cotton, M — the oil→polyester substitution channel; no donor is *physically* routed through the Strait); the empirical SUTVA tests in [validation.md §5d](validation.md) flag 0 of 32 at the actual strike date $T_0$ = 2026-02-28 (Cotton’s M is an economic causal-channel call that the contemporaneous tests do not independently reproduce, as expected for an indirect/lagged channel) (the earlier $T_0$ = 2026-02-01 produced a single Wilcoxon-only IronOre flag, which was a concurrent commodity-cycle move rather than Hormuz-treatment).
 
@@ -89,11 +89,11 @@ The narrative is sharpest set against what is **deliberately excluded**. WTI, He
 
 **Pool variants used in the SCM notebook (see [methodology.md §3](methodology.md) for the design rationale):**
 
-- *Strict clean* (drops H + M): 18 donors for Russia; the same 18 donors are the **preferred specification for both events** (shared pool enables cross-event weight-transfer validation per [validation.md §5f](validation.md)).
+- *Strict clean* (drops H + M): 19 donors for Russia; the same 19 donors are the **preferred specification for both events** (shared pool enables cross-event weight-transfer validation per [validation.md §5f](validation.md)).
 - *Permissive* (drops H only): 26 donors — Russia-only appendix robustness check.
 - *Full pool* (no exclusions): 32 donors — appendix robustness for both events, also a contamination diagnostic for Russia.
 
-For **Hormuz 2026** the audit gives all clean except Cotton (M, oil→polyester channel), but the preferred specification uses the same 18-donor shared pool (with the full 32 as an appendix robustness check) to preserve cross-event comparability with Russia.
+For **Hormuz 2026** the audit gives all clean except Cotton (M, oil→polyester channel), but the preferred specification uses the same 19-donor shared pool (with the full 32 as an appendix robustness check) to preserve cross-event comparability with Russia.
 
 ---
 
@@ -152,12 +152,12 @@ Direction conventions are mixed because that is how Yahoo publishes them — the
 | TLT          | `TLT`  | Long-duration US Treasuries (inverse to yields) | C | C |
 | HYG          | `HYG`  | US high-yield credit / risk premium | C | C |
 
-### Volatility (1 — audited clean but excluded from the pool by the breakpoint rule)
+### Volatility (1 — audited clean and retained)
 | Donor | Ticker | Factor | RU 2022 | HZ 2026 |
 |---|---|---|---|---|
 | VIX | `^VIX` | Implied vol on S&P 500 — risk-on/risk-off | C | C |
 
-VIX is **audited clean (C/C)** but is **removed from the shared/clean pools by the Bai-Perron breakpoint rule** (`config.BREAKPOINT_EXCLUDE`): its donor↔Brent relationship breaks on **2022-01-07**, ~7 weeks before the Russia invasion (early-January Fed hawkish pivot + nascent Ukraine-risk repricing), inside the pre-window — see [validation.md §5c (ii)](validation.md). It stays in the raw data and the *full*-pool contamination diagnostic. This is the only donor the rule currently removes, taking the strict-clean / shared pool from 19 to 18.
+VIX is **audited clean (C/C) and kept in the shared pool.** Battery C's Bai-Perron relationship test dates a single full-history break on **2022-01-07** (~7 weeks before the Russia invasion: early-January Fed hawkish pivot + nascent Ukraine-risk repricing) — see [validation.md §5c (ii)](validation.md). Under the project's policy that Battery C is **informative, not exclusionary** (`config.BREAKPOINT_EXCLUDE` is a manual list, currently empty), this flag is noted but does **not** remove VIX: it is a loading-*stability* signal rather than a SUTVA violation, it sits in the 10%-trim dead zone of an analysis-window re-run (the contemporaneous break is better attributed to HYG; `scripts/battery_c_analysis_period_robustness.py`), and keeping vs dropping VIX moves the ensemble premium by ≤0.6 pp (`scripts/vix_sensitivity.py`). VIX is the risk-appetite (inverse-VIX) factor in its purest form and is retained for that coverage.
 
 ### Crypto (1)
 | Donor | Ticker | Factor | RU 2022 | HZ 2026 |
@@ -168,11 +168,11 @@ VIX is **audited clean (C/C)** but is **removed from the shared/clean pools by t
 
 | Pool variant | Russia 2022 | Hormuz 2026 | Used as |
 |---|---|---|---|
-| **Strict clean / shared 18-donor intersection** | 18 donors | 18 donors | **Preferred specification, both events** |
+| **Strict clean / shared 19-donor intersection** | 19 donors | 19 donors | **Preferred specification, both events** |
 | Permissive (drops H only) | 26 donors | n/a | Russia appendix robustness |
 | Full pool (no exclusions) | 32 donors | 32 donors | Both events appendix robustness |
 
-Russia 2022 excludes for the strict-clean pool: **Wheat, Corn, Palladium, EUR, DXY, BTC** (H) **+ Copper, IronOre, Soybeans, EM_Eq, GBP, US10Y, Cotton** (M); **plus VIX, removed by the breakpoint rule** (audited C but a pre-window relationship break near $T_0$), which takes the strict-clean pool from 19 to **18**. Hormuz 2026 uses the same 18-donor intersection as preferred specification (sacrificing 12 Hormuz-clean donors plus Cotton to enable cross-event weight-transfer validation); see [methodology.md §3](methodology.md) for the rationale and [validation.md §5f](validation.md) for the validation test that requires the shared pool.
+Russia 2022 excludes for the strict-clean pool: **Wheat, Corn, Palladium, EUR, DXY, BTC** (H) **+ Copper, IronOre, Soybeans, EM_Eq, GBP, US10Y, Cotton** (M), leaving **19 donors**. VIX is audited C and **retained** (Battery C flags a pre-window relationship break but is informative, not exclusionary — see the Volatility note above). Hormuz 2026 uses the same 19-donor intersection as preferred specification (sacrificing 12 Hormuz-clean donors plus Cotton to enable cross-event weight-transfer validation); see [methodology.md §3](methodology.md) for the rationale and [validation.md §5f](validation.md) for the validation test that requires the shared pool.
 
 ---
 
@@ -197,7 +197,7 @@ One curated event falls inside this window:
 
 | Event | Date | Common factor or donor-specific? | Implication for donor pool |
 |---|---|---|---|
-| Energy-cycle reflation | 2021-10-01 | **Common (oil cycle)** — post-COVID global demand recovery and commodity-supercycle narrative; moved Brent, industrial metals, EM equities, and growth-sensitive currencies together | Donors sharing this channel are already flagged **M** on the Russia audit (Copper, Iron Ore, Soybeans, EM_Eq, GBP, US10Y) and excluded from the *strict-clean* preferred pool. The remaining 18 donors load on the reflation only through generic global-growth co-movement, which the synthetic absorbs by construction (Abadie 2021 §2.2). |
+| Energy-cycle reflation | 2021-10-01 | **Common (oil cycle)** — post-COVID global demand recovery and commodity-supercycle narrative; moved Brent, industrial metals, EM equities, and growth-sensitive currencies together | Donors sharing this channel are already flagged **M** on the Russia audit (Copper, Iron Ore, Soybeans, EM_Eq, GBP, US10Y) and excluded from the *strict-clean* preferred pool. The remaining 19 donors load on the reflation only through generic global-growth co-movement, which the synthetic absorbs by construction (Abadie 2021 §2.2). |
 
 **Donors with pre-window contamination beyond what the focal-event audit captures: none.** The reflation is a common factor on the energy complex and on growth-sensitive donors; every channel through which it could plausibly contaminate a donor (industrial-metals demand, EM growth, commodity-export terms-of-trade) is precisely what the M-tier downgrade already addresses.
 
@@ -241,9 +241,9 @@ SCM weights are learned on the **pre-window**; the counterfactual is the weighte
 
 Two consequences. First, delayed contamination is **conservative** for this thesis — it *shrinks* the estimated premium, it cannot manufacture one. Second, the lever that controls it is the **post-window**, not the pre-window. (Pre-window contamination is the mirror case: it biases the *weights* and is fixed by moving / shortening the *pre-window*, per [methodology.md §2](methodology.md). Delayed contamination is fixed by shortening the *post-window*.)
 
-### Per-donor delayed-channel audit (Russia 2022, the 18-donor clean pool)
+### Per-donor delayed-channel audit (Russia 2022, the 19-donor clean pool)
 
-The contemporaneous audit marks these 18 donors C for Russia. Their *delayed* exposure is not zero — ordered by the plausibility of a cumulative Russia channel:
+The contemporaneous audit marks these 19 donors C for Russia. Their *delayed* exposure is not zero — ordered by the plausibility of a cumulative Russia channel:
 
 | Donor(s) | Delayed channel that builds over 2022 | Cumulative risk |
 |---|---|---|
@@ -253,10 +253,10 @@ The contemporaneous audit marks these 18 donors C for Russia. Their *delayed* ex
 | **Platinum** | Russia (Norilsk) is a meaningful PGM producer — far below its ~40% palladium share, but non-trivial for platinum; a sanctions / logistics risk premium built over 2022. The CSV audit's "no Russia exposure" note understates this | Low-moderate |
 | **TLT, HYG** | The 2022 inflation surge (partly Russia-energy-driven) drove the Fed-hike path; US duration and credit moved with an inflation / rate channel Russia contributed to — the same rationale that already makes US10Y an M-tier donor | Low |
 | **SP500, Nikkei** | The European energy crisis fed global recession risk over 2022; equities carried a diffuse Russia growth-risk component | Low |
-| **Gold, JPY, CHF** *(VIX was here but is now breakpoint-excluded)* | Safe-haven bid. The catalog's position is that risk-off co-movement is the *intended* common factor SCM exploits, not contamination — but a *persistent, Russia-specific* safe-haven premium blurs that line | Interpretive — treated as signal; flagged for transparency |
+| **Gold, JPY, CHF, VIX** | Safe-haven / risk-off bid. The catalog's position is that risk-off co-movement is the *intended* common factor SCM exploits, not contamination — but a *persistent, Russia-specific* safe-haven premium blurs that line. VIX (inverse) is the purest expression of this channel and is retained; Battery C flags its 2022-01 loading shift but that is informative, not exclusionary | Interpretive — treated as signal; flagged for transparency |
 | **KRW, LiveCattle** | Korea energy-importer cost pressure; North-American livestock largely insulated | Negligible |
 
-Empirical corroboration: the §5c (ii) Bai-Perron relationship test independently dates a within-pre-window break for **VIX** (now **excluded from the pool by the breakpoint rule**, 19→18) and re-flags **Wheat**, and the §5d KS test flags **INR** (Hormuz) and a broad set (~21 of 32 donors) on Russia (the latter a macro-regime shift, not Russia-treatment) as distributionally shifted ([validation.md §5d](validation.md)) — broadly consistent with the channels above, though KS cannot separate them from the macro-regime change.
+Empirical corroboration: the §5c (ii) Bai-Perron relationship test independently dates a within-pre-window break for **VIX** (flagged but **retained** — Battery C is informative, not exclusionary) and re-flags **Wheat**, and the §5d KS test flags **INR** (Hormuz) and a broad set (~21 of 32 donors) on Russia (the latter a macro-regime shift, not Russia-treatment) as distributionally shifted ([validation.md §5d](validation.md)) — broadly consistent with the channels above, though KS cannot separate them from the macro-regime change.
 
 ### What to do about it — options and current position
 
@@ -267,7 +267,7 @@ This is genuinely **partly open**. The defensible menu, in order of preference:
 3. **a priori reclassification.** Promote the highest-risk delayed donors (INR, CNY, the softs, Platinum) from C to M and re-run — the same monotonic-shrinkage check as the existing 21 / 27 / 33 Russia pool diagnostic ([methodology.md §7](methodology.md)).
 4. **iSCM spillover correction** — considered and rejected in [methodology.md §3](methodology.md) for the small post-window and cross-event-comparability reasons.
 
-**Current position.** The headline keeps the contemporaneous 18-donor pool and the existing OPEC+-truncated post-window; the implemented post-window sensitivity (option 1) quantifies the delayed-contamination exposure, and the direction of any residual bias is *toward zero* — conservative for the thesis claim that the premium is positive and large. Options 2-3 are the route to a sharper answer and are flagged as the next iteration.
+**Current position.** The headline keeps the contemporaneous 19-donor pool and the existing OPEC+-truncated post-window; the implemented post-window sensitivity (option 1) quantifies the delayed-contamination exposure, and the direction of any residual bias is *toward zero* — conservative for the thesis claim that the premium is positive and large. Options 2-3 are the route to a sharper answer and are flagged as the next iteration.
 
 **What the sensitivity sweep finds** ([06_Ensemble_Final.ipynb](../notebooks/06_Ensemble_Final.ipynb)):
 

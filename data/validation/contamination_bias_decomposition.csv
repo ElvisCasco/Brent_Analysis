@@ -1,41 +1,41 @@
 ,event,model,horizon,net_bias_log,net_bias_pct_approx,verdict
-0,russia,convex_scm,1w,0.04466900210806093,4.568168418705532,overestimate
-1,russia,convex_scm,1m,0.07143370553532977,7.404694497381947,overestimate
-2,russia,convex_scm,3m,0.109418615800761,11.56292726454231,overestimate
-3,russia,convex_scm,full,0.19408682817240222,21.42017052943508,overestimate
-4,russia,ascm,1w,0.07824073753054918,8.138295679965957,overestimate
-5,russia,ascm,1m,0.08498688612475741,8.870278949222655,overestimate
-6,russia,ascm,3m,0.09679894354942928,10.1638859754408,overestimate
-7,russia,ascm,full,0.12927230558619163,13.799996572577623,overestimate
-8,russia,elastic_net,1w,0.06708368924461716,6.9384970450159456,overestimate
-9,russia,elastic_net,1m,0.09447159639436273,9.907794491312515,overestimate
-10,russia,elastic_net,3m,0.13101432889666503,13.998411590955829,overestimate
-11,russia,elastic_net,full,0.19697962813266987,21.771923323855713,overestimate
+0,russia,convex_scm,1w,0.044669039634700786,4.568172342797605,overestimate
+1,russia,convex_scm,1m,0.07143377880188226,7.404702366553928,overestimate
+2,russia,convex_scm,3m,0.10941866463871679,11.562932713047736,overestimate
+3,russia,convex_scm,full,0.19408694915053123,21.420185218621015,overestimate
+4,russia,ascm,1w,0.08582423732388304,8.961479786086123,overestimate
+5,russia,ascm,1m,0.09131704344255459,9.561630816656152,overestimate
+6,russia,ascm,3m,0.09995718080453088,10.512359655922165,overestimate
+7,russia,ascm,full,0.11944553879059916,12.687187159104486,overestimate
+8,russia,elastic_net,1w,0.07213316095385748,7.479845572272814,overestimate
+9,russia,elastic_net,1m,0.09974338936863623,10.488735585269193,overestimate
+10,russia,elastic_net,3m,0.13223926773918573,14.138138234124176,overestimate
+11,russia,elastic_net,full,0.18726996819211775,20.59528100071526,overestimate
 12,russia,xgboost,1w,,,n/a (nonlinear)
 13,russia,xgboost,1m,,,n/a (nonlinear)
 14,russia,xgboost,3m,,,n/a (nonlinear)
 15,russia,xgboost,full,,,n/a (nonlinear)
-16,russia,bayesian_ridge,1w,0.06820763608123746,7.058757801170823,overestimate
-17,russia,bayesian_ridge,1m,0.03474789769553881,3.535865959142548,overestimate
-18,russia,bayesian_ridge,3m,-0.007505610302126098,-0.7477513547497594,underestimate (conservative)
-19,russia,bayesian_ridge,full,-0.09584680850455485,-9.139680430981922,underestimate (conservative)
-20,hormuz,convex_scm,1w,0.009313127202855452,0.935662931402792,overestimate
-21,hormuz,convex_scm,1m,-0.015481295088401948,-1.5362075855188229,underestimate (conservative)
-22,hormuz,convex_scm,3m,-0.012886861802621727,-1.2804181742314569,underestimate (conservative)
-23,hormuz,convex_scm,full,-0.012886861802621727,-1.2804181742314569,underestimate (conservative)
-24,hormuz,ascm,1w,0.0049295165279132774,0.49416865837923485,overestimate
-25,hormuz,ascm,1m,-0.01785607913729708,-1.7697604006264855,underestimate (conservative)
-26,hormuz,ascm,3m,-0.03645717719527553,-3.580061726585193,underestimate (conservative)
-27,hormuz,ascm,full,-0.03645717719527553,-3.580061726585193,underestimate (conservative)
-28,hormuz,elastic_net,1w,0.0017947458403716463,0.1796357360632994,overestimate
-29,hormuz,elastic_net,1m,-0.008924639644321466,-0.8884933257459537,underestimate (conservative)
-30,hormuz,elastic_net,3m,-0.027938242100043757,-2.755157868087621,underestimate (conservative)
-31,hormuz,elastic_net,full,-0.027938242100043757,-2.755157868087621,underestimate (conservative)
+16,russia,bayesian_ridge,1w,0.07610725195630313,7.907830121000559,overestimate
+17,russia,bayesian_ridge,1m,0.04376499831683882,4.473681112889971,overestimate
+18,russia,bayesian_ridge,3m,0.013887724716074148,1.3984607137577543,overestimate
+19,russia,bayesian_ridge,full,-0.07417690698029669,-7.149258013272252,underestimate (conservative)
+20,hormuz,convex_scm,1w,0.00931334778489862,0.9356851960000023,overestimate
+21,hormuz,convex_scm,1m,-0.015480212164179124,-1.5361009566352113,underestimate (conservative)
+22,hormuz,convex_scm,3m,-0.012885618821744943,-1.280295467602821,underestimate (conservative)
+23,hormuz,convex_scm,full,-0.012885618821744943,-1.280295467602821,underestimate (conservative)
+24,hormuz,ascm,1w,0.008181137518072446,0.8214694472547412,overestimate
+25,hormuz,ascm,1m,-0.01600165640458703,-1.5874310056371965,underestimate (conservative)
+26,hormuz,ascm,3m,-0.021317201949244344,-2.109159633697244,underestimate (conservative)
+27,hormuz,ascm,full,-0.021317201949244344,-2.109159633697244,underestimate (conservative)
+28,hormuz,elastic_net,1w,-0.0016304492299258444,-0.16291207696739196,underestimate (conservative)
+29,hormuz,elastic_net,1m,-0.009769600698044983,-0.9722033180394551,underestimate (conservative)
+30,hormuz,elastic_net,3m,-0.02425112428902303,-2.39594285154614,underestimate (conservative)
+31,hormuz,elastic_net,full,-0.02425112428902303,-2.39594285154614,underestimate (conservative)
 32,hormuz,xgboost,1w,,,n/a (nonlinear)
 33,hormuz,xgboost,1m,,,n/a (nonlinear)
 34,hormuz,xgboost,3m,,,n/a (nonlinear)
 35,hormuz,xgboost,full,,,n/a (nonlinear)
-36,hormuz,bayesian_ridge,1w,-0.01607885227471577,-1.5950277563096638,underestimate (conservative)
-37,hormuz,bayesian_ridge,1m,-0.03935818317869,-3.859371209311324,underestimate (conservative)
-38,hormuz,bayesian_ridge,3m,-0.07359243912309213,-7.094973876942301,underestimate (conservative)
-39,hormuz,bayesian_ridge,full,-0.07359243912309213,-7.094973876942301,underestimate (conservative)
+36,hormuz,bayesian_ridge,1w,-0.013915304594005947,-1.3818934268384542,underestimate (conservative)
+37,hormuz,bayesian_ridge,1m,-0.03422237124839315,-3.364340917842845,underestimate (conservative)
+38,hormuz,bayesian_ridge,3m,-0.07898857425983127,-7.594951765451519,underestimate (conservative)
+39,hormuz,bayesian_ridge,full,-0.07898857425983127,-7.594951765451519,underestimate (conservative)

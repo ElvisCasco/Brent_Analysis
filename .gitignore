@@ -38,8 +38,13 @@ presentation/*
 plots/*
 !plots/milestone2/
 !plots/milestone2/*
+!plots/milestone3/
+!plots/milestone3/*
 # Allow-list standalone interactive HTMLs for GitHub Pages publication.
 !plots/eda_*.html
+
+# LaTeX build artifacts
+**/aux_files/
 
 # Claude Code session state (transcripts, task outputs, memory, local settings)
 .claude/

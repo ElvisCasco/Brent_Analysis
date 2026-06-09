@@ -1,0 +1,165 @@
+% Speaker companion for milestone3 --- SUTVA statistical-battery slides.
+% Per-slide talking points, background context, and Q&A backup material.
+% Compile: pdflatex milestone3_speaker_companion.tex
+
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2cm,top=1.8cm,bottom=2cm]{geometry}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{parskip}
+\usepackage{tcolorbox}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+
+\definecolor{accent}{HTML}{8B0000}
+\definecolor{muted}{HTML}{555555}
+\definecolor{lightbg}{HTML}{F7F4F0}
+
+\titleformat{\section}{\large\bfseries\color{accent}}{\thesection.}{0.6em}{}
+\titlespacing*{\section}{0pt}{1.2em}{0.2em}
+\titleformat{\subsection}{\normalsize\bfseries}{}{0em}{}
+\titlespacing*{\subsection}{0pt}{0.6em}{0.1em}
+
+\setlist[itemize]{leftmargin=1.2em,itemsep=0.15em,topsep=0.2em}
+
+\newcommand{\timetag}[1]{\hfill\textcolor{muted}{\small[#1]}}
+\newcommand{\highlight}[1]{\textcolor{accent}{\textbf{#1}}}
+
+\title{\bfseries Milestone 3 --- Speaker Companion: SUTVA Statistical Battery}
+\author{Per-slide guidance, background, and Q\&A backup}
+\date{}
+
+\begin{document}
+
+\maketitle
+\vspace{-2em}
+
+\begin{tcolorbox}[colback=lightbg,colframe=accent!40,arc=2pt]
+\textbf{One-line spine for these two slides.} \emph{The economic audit is the SUTVA defense; the
+permutation test and HLT \emph{confirm} it; the break tests are informative loading-stability
+diagnostics, not exclusion rules.} If you remember nothing else, say that sentence --- it is also
+exactly what the code now encodes (\texttt{config.BREAKPOINT\_EXCLUDE} is empty; pool membership
+follows the audit).
+\end{tcolorbox}
+
+% =====================================================================
+\section{How we defend donor selection (SUTVA) \timetag{60s}}
+
+\subsection{Talking points}
+\begin{itemize}
+  \item \highlight{Primary defense is the economic audit} --- the SCM-canonical approach (Abadie 2021
+    \S3.1: donor exclusion rests on \emph{substantive} grounds, not statistical pretests). Screen every
+    candidate against two contamination channels: the oil-supply path (energy complex, petrocurrencies
+    --- categorically out) and the disruption itself (Hormuz routing, Russia/Ukraine trade --- donor by donor).
+  \item \highlight{Statistical cross-check --- the two tests on the slides:}
+    \begin{itemize}
+      \item \highlight{Permutation mean-shift} (Chow 1960 framing; Lehmann \& Romano permutation
+        reference) --- the literal SUTVA question (did the donor's own series shift at $T_0$?), Brent-free,
+        nonparametric. The validation doc designates this as the minimum load-bearing statistical
+        confirmation, and it is the test that produces the lone flag (CNY).
+      \item \highlight{HLT trend break} --- Brent-free and I(0)/I(1)-robust, so a break at $T_0$
+        \emph{unambiguously} implicates the donor itself. The cleanest of the battery; flags nothing.
+    \end{itemize}
+  \item \highlight{Bai--Perron and KS are diagnostics, not exclusion rules} --- say this explicitly.
+    Bai--Perron regresses on \emph{treated} Brent, so a $T_0$ break is circular (could just be Brent
+    moving); it measures \emph{loading stability}, not SUTVA. KS over-rejects under macro-regime change.
+    Both are reported but neither auto-excludes a donor.
+\end{itemize}
+
+\subsection{The other at-$T_0$ test (run, not on the slides): Wilcoxon event-window}
+A third at-$T_0$ test sits in the battery but is kept off the slides:
+\begin{itemize}
+  \item \highlight{Wilcoxon event-window} (Brown \& Warner 1985, event-study tradition): compares the
+    donor's returns in a \emph{short window around} $T_0$ against a control window, rank-based. Where the
+    permutation test looks for a \emph{persistent mean shift} across the whole pre/post split, the
+    event-window looks for a \emph{localized return reaction} right at the event --- they are complementary.
+  \item \highlight{Why it is not shown:} on the retained pool it flags \emph{nothing} --- it does not even
+    pick up CNY ($p \approx 0.44$ vs the permutation test's $p \approx 0.002$) --- and it is lower-powered
+    on the handful of event-window observations. So it adds no information to the result; the permutation
+    test carries the lone flag on its own. Mention it only if asked ``did you run more than one at-$T_0$ test?''
+  \item In the combined BH-FDR flag the pipeline computes, the flag is ``permutation \emph{or} event-window'';
+    since event-window fires on nothing here, the combined flag equals the permutation test alone.
+\end{itemize}
+
+\subsection{Behind the slide}
+The hierarchy matters: audit is what a reviewer expects and what carries the argument; everything
+statistical is supplementary. We deliberately do \emph{not} let a test exclude a donor automatically ---
+the test flags a candidate, the researcher decides. This is the ``report and interpret'' convention of
+the SCM literature.
+
+\subsection{If asked}
+\begin{itemize}
+  \item \textit{Why isn't Bai--Perron a SUTVA test?} It regresses each donor on Brent's returns. Brent
+    is the treated unit, so at $T_0$ Brent itself jumps; a break in the donor--Brent relationship there
+    cannot be separated from Brent's own move. It tells you whether the donor's \emph{loading} is stable
+    across the fitting window (a parallel-fit concern), not whether the donor was treated.
+  \item \textit{Why drop KS?} It rejects $\sim$21 of 32 donors on Russia --- but that is the macro-regime
+    change (COVID recovery $\to$ 2022 tightening), not per-donor treatment. Our own flag rule excludes it
+    for that reason; it is a regime diagnostic, not a SUTVA test.
+  \item \textit{Is HLT definitive?} No --- a non-rejection is failure-to-reject, not proof of no
+    interference, and HLT only catches \emph{trend} breaks. It is the cleanest \emph{statistical}
+    triangulation, but the audit remains primary.
+\end{itemize}
+
+% =====================================================================
+\section{SUTVA test: no retained donor is treated at $T_0$ \timetag{75s}}
+
+\subsection{The table (verified, 19-donor retained pool)}
+\begin{center}
+\begin{tabular}{@{}l c c@{}}
+  \toprule
+  \textbf{Flagged at $T_0$ (of 19 retained)} & \textbf{Hormuz 2026} & \textbf{Russia 2022} \\
+  \midrule
+  HLT trend-break (Brent-free $\Rightarrow$ SUTVA)   & 0 / 19 & 0 / 19 \\
+  Permutation mean-shift \emph{(on slides)}          & 0 / 19 & 1 / 19 (CNY) \\
+  Wilcoxon event-window \emph{(run, not shown)}      & 0 / 19 & 0 / 19 \\
+  Bai--Perron (loading stability; appendix)          & 0 / 19 & 1 / 19 (VIX) \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Talking points}
+\begin{itemize}
+  \item \highlight{HLT flags nothing at either event} --- the headline. Since it is Brent-free, this is
+    the strongest clean read: no retained donor's own trend breaks at the event.
+  \item \highlight{Two Russia flags, both retained on substantive grounds:}
+    \begin{itemize}
+      \item \highlight{CNY} (permutation test) --- the shift is the concurrent China zero-COVID
+        reopening, not Russia-treatment. The test cannot separate the two; the audit judges it clean.
+      \item \highlight{VIX} (Bai--Perron) --- a generic risk-off spike around the invasion, i.e.\
+        \emph{intended} common-factor co-movement, which is what SCM exploits, not contamination.
+    \end{itemize}
+  \item \highlight{Tests inform; the audit decides.} Neither flag triggers an exclusion --- that is the
+    policy, and it is why both donors stay in the 19-donor pool.
+\end{itemize}
+
+\subsection{Behind the slide}
+VIX was \emph{previously} excluded by an automatic ``breakpoint rule.'' We removed that rule after
+two checks: (i) the Bai--Perron break does not reproduce when the test is re-run on the analysis window
+alone (it sits in the trimming dead zone; the contemporaneous early-2022 break is better attributed to
+HYG), and (ii) a VIX-in/out sensitivity moves the ensemble premium by only $-0.2$ pp (Russia) and
+$+0.6$ pp (Hormuz). Audit-vs-test agreement overall: Russia 18 / 32, Hormuz 31 / 32.
+
+\subsection{If asked}
+\begin{itemize}
+  \item \textit{If a test flags VIX, why keep it?} The flag is a loading-stability signal, not SUTVA;
+    it is sample-dependent (does not survive an analysis-window re-run); and it is immaterial to the
+    estimate ($\leq 0.6$ pp; see \texttt{scripts/vix\_sensitivity.py}). Excluding it would also force
+    dropping a clean, high-information donor from Hormuz purely to keep a shared pool.
+  \item \textit{Then why show Bai--Perron at all?} Honesty and completeness --- it is a legitimate
+    fit-stability diagnostic and it independently re-flags the audit's known cases (e.g.\ Wheat). We
+    present it as what it is, not as a SUTVA test.
+  \item \textit{Why does the permutation test flag CNY but not the audit?} The test sees ``CNY moved at
+    $T_0$''; it cannot attribute that to Russia versus the concurrent China reopening. The audit, which
+    reasons about causal channels, places CNY's move on the China-policy channel --- off the oil-supply /
+    disruption path --- so it stays.
+  \item \textit{Couldn't HLT just be under-powered on a short window?} On the full-history spec it is
+    well-powered and clean. A window-restricted HLT does throw a few rejections, but at off-$T_0$ dates
+    (COVID, 2025 metals moves) --- volatility episodes, not focal-event treatment --- so the full-history
+    result is the right one to read.
+\end{itemize}
+
+\end{document}

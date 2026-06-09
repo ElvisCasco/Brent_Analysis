@@ -2,10 +2,10 @@ event,russia
 window,extended
 variant,shared
 model,ascm
-rmspe_pre_log,0.21550384915679813
-rmspe_pre_pct,24.04867577419627
+rmspe_pre_log,0.23150592527886849
+rmspe_pre_pct,26.049679535050927
 t0,2022-02-24 00:00:00
 t_pre_start,2020-01-01 00:00:00
 n_pre,546
 n_post,151
-n_donors_active,21
+n_donors_active,19

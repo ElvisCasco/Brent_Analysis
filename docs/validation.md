@@ -18,15 +18,15 @@ The six sub-sections below cover each level. Every test is run **per model in th
 | 5a (ii) | Moment matching (mean, SD, min, max, AR(1)) | Pre-period distributional coverage | Abadie 2010 | Hard threshold on mean ($\|\Delta\| < 0.01$ log); softer on SD / extrema / AR(1). |
 | 5b | Pre-period parallel-fit (gap-series mean / SD / AR(1) / OLS slope) | Parallel-trends analog | Abadie 2010, 2015, 2021; Roth 2022 | No formal threshold (SCM-literature convention); drift-correction recipe in text. |
 | 5c (i) | Pre-period regime-stability (distance correlation across thirds) | Donor-Brent factor stability | Székely & Rizzo 2007; Stock & Watson 1996, 2002 | Model-agnostic; no canonical SCM precedent; `max_shift > 0.30` is a narrative flag, not exclusion. |
-| 5c (ii) | Bai-Perron multiple structural-break dating (donor-Brent return relationship, full history) | Donor-Brent loading stability over time ("treated over time") | Bai & Perron 1998, 2003 | Model-agnostic; dates breaks (vs assuming them). **A relationship break inside the pre-window near $T_0$ now triggers the breakpoint-rule exclusion** (`config.BREAKPOINT_EXCLUDE`), a statistical layer *separate from* the hand audit. Russia: 2/33 in-pre-window — **Wheat** (already audit-H) and **VIX** (2022-01-07, ~7 wk pre-invasion → **excluded by the rule; shared pool 19→18**); Hormuz: 3/33 (Silver, Platinum, EM_Eq), none near $T_0$. |
+| 5c (ii) | Bai-Perron multiple structural-break dating (donor-Brent return relationship, full history) | Donor-Brent loading stability over time ("treated over time") | Bai & Perron 1998, 2003 | Model-agnostic; dates breaks (vs assuming them). **A relationship break inside the pre-window is an informative flag, not an automatic exclusion** (`config.BREAKPOINT_EXCLUDE` is a manual list, currently empty; pool membership follows the hand audit). Russia: 2/33 in-pre-window — **Wheat** (already audit-H) and **VIX** (2022-01-07, ~7 wk pre-invasion → flagged but **retained**; see §5c ii); Hormuz: 3/33 (Silver, Platinum, EM_Eq), none near $T_0$. |
 | 5c (iii) | Harvey-Leybourne-Taylor trend-break test (donor's own log-level, full history) | Own-trend stability, I(0)/I(1)-robust ("change in trend") | Harvey, Leybourne & Taylor 2009 | Model-agnostic; Brent-free, so a break at $T_0$ is unambiguous donor-treatment. `break_near_T0` is the focal flag. Result: 33/33 I(1)-classified, 1/33 reject (Gold, 2018), 0 breaks near either $T_0$. |
 | 5d | Permutation mean-shift test at known $T_0$ | Donor SUTVA (model-agnostic) | Chow 1960 (hypothesis); Lehmann & Romano 2005 (permutation reference dist.) | Enters BH-FDR ($\alpha = 0.10$) combined flag. |
 | 5d | Wilcoxon event-window | Donor SUTVA (model-agnostic) | Brown & Warner 1985 | Enters BH-FDR combined flag. |
 | 5d | KS distribution shift | Regime-shift diagnostic | Two-sample KS | Reported only; **excluded** from flag rule (over-rejects under regime shift). |
-| 5e (i) | In-space placebo, inferential | Treated-unit inference | Abadie 2010 §3.3 | Min permutation $p \approx 1/N$: 0.053 (18-donor) vs 0.030 (32-donor) — **reported under both pools**. |
+| 5e (i) | In-space placebo, inferential | Treated-unit inference | Abadie 2010 §3.3 | Min permutation $p \approx 1/N$: 0.050 (19-donor) vs 0.029 (32-donor) — **reported under both pools**. |
 | 5e (ii) | In-time placebo (with mixed-placebo p-value) | Spurious-effect check on the treated unit | Abadie, Diamond & Hainmueller 2015; Chen & Yan 2023 | Mixed-placebo p-value computed per model. Formal inferential validity rests on the Hahn & Shi (2017) normality / symmetry assumption — strongest for convex SCM/ASCM, informative-rank only for nonlinear models. Pre-window shrinks under refit (XGBoost low-power); fake post-period audited for event-cleanliness. |
 | 5e (iii) | Leave-one-donor-out | Donor-fragility robustness | Abadie, Diamond & Hainmueller 2015 | Importance metric is model-specific: convex weight (SCM, ASCM), regression coefficient (Elastic-net), SHAP (XGBoost), standardised-coefficient magnitude $|\hat\beta_j|/\sigma_{\hat\beta_j}$ (Bayesian Ridge — PIP proxy, not true PIP). |
-| 5f | Cross-event weight transfer | Cross-event methodology generalization | No canonical reference (designed for this analysis) | Requires the shared 18-donor pool ([methodology.md §3](methodology.md)); strongest single test of methodology generalization. |
+| 5f | Cross-event weight transfer | Cross-event methodology generalization | No canonical reference (designed for this analysis) | Requires the shared 19-donor pool ([methodology.md §3](methodology.md)); strongest single test of methodology generalization. |
 
 ### 5.0a Minimum load-bearing tests
 
@@ -36,7 +36,7 @@ The twelve tests above span model fit, donor identification, and inference. The 
 |---|---|---|---|
 | **Model fit** | §5a (i) Walk-forward CV | [03_Validate.ipynb](../notebooks/03_Validate.ipynb) `wf-cv` cell | Only out-of-sample signal in §5; works for all 5 models; reveals XGBoost/Bayesian Ridge overfitting (val/train > 3 on Russia) |
 | **Donor identification** | Qualitative audit in [donor_catalog.md](donor_catalog.md), confirmed by §5d permutation mean-shift test at $T_0$ | [01.5_Donor_Cleanliness.ipynb](../notebooks/01.5_Donor_Cleanliness.ipynb) | Per Abadie 2021 §3.1, donor exclusion is a-priori on substantive grounds; the permutation mean-shift test asks the literal SUTVA question (mean shift at $T_0$) |
-| **Inference** | §5e (i) in-space placebo run under **both** the 18-donor and the 32-donor pool | [04_Inference.ipynb](../notebooks/04_Inference.ipynb) `iso` cells | Canonical Abadie 2010 §3.3 test. The 18-donor permutation floor is $1/19 \approx 0.053$; without the 32-donor rerun (floor $1/33 \approx 0.030$) Hormuz p-values cannot be distinguished from the saturation value. |
+| **Inference** | §5e (i) in-space placebo run under **both** the 19-donor and the 32-donor pool | [04_Inference.ipynb](../notebooks/04_Inference.ipynb) `iso` cells | Canonical Abadie 2010 §3.3 test. The 19-donor permutation floor is $1/20 = 0.05$; without the 32-donor rerun (floor $1/34 \approx 0.029$) Hormuz p-values cannot be distinguished from the saturation value. |
 
 Everything else in §5 — moment matching (§5a ii), parallel-fit (§5b), regime-stability (§5c), Wilcoxon and KS (§5d), in-time placebo and LOO (§5e ii/iii), cross-event transfer (§5f) — is **defensive depth**. Each strengthens the headline when it agrees, or forces qualification when it disagrees, but none of them replace any of the three minimum tests.
 
@@ -143,11 +143,11 @@ The formal upgrade to the distance-correlation test. Where (i) asks whether the 
 
 **Per-event flags.** Breaks are dated once per donor (event-independent); two event-specific flags are derived:
 - `break_in_prewindow` — a break **strictly inside** that event's preferred pre-window → the donor-Brent loading is not stable across the fitting window. A narrative flag (caution / down-weighting), **not** an automatic exclusion.
-- `break_near_T0` — a break within ±8 weeks of $T_0$. A break dated **strictly inside the pre-window** (i.e. *before* $T_0$, so not confounded by Brent's own $T_0$ move) now triggers the **breakpoint-rule exclusion** (`config.BREAKPOINT_EXCLUDE`), a statistical layer separate from the hand audit. A break landing *at or after* $T_0$ remains an ambiguous narrative flag only, since the relationship spec regresses on Brent, which is itself treated at $T_0$.
+- `break_near_T0` — a break within ±8 weeks of $T_0$. A break dated **strictly inside the pre-window** (i.e. *before* $T_0$, so not confounded by Brent's own $T_0$ move) is an **informative flag** that informs the researcher's manual pool decision (`config.BREAKPOINT_EXCLUDE`), but is **not** an automatic exclusion — Battery C is diagnostic, not confirming. A break landing *at or after* $T_0$ remains an ambiguous narrative flag only, since the relationship spec regresses on Brent, which is itself treated at $T_0$.
 
 **Empirical findings.**
 - **Most donor breaks predate both pre-windows** — clustering at 2011-2013 (post-GFC normalization) and the 2020-03 COVID crash. The COVID break sits *before* the Russia pre-window start (2020-07-01) and is therefore correctly not flagged, empirically vindicating that start date ([methodology.md §2](methodology.md)).
-- **Russia: 2 of 33 break inside the pre-window** — **Wheat** (audit-H; the break test *independently corroborates* the qualitative audit) and **VIX** (2022-01-07, ~7 weeks before the invasion — a genuine pre-treatment relationship break from the early-Jan Fed hawkish pivot + nascent Ukraine-risk repricing, so **excluded by the breakpoint rule**; shared pool 19→18). Wheat is already audit-H excluded, so **VIX is the lone net removal**.
+- **Russia: 2 of 33 break inside the pre-window** — **Wheat** (audit-H; the break test *independently corroborates* the qualitative audit) and **VIX** (2022-01-07, ~7 weeks before the invasion — a pre-treatment relationship break from the early-Jan Fed hawkish pivot + nascent Ukraine-risk repricing). Wheat is already audit-H excluded; **VIX is flagged but retained** — the break is a loading-stability signal (not SUTVA), sits in the trim dead zone of an analysis-window re-run, and is immaterial to the estimate (≤0.6 pp; see `scripts/vix_sensitivity.py`). No donor is removed by Battery C.
 - **Hormuz: 3 of 33 break inside the pre-window** — Silver, Platinum, EM_Eq, all on a 2024-09-13 precious-metals / Fed-pivot shift; flagged for regime-aware reading of their Hormuz weights.
 
 **Honest limitations.** BIC selection of the break count is the simplest defensible rule; Bai & Perron's sequential supF($\ell+1\mid\ell$) test with bootstrap critical values is the more rigorous alternative, noted for a future iteration. The relationship spec is also intentionally Brent-based, so a break *at* $T_0$ is ambiguous (Brent is itself treated) — the §5c (iii) own-trend test below resolves that.
@@ -207,15 +207,15 @@ Three tests of whether the estimated post-event gap for Brent is statistically l
 
 Note: this is the *same procedure* as §5d's donor-cleanliness placebo, but used for a different purpose. The donor-cleanliness placebo asks "is donor $j$ in the *tail* of the distribution?" (a tail position means treated → exclude). The inferential placebo asks "is *Brent* in the tail of the distribution?" (a tail position means the estimated effect is unusual).
 
-1. For each donor in the (shared 18-donor) pool, refit the SCM treating *that donor* as the placebo treated unit, using the remaining 17 donors as its synthetic.
+1. For each donor in the (shared 19-donor) pool, refit the SCM treating *that donor* as the placebo treated unit, using the remaining 18 donors as its synthetic.
 2. Compute the post/pre RMSPE ratio for each placebo unit and for Brent.
 3. Rank Brent's ratio against the placebo distribution. Permutation p-value = share of placebo ratios ≥ Brent's.
 
 A small p-value (< 0.10 is the conventional Abadie threshold) means Brent's gap is unusually large relative to what the SCM produces on units that were not treated. This is the standard non-parametric SCM inference.
 
-**Permutation-distribution resolution — report under both pools.** With the shared 18-donor pool, the permutation distribution has 21 placebo units plus Brent (22 units total), so the minimum attainable p-value is $1/22 \approx 0.045$. This sits right at Abadie's conventional 0.10 threshold but leaves very little headroom below 0.05. To increase resolution, the in-space placebo is **re-run under the 32-donor full pool** (Russia: 32 donors; Hormuz: 32 donors), where the minimum attainable p-value is $1/34 \approx 0.029$. Both permutation p-values are reported in the appendix robustness table ([methodology.md §7](methodology.md)) alongside the headline 18-donor result. Reading: if the 18-donor p-value is at or near the floor of $0.048$, the 32-donor p-value is the cleaner signal of statistical significance; if both are well above the floor, the 18-donor result stands on its own and the 32-donor reading is supplementary.
+**Permutation-distribution resolution — report under both pools.** With the shared 19-donor pool, the permutation distribution has 19 placebo units plus Brent (20 units total), so the minimum attainable p-value is $1/20 = 0.05$. This sits right at Abadie's conventional 0.10 threshold but leaves very little headroom below 0.05. To increase resolution, the in-space placebo is **re-run under the 32-donor full pool**, where the minimum attainable p-value is $1/34 \approx 0.029$. Both permutation p-values are reported in the appendix robustness table ([methodology.md §7](methodology.md)) alongside the headline 19-donor result. Reading: if the 19-donor p-value is at or near the floor of $0.05$, the 32-donor p-value is the cleaner signal of statistical significance; if both are well above the floor, the 19-donor result stands on its own and the 32-donor reading is supplementary.
 
-For reference, Abadie 2010 (California tobacco) has 38 placebo states; Abadie, Diamond & Hainmueller 2015 (German reunification) has 16 countries. 18 donors is comparable to the latter — defensible, but not generous on resolution.
+For reference, Abadie 2010 (California tobacco) has 38 placebo states; Abadie, Diamond & Hainmueller 2015 (German reunification) has 16 countries. 19 donors is comparable to the latter — defensible, but not generous on resolution.
 
 **(ii) In-time placebo (Abadie, Diamond & Hainmueller 2015).**
 
@@ -278,10 +278,10 @@ Reporting one importance metric per model — consistent between [methodology.md
 
 ## 5f. Cross-event weight-transfer validation
 
-The strongest single test of methodology generalization across events. Enabled by the shared 18-donor pool ([methodology.md §3](methodology.md)) — both events have the same input vector, so weights are directly transferable without ad-hoc reweighting.
+The strongest single test of methodology generalization across events. Enabled by the shared 19-donor pool ([methodology.md §3](methodology.md)) — both events have the same input vector, so weights are directly transferable without ad-hoc reweighting.
 
-1. Fit weights $w^{RU}$ on Russia pre-period (2020-07 → 2022-02) using the 18-donor preferred pool.
-2. Apply $w^{RU}$ to the Hormuz pre-period (2024-06 → 2026-02): compute $\hat Y^{HZ}_t = \sum_j w^{RU}_j \cdot Y_{jt}$ for $t$ in the Hormuz pre-period using the same 18 donors.
+1. Fit weights $w^{RU}$ on Russia pre-period (2020-07 → 2022-02) using the 19-donor preferred pool.
+2. Apply $w^{RU}$ to the Hormuz pre-period (2024-06 → 2026-02): compute $\hat Y^{HZ}_t = \sum_j w^{RU}_j \cdot Y_{jt}$ for $t$ in the Hormuz pre-period using the same 19 donors.
 3. Project the implied Hormuz counterfactual using $w^{RU}$ across the post-event window.
 4. Compare to the independently-fit Hormuz counterfactual.
 
@@ -295,7 +295,7 @@ The test compares *projected synthetics*, not *individual donor weights*. Donor 
 
 This is consistent with the test passing for two reasons:
 
-1. **Convex SCM weights are not unique when donors are correlated.** With 18 donors clustered into highly-correlated groups (soft commodities, precious metals, Asian FX, safe-haven FX), the pre-period RMSPE surface is flat over a low-dimensional manifold of weight vectors. Two materially different `w` vectors can produce nearly identical synthetic paths. Abadie & L'Hour (2021, *Journal of Business & Economic Statistics*) document this non-uniqueness problem and propose a penalty term to break ties; we do not apply that penalty, so the solver picks an arbitrary point on the flat region. The arbitrary point can shift substantially between events without the underlying factor structure changing.
+1. **Convex SCM weights are not unique when donors are correlated.** With 19 donors clustered into highly-correlated groups (soft commodities, precious metals, Asian FX, safe-haven FX), the pre-period RMSPE surface is flat over a low-dimensional manifold of weight vectors. Two materially different `w` vectors can produce nearly identical synthetic paths. Abadie & L'Hour (2021, *Journal of Business & Economic Statistics*) document this non-uniqueness problem and propose a penalty term to break ties; we do not apply that penalty, so the solver picks an arbitrary point on the flat region. The arbitrary point can shift substantially between events without the underlying factor structure changing.
 
 2. **What is stable is the projection onto donor space, not the per-donor coefficient.** Soft commodities and Asian FX both proxy for the same latent factor that co-moves with Brent (global demand × inflation expectations × risk appetite). The 2020-22 Russia pre-period happened to have soft commodities as the cleanest available proxy (the 2021 inflation rally); the 2024-26 Hormuz pre-period has Asian FX as the cleanest proxy (post-2024 yen carry dynamics). The latent factor is the same; the best in-pool proxy differs.
 
@@ -354,9 +354,9 @@ nonlinear and its importances are unsigned, so it is reported elsewhere but excl
 
 ### Empirical findings
 
-**Reliable donors agree on direction.** Restricting to $R^2\geq 0.08$ (VIX, formerly the highest-$R^2$ reliable donor, is now excluded by the breakpoint rule, so it no longer enters this set):
+**Reliable donors agree on direction.** Restricting to $R^2\geq 0.08$ (from `data/validation/donor_signed_divergence_russia.csv`):
 
-- **Russia: 3 / 3 reliable donors diverge *down*** ($\delta_j<0$): Silver (-0.23), Gold (-0.08), AUD (-0.02). The cyclical / risk basket was depressed post-invasion -- the demand-crowd-out / risk-off signature. The direction does **not** depend on the low-$R^2$ soft commodities, and dropping VIX leaves the down-divergence conclusion unchanged.
+- **Russia: 5 / 5 reliable donors diverge *down*** ($\delta_j<0$): AUD (-0.02), Silver (-0.23), Platinum (-0.24), SP500 (-0.11), Gold (-0.08). The cyclical / risk basket was depressed post-invasion -- the demand-crowd-out / risk-off signature. The direction does **not** depend on the low-$R^2$ soft commodities. (VIX is retained in the pool but does not surface in this signed-divergence diagnostic.)
 - **Hormuz: 4 down / 2 up**: the precious metals diverge notably down (Silver -0.25, Platinum -0.20, Gold -0.16) while AUD (-0.01) is small-down and JPY (+0.02) / CHF (+0.03) tick up. Unlike Russia, the down-divergence here sits in the metals (the anti-conservative direction), bounded by the post-window sensitivity sweep.
 
 **Per-model, full-window decomposition** (positive = overestimate; share = bias / that model's gap):

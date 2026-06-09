@@ -115,7 +115,7 @@
 % =====================================================================
 % COMMENT 1 --- SECTION DIVIDER + THE FILTERING QUESTION
 % =====================================================================
-\begin{frame}{Comment 1 --- donor selection and SUTVA}
+\begin{frame}{Comment 1 --- how we defend donor selection (SUTVA)}
   \footnotesize
   \hd{The selection question, asked of every candidate:}
   \vspace{0.3em}
@@ -124,22 +124,24 @@
     \vspace{0.25em}
     \begin{center}
       {\normalsize\itshape Does the asset \textcolor{accent}{co-move with Brent through common global factors},
-      yet stay \textcolor{accent}{off the oil-supply / disruption path}?}\\[0.3em]
-      {\footnotesize\textcolor{muted}{Yes to both $\rightarrow$ include. On the oil-supply / disruption path
-      (chokepoint or Russia/Ukraine trade) $\rightarrow$ exclude (SUTVA).}}
+      yet stay \textcolor{accent}{off the oil-supply / disruption path}?}
     \end{center}
     \vspace{0.1em}
   \end{minipage}}
   \end{center}
 
-  \vspace{1.0em}
-  \hd{Two contamination channels to screen out:}
+  \vspace{0.8em}
+  \hd{Approaches:}
   \vspace{0.3em}
-  \begin{itemize}\setlength\itemsep{0.5em}
-    \item \hd{The oil-supply path} --- energy complex (WTI, gas, refined products) and petrocurrencies
-      (CAD, NOK, BRL, \dots). \smalltext{Categorically on the oil-supply path $\rightarrow$ never candidates.}
-    \item \hd{The disruption itself} --- Persian-Gulf routing (Hormuz) or Russia/Ukraine trade (Russia 2022).
-      \smalltext{Screened donor-by-donor, category by category $\rightarrow$}
+  \begin{itemize}\setlength\itemsep{0.45em}
+    \item[\textcolor{accent}{\hd{$\Rightarrow$}}] \hd{(Main) Economic audit.} \src{Abadie 2021}
+      Screen every candidate against two contamination channels: the \hd{oil-supply path}
+      (energy complex, petrocurrencies --- categorically out) and the \hd{disruption itself}
+      (Hormuz routing, Russia/Ukraine trade --- screened donor-by-donor).
+    \item[\textcolor{accent}{\hd{+}}] \hd{Statistical cross-check.}
+      Two tests of whether a donor's \emph{own} series shifts at $T_0$ ---
+      a \hd{permutation mean-shift} test \src{Chow 1960}
+      and the \hd{HLT} trend-break test \src{Harvey, Leybourne \& Taylor 2009}.
   \end{itemize}
 \end{frame}
 
@@ -150,7 +152,7 @@
 % =====================================================================
 
 % ---- Metals & Agriculturals ----
-\begin{frame}{Donor selection --- Metals \& Agriculturals}
+\begin{frame}{Economic audit --- Metals \& Agriculturals}
   \footnotesize
   \begin{columns}[T]
     \begin{column}{0.49\textwidth}
@@ -175,7 +177,7 @@
 \end{frame}
 
 % ---- Equities & FX ----
-\begin{frame}{Donor selection --- Equities \& FX}
+\begin{frame}{Economic audit --- Equities \& FX}
   \footnotesize
   \begin{columns}[T]
     \begin{column}{0.49\textwidth}
@@ -199,7 +201,7 @@
 \end{frame}
 
 % ---- Rates / credit & Volatility ----
-\begin{frame}{Donor selection --- Rates / credit \& Volatility}
+\begin{frame}{Economic audit --- Rates / credit \& Volatility}
   \footnotesize
   \begin{columns}[T]
     \begin{column}{0.49\textwidth}
@@ -219,67 +221,101 @@
       \end{itemize}
     \end{column}
   \end{columns}
+
+  \vspace{1em}
+  \begin{center}
+    {\normalsize \hd{Net of the audit: 19 of 32 candidates retained}}
+    \smalltext{(shared pool, both events --- 13 dropped for Russia exposure).}
+  \end{center}
 \end{frame}
 
 % =====================================================================
 % COMMENT 1 --- SUTVA test: structural breakpoints at T0 (moved from stat-tests block)
 % =====================================================================
-\begin{frame}{Comment 1 --- SUTVA test: structural breakpoints at $T_0$}
-  \footnotesize
-  A clean donor should show \emph{no} structural break at the event. Two tests:
-  \hd{Bai--Perron} (level breaks in the donor--Brent relationship) \src{Bai \& Perron 2003};
-  \hd{HLT} (trend break, I(0)/I(1)-robust) \src{Harvey, Leybourne \& Taylor 2009}.
+\begin{frame}{Statistical cross-check --- shifts at $T_0$}
+  \begin{itemize}\setlength\itemsep{0.3em}
+    \item \hd{Permutation mean-shift} \src{Chow 1960}: split the donor's own series at $T_0$, take the
+      mean gap (after $-$ before), and compare it to thousands of random before/after relabelings ---
+      an unusually large gap signals a real shift. Nonparametric, no distributional assumption.
+    \item \hd{HLT trend-break} \src{Harvey, Leybourne \& Taylor 2009}: tests whether the donor's own
+      \emph{trend} breaks at $T_0$, valid whether the price is stationary or a random walk. Brent-free,
+      so a break implicates the donor itself, not Brent's own $T_0$ move.
+  \end{itemize}
 
-  \vspace{0.8em}
+  \vspace{0.4em}
   \begin{center}
   \begin{tabular}{@{}l c c@{}}
     \toprule
-    \hd{Break near $T_0$ (of 19)} & \hd{Hormuz 2026} & \hd{Russia 2022} \\
+    \hd{Flagged at $T_0$ (of 19 retained)} & \hd{Hormuz 2026} & \hd{Russia 2022} \\
     \midrule
-    Bai--Perron     & 0 / 19 & 1 / 19 \smalltext{(VIX)} \\
-    HLT trend-break & 0 / 19 & 0 / 19 \\
+    HLT trend-break        & 0 / 19 & 0 / 19 \\
+    Permutation mean-shift & 0 / 19 & 1 / 19 \smalltext{(CNY)} \\
     \bottomrule
   \end{tabular}
   \end{center}
 
+  \vspace{0.4em}
+  \smalltext{HLT flags nothing. The lone flag --- \hd{CNY} --- is the concurrent China zero-COVID
+  reopening, not Russia-treatment, and is kept on the audit's judgment. \emph{Tests inform; the audit decides.}}
+\end{frame}
+
+% =====================================================================
+% COMMENT 2 --- PREFACE: the question and our two-step answer
+% =====================================================================
+\begin{frame}{Comment 2 --- why the models behaved as they did}
+  \footnotesize
+  \hd{The question:}
+  \vspace{0.3em}
+  \begin{center}
+  \fcolorbox{accent!50}{accent!5}{\begin{minipage}{0.93\textwidth}
+    \vspace{0.25em}
+    \begin{center}
+      {\normalsize\itshape Why did the five models move (and disagree) the way they did during the event ---
+      and does that behaviour \textcolor{accent}{inflate} the premium?}
+    \end{center}
+    \vspace{0.1em}
+  \end{minipage}}
+  \end{center}
+
   \vspace{0.8em}
-  \begin{itemize}\setlength\itemsep{0.3em}
-    \item \hd{No excluded donor breaks} at either $T_0$.
-    \item Lone flag: \hd{VIX} (included) --- the generic risk-off spike at the invasion, i.e.\ intended
-      common-factor co-movement, not Russia-specific contamination.
+  \hd{How we answer it --- two steps:}
+  \vspace{0.3em}
+  \begin{itemize}\setlength\itemsep{0.55em}
+    \item[\textcolor{accent}{\hd{1}}] \hd{Behaviour $=$ donor weights.} Read which donors each model leans on.
+      This explains \emph{why} there is a gap at all (the weighted donors track common factors, \emph{not} the
+      oil-specific shock) and \emph{why} the models diverge on Russia (different donors; one degenerate model).
+    \item[\textcolor{accent}{\hd{2}}] \hd{Sign the contamination.} The natural worry --- are those donors
+      themselves moved by the treatment (demand destruction)? We split each gap into a clean part and a
+      donor-contamination part and \emph{sign} it: conservative for Hormuz (a \hd{lower bound}), positive for
+      Russia (why Russia is only a \hd{magnitude check}).
   \end{itemize}
+
+  \vspace{0.5em}
+  \smalltext{Take-away: the behaviour is interpretable (donor-driven), and the residual contamination is signed --- it does not inflate the headline.}
 \end{frame}
 
 % =====================================================================
 % COMMENT 2 --- importance heatmap, tied to model behaviour
 % =====================================================================
 \begin{frame}{Comment 2 --- how the donor weights drive model behaviour}
-  \begin{columns}[T]
-    \begin{column}{0.60\textwidth}
-      \begin{center}
-        \includegraphics[width=\textwidth,height=0.70\textheight,keepaspectratio]{../../plots/milestone2/donor_importance_heatmap.png}
-      \end{center}
+  \begin{columns}[c]
+    \begin{column}{0.71\textwidth}
+      \centering
+      \includegraphics[width=\textwidth,height=0.84\textheight,keepaspectratio]{../../plots/milestone3/donor_importance_heatmap.png}
     \end{column}
-    \begin{column}{0.40\textwidth}
-      \footnotesize
-      \hd{Reading the heatmap.} Column-normalised donor importance per model
-      (convex weight / $|\hat\beta_j|$ / feature importance).
+    \begin{column}{0.28\textwidth}
+      \scriptsize
+      \hd{Hormuz.} Weight on safe-haven / non-oil donors (Gold, JPY, Sugar) --- they track common risk
+      but \emph{not} the chokepoint shock $\Rightarrow$ synthetic undershoots Brent $\Rightarrow$ positive gap.
 
-      \vspace{0.5em}
-      \hd{Hormuz.} Weight concentrates on \emph{safe-haven metals} (Gold, Platinum) and \emph{JPY / VIX}.
-      These rose on generic risk but \emph{not} on the oil-specific shock $\rightarrow$ synthetic undershoots
-      actual Brent $\rightarrow$ large \emph{positive} gap.
+      \vspace{0.9em}
+      \hd{Russia --- divergence is donor-driven.} Models lean on \emph{different} donors (Coffee/Platinum
+      vs SP500); Bayesian Ridge degenerates ($w\!\approx\!1.8$--$2.4$) $\Rightarrow$ dropped from the IQR.
 
-      \vspace{0.5em}
-      \hd{Russia --- divergence is donor-driven.} The models split because they lean on \emph{different}
-      donors: Convex/ASCM concentrate on Coffee \& Platinum ($w \approx 0.5$--$0.65$), XGBoost leans SP500
-      ($\sim$0.48), while Bayesian Ridge blows up on JPY \& KRW ($w \approx 1.8$--$2.4$, far outside the
-      simplex) $\rightarrow$ degeneracy. That is \emph{why} the ensemble IQR \emph{excludes} the two
-      non-convex models.
+      \vspace{0.9em}
+      \textcolor{muted}{\tiny Each column = that model's own importance metric (convex weight / $|\hat\beta_j|$ / XGBoost gain), normalised over the 19 donors. Gray = not used.}
     \end{column}
   \end{columns}
-  \vspace{-0.2em}
-  \begin{center}\smalltext{Per-model donor weights from data/validation/contamination\_bias\_top\_contributors.csv; concentration from donor\_concentration.csv.}\end{center}
 \end{frame}
 
 % =====================================================================
@@ -288,38 +324,32 @@
 % =====================================================================
 \begin{frame}{Comment 2 --- the contamination bias is signed, and it makes us \emph{conservative}}
   \footnotesize
-  \hd{The critique.} If high oil prices \emph{crowd out demand}, the donors that proxy global activity are
-  themselves pushed \emph{down} by the treatment $\rightarrow$ the synthetic is dragged down with them
-  $\rightarrow$ residual contamination in the gap. \hd{So: which way does the bias go, and how big?}
+  \hd{The critique.} If high oil \emph{crowds out demand}, activity-proxy donors are pushed \emph{down},
+  dragging the synthetic down $\rightarrow$ contamination in the gap. \hd{Which way, and how big?}
+  We sign each linear model's net donor-bias \smalltext{($-\sum_j w_j\,\delta_j$)} over the full post-window:
 
-  \vspace{0.4em}
-  \hd{We sign it.} For each linear model we decompose the gap into a clean component and a donor-contamination
-  component (net bias) over the full post-window:
-
-  \vspace{0.3em}
+  \vspace{0.1em}
   \begin{center}
   \begin{tabular}{@{}l r r@{}}
     \toprule
     \hd{Model}     & \hd{Hormuz net bias} & \hd{Russia net bias} \\
     \midrule
-    Convex SCM     & $-1.3\%$ \smalltext{(conservative)} & $+21.3\%$ \\
-    ASCM           & $-2.3\%$ \smalltext{(conservative)} & $+11.8\%$ \\
-    Elastic-net    & $-2.6\%$ \smalltext{(conservative)} & $+19.5\%$ \\
-    Bayesian Ridge & $-7.3\%$ \smalltext{(conservative)} & $-7.5\%$ \\
-    XGBoost        & \smalltext{n/a (nonlinear)}          & \smalltext{n/a (nonlinear)} \\
+    Convex SCM     & $-1.3\%$ \smalltext{(conservative)} & $+21.4\%$ \\
+    ASCM           & $-2.1\%$ \smalltext{(conservative)} & $+12.7\%$ \\
+    Elastic-net    & $-2.4\%$ \smalltext{(conservative)} & $+20.6\%$ \\
+    Bayesian Ridge & $-7.6\%$ \smalltext{(conservative)} & $-7.1\%$ \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \smalltext{Source: data/validation/contamination\_bias\_decomposition.csv.}
+  \smalltext{Linear models only (XGBoost nonlinear). Source: contamination\_bias\_decomposition.csv.}
 
-  \vspace{0.4em}
+  \vspace{0.15em}
   \begin{itemize}\setlength\itemsep{0.1em}
-    \item \hd{Hormuz: bias is \emph{negative} across all linear models} $\rightarrow$ the demand-destruction
-      channel makes the SCM \emph{under}-state the premium. The headline \textcolor{accent}{\bfseries $\sim$59\%}
-      is therefore a \hd{lower bound}, not an inflated one.
-    \item \hd{Russia: bias is positive} ($+12$ to $+21\%$) $\rightarrow$ donors \emph{did} catch the invasion
-      shock and drift up --- exactly the Russia-specific contamination we flagged, and why Russia is a
-      magnitude check, not the headline.
+    \item \hd{Hormuz: bias \emph{negative}} for all linear models $\rightarrow$ demand-destruction makes the
+      SCM \emph{under}-state the premium, so the headline \textcolor{accent}{\bfseries $\sim$59\%} is a \hd{lower bound}.
+    \item \hd{Russia: bias \emph{positive}} $\rightarrow$ retained cyclical donors (Coffee, Platinum, SP500)
+      were pushed \emph{down}, dragging the synthetic down and \emph{inflating} the gap $\rightarrow$ Russia
+      is a magnitude check, not the headline.
   \end{itemize}
 \end{frame}
 

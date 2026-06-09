@@ -62,15 +62,23 @@ POST_END = {
 DONOR_POOL_VARIANT = 'shared'
 
 # ===== Breakpoint-rule exclusions (SEPARATE from the SUTVA audit) =====
-# Donors removed from the clean pools (strict_clean / permissive / shared) because they
-# FAIL the Bai-Perron relationship breakpoint test (Battery C, notebooks/01.5): a structural
-# break in the donor<->Brent weekly-return relationship inside the pre-window, near T_0.
-# These donors remain audited 'C' and stay in the data and diagnostics; this is an
-# additional statistical exclusion layer on top of the hand audit (see docs/validation.md).
-#   VIX: relationship break 2022-01-07 (~7 weeks before the Russia invasion -- Fed hawkish
-#        pivot + early Ukraine-risk repricing). Applied to BOTH events (shared pool).
-# The 'full' variant is the no-exclusions contamination diagnostic and ignores this list.
-BREAKPOINT_EXCLUDE = ['VIX']
+# POLICY: this list is a MANUAL, researcher-curated input. The statistical break tests
+# (Battery C, notebooks/01.5 -- Bai-Perron relationship breaks + HLT trend breaks) are
+# INFORMATIVE, not confirming: they flag candidates and inform the judgment, but never
+# trigger an automatic exclusion. Any entry here is a deliberate human decision; absent a
+# decision the pool is driven by the qualitative donor-catalog audit (docs/donor_catalog.md),
+# per the SCM "report and interpret" convention.
+#
+# Currently empty (no manual exclusions). Rationale for not excluding VIX despite its flag:
+#   - VIX's only flag was a single full-history Bai-Perron relationship break at 2022-01-07
+#     (Fed hawkish pivot + early Ukraine-risk repricing). That is a loading-STABILITY signal,
+#     not a SUTVA violation, and it is sample-dependent: it does not reproduce when the test is
+#     run on the analysis window alone, and the contemporaneous break is better attributed to
+#     HYG (see scripts/battery_c_analysis_period_robustness.py).
+#   - Sensitivity check (scripts/vix_sensitivity.py, preferred window): keeping VIX moves the
+#     ensemble premium by -0.21 pp (Russia) / +0.64 pp (Hormuz) -- immaterial.
+# The 'full' variant remains the no-exclusions contamination diagnostic and ignores this list.
+BREAKPOINT_EXCLUDE = []
 
 
 # ===== Model ensemble (Option B from docs/methodology.md §4) =====
