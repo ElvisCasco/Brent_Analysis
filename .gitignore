@@ -40,4 +40,11 @@ plots/*
 # Allow-list standalone interactive HTMLs for GitHub Pages publication.
 !plots/eda_*.html
 
+# Claude Code session state (transcripts, task outputs, memory, local settings)
+.claude/
+
+# Loose reference papers / personal transcripts (cited papers belong in references/)
+/*.pdf
+docs/*.docx
+
 
