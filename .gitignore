@@ -27,6 +27,7 @@ Thumbs.db
 references/
 
 presentation/*
+!presentation/*/
 !presentation/**/*.pdf
 !presentation/**/*.tex
 !presentation/*.pdf
