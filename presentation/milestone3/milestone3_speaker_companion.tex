@@ -269,4 +269,26 @@ would imply a negative bias, the opposite of what we report.)
     behave'' --- a different question from Comment 2 --- so it is reserve material for the significance Q.
 \end{itemize}
 
+% =====================================================================
+\section{Appendix (reserve) --- walk-forward CV RMSE \timetag{only if asked}}
+\begin{itemize}
+  \item \highlight{What it is:} 5-fold expanding-window walk-forward CV (\S5a). \emph{val RMSE} = pooled
+    out-of-sample error; \emph{train RMSE} = cross-fold mean; \emph{val/train $>2$} is a heuristic over-fit flag.
+  \item \highlight{Result:} Russia \textbf{2/5} clean (Convex 1.25, Elastic-net 1.99 --- ASCM 2.06, XGBoost
+    3.31, Bayesian Ridge 3.09 over-fit the volatile 2020--22 pre-period); Hormuz \textbf{4/5} clean (only
+    Bayesian Ridge, 2.28).
+  \item \highlight{Key point:} flagged models are \emph{not} dropped --- the ensemble takes the median, and
+    the IQR band \emph{is} the model-uncertainty. The ratio is a diagnostic, not a target.
+\end{itemize}
+
+% =====================================================================
+\section{Appendix (reserve) --- per-model synthetic paths \timetag{only if asked}}
+\begin{itemize}
+  \item \highlight{What it shows:} observed Brent vs each of the five models' synthetic counterfactuals.
+    Pre-$T_0$ the synthetics \emph{track} Brent (the fit); post-$T_0$ they diverge --- the gap is the premium.
+  \item \highlight{Reading:} Convex SCM \& ASCM are the headline pair; Bayesian Ridge's Russia path blows up
+    (degenerate weights, $w$ outside the simplex), which is exactly why it is down-weighted (cf. the LOO and
+    RMSE appendices). Use this slide to make the divergence concrete if someone wants to ``see the gap.''
+\end{itemize}
+
 \end{document}
