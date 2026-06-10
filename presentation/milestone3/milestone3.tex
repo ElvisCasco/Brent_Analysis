@@ -276,8 +276,7 @@
   \hd{Approaches:}
   \vspace{0.2em}
   \begin{itemize}\setlength\itemsep{0.35em}
-    \item[\textcolor{accent}{\hd{1}}] \hd{Behaviour via donor weights.} Which donors each model leans on ---
-      explains the gap (donors miss the oil-specific shock) and the Russia divergence (different donors).
+    \item[\textcolor{accent}{\hd{1}}] \hd{Behaviour via donor weights.} Which donors each model leans on to explain Hormuz gap and the Russia divergence?
     \item[\textcolor{accent}{\hd{2}}] \hd{Leave-one-out robustness.} Does any single donor drive the gap?
     \item[\textcolor{accent}{\hd{3}}] \hd{Signed contamination bias.} Are those donors themselves moved by the
       treatment (demand destruction)? Decompose each gap into a clean part and a donor-contamination part, and \emph{sign} it.
@@ -337,8 +336,7 @@
   \begin{itemize}\setlength\itemsep{0.1em}
     \item \hd{Hormuz: tight} ($\sim$6--10 pp on a $\sim$59\% effect) --- no single donor flips the result; ASCM tightest.
     \item \hd{Russia: wide} (14--27 pp). Bayesian Ridge ($\dagger$ range crosses zero, $-21.9$ to $+5.4$) is
-      LOO-fragile, consistent with its degenerate fit; XGBoost is the most stable. Reinforces Russia as a
-      magnitude check, not the headline.
+      LOO-fragile, consistent with its degenerate fit; XGBoost is the most stable.
   \end{itemize}
 \end{frame}
 
@@ -547,6 +545,38 @@
   \vspace{0.2em}
   \begin{flushleft}\smalltext{Convex SCM \& ASCM are the headline pair; Bayesian Ridge's Russia path blows up
   (degenerate weights, $w$ outside the simplex) --- which is why it is down-weighted in the ensemble.}\end{flushleft}
+\end{frame}
+
+% =====================================================================
+% Appendix --- interactive figures (GitHub Pages links)
+% =====================================================================
+\begin{frame}{Appendix --- interactive figures online}
+  \footnotesize
+  Interactive HTML versions of the EDA figures (zoom, hover, toggle traces) are hosted on GitHub Pages at
+  \href{https://elviscasco.github.io/Brent_Analysis/}{\texttt{elviscasco.github.io/Brent\_Analysis}}.
+  The donor panels show the \hd{19-donor audited pool} (VIX retained). Data embedded inline; only the Plotly
+  rendering library loads from CDN.
+
+  \vspace{0.6em}
+  \begin{tabular}{@{}p{0.36\textwidth} p{0.58\textwidth}@{}}
+    \toprule
+    \hd{Figure} & \hd{URL} \\
+    \midrule
+    Brent + curated events, 2000--2026 &
+      \href{https://elviscasco.github.io/Brent_Analysis/plots/eda_brent_events_timeline.html}{\texttt{plots/eda\_brent\_events\_timeline.html}} \\[0.4em]
+    Donors vs Brent, Hormuz panel &
+      \href{https://elviscasco.github.io/Brent_Analysis/plots/eda_donors_audited_hormuz.html}{\texttt{plots/eda\_donors\_audited\_hormuz.html}} \\[0.4em]
+    Donors vs Brent, Russia panel &
+      \href{https://elviscasco.github.io/Brent_Analysis/plots/eda_donors_audited_russia.html}{\texttt{plots/eda\_donors\_audited\_russia.html}} \\[0.4em]
+    Event-window response heatmap &
+      \href{https://elviscasco.github.io/Brent_Analysis/plots/eda_event_window_response_heatmap.html}{\texttt{plots/eda\_event\_window\_response\_heatmap.html}} \\[0.4em]
+    Brent + Geopolitical Risk overlay &
+      \href{https://elviscasco.github.io/Brent_Analysis/plots/eda_brent_gpr.html}{\texttt{plots/eda\_brent\_gpr.html}} \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{0.6em}
+  \smalltext{Source: notebooks/01\_EDA.ipynb; outputs regenerated on every notebook run.}
 \end{frame}
 
 \end{document}

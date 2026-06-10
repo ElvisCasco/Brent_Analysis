@@ -27,6 +27,7 @@
 
 \newcommand{\timetag}[1]{\hfill\textcolor{muted}{\small[#1]}}
 \newcommand{\highlight}[1]{\textcolor{accent}{\textbf{#1}}}
+\newcommand{\src}[1]{{\normalfont\small\textcolor{muted}{(#1)}}}
 
 \title{\bfseries Milestone 3 --- Speaker Companion}
 \author{Per-slide guidance, background, and Q\&A backup}
@@ -182,6 +183,16 @@ the treatment?). The preface states the method only; the conclusions come on the
     \highlight{Hormuz tight} ($\sim$6--10 pp on a $\sim$59\% effect) --- no single donor flips it.
     \highlight{Russia wide} (14--27 pp); Bayesian Ridge crosses zero (LOO-fragile, consistent with its
     degenerate fit). Reinforces Russia-as-magnitude-check.
+    \begin{itemize}\setlength\itemsep{0.15em}
+      \item \textit{If asked ``which donor drives the range?''} --- it is event-specific:
+        \textbf{Convex SCM} is sparse (weight on 2--3 donors), so on \textbf{Russia} dropping
+        \textbf{Coffee} alone swings the ATT $33.7\%\!\to\!59.6\%$ ($+26$ pp) --- concentration risk, not a
+        real effect; on Hormuz it is bounded by Sugar ($-4$ pp) and JPY ($+4$ pp).
+      \item \textbf{Bayesian Ridge} (dense weights) on \textbf{Russia} ranges from $-21.9\%$ (drop
+        \textbf{Platinum}; ZAR close behind) up to $+5.4\%$ (drop \textbf{JPY}) --- a $\sim$27 pp,
+        sign-flipping span, which is exactly why this model is the least trusted; on Hormuz \textbf{AUD}
+        is the only large mover ($+8$ pp). Numbers from \texttt{data/validation/inference\_loo\_*.csv}.
+    \end{itemize}
   \item \highlight{Signed contamination bias} (closing approach). Demand-destruction critique: high oil
     crowds out activity, so activity-proxy donors are pushed down $\Rightarrow$ residual contamination. We
     decompose each linear model's gap (net bias $=-\sum_j w_j\,\delta_j$) and \emph{sign} it.
@@ -255,6 +266,62 @@ would imply a negative bias, the opposite of what we report.)
   \item \textit{Why is Hormuz the headline and Russia the check?} Russia's pre-period (2020-07 $\to$
     2022-02) spans COVID recovery + the reflation rally --- high donor volatility weakens in-space
     inference; the Hormuz pre-period is calmer and the placebo is at the floor for every model.
+\end{itemize}
+
+% =====================================================================
+\section{Reference --- the five ensemble models \& what is tuned \timetag{background}}
+
+All five build a counterfactual Brent from the \emph{same} 19 donors; they differ in \emph{how} they
+weight them. Every tunable knob is chosen by \highlight{lowest pooled 5-fold walk-forward val RMSE}, then
+the model is refit on the full pre-period (train$+$val) at that value. The ensemble reports the
+\emph{median} across the five, and the IQR is the model-uncertainty band.
+
+\subsection{Convex SCM \src{Abadie, Diamond \& Hainmueller 2010}}
+\begin{itemize}
+  \item \highlight{What it does:} synthetic $=$ a \emph{convex} combination of donors --- weights
+    $w_j \ge 0$, $\sum w_j = 1$. Cannot extrapolate beyond the donors' range; weights are directly readable.
+  \item \highlight{Tuned:} \emph{nothing} (no penalty). Internally it draws \texttt{n\_random\_v}$=120$
+    random predictor-importance vectors $V$ and keeps the one with the best pre-period fit --- a robustness
+    sweep, not a hyperparameter. The interpretable, conservative core of the ensemble.
+\end{itemize}
+
+\subsection{Augmented SCM (ASCM) \src{Ben-Michael, Feller \& Rothstein 2021}}
+\begin{itemize}
+  \item \highlight{What it does:} convex SCM \emph{plus} a ridge correction that relaxes the simplex when
+    no good convex fit exists, reducing pre-period bias (it can take small negative / $>1$ weights).
+  \item \highlight{Tuned:} \texttt{ridge\_lambda} $\in\{0.01,0.1,1,10,100\}$ --- the penalty on that
+    correction. \emph{Large} $\lambda \to$ back toward plain convex SCM; \emph{small} $\lambda \to$ more
+    correction (more extrapolation). Our headline pair with Convex SCM.
+\end{itemize}
+
+\subsection{Elastic-net \src{penalized regression; Doudchenko \& Imbens 2016}}
+\begin{itemize}
+  \item \highlight{What it does:} penalized linear regression of Brent on the donors (no simplex
+    constraint --- weights can be negative or $>1$).
+  \item \highlight{Tuned:} \texttt{alpha} $\in\{0.001,0.01,0.05,0.1,0.5\}$ = overall shrinkage strength
+    (higher $\to$ smaller weights); \texttt{l1\_ratio} $\in\{0.2,0.5,0.8\}$ = the L1-vs-L2 mix (higher
+    $\to$ more lasso $\to$ sparser, fewer donors used; lower $\to$ more ridge $\to$ spread weight).
+\end{itemize}
+
+\subsection{XGBoost \src{gradient-boosted trees}}
+\begin{itemize}
+  \item \highlight{What it does:} the one \emph{nonlinear} model --- an additive ensemble of small
+    regression trees, so it can capture donor interactions and thresholds a linear fit misses.
+  \item \highlight{Tuned:} \texttt{max\_depth} $\in\{2,3,4\}$ = tree depth / interaction order;
+    \texttt{learning\_rate} $\in\{0.001\text{--}0.1\}$ = shrinkage per tree (smaller $\to$ slower, less
+    over-fit); \texttt{reg\_lambda} $\in\{1,10\}$ = L2 penalty on leaf values. \texttt{n\_estimators} is
+    \emph{not} grid-searched --- early stopping (patience 20, eval $=$ val window) picks it, capped at 1000.
+    Heavily regularised for the small ($N\!\sim\!420$) sample.
+\end{itemize}
+
+\subsection{Bayesian Ridge \src{Bayesian linear regression; BSTS regression component, Brodersen 2015}}
+\begin{itemize}
+  \item \highlight{What it does:} linear regression on donors with Gaussian priors --- a Bayesian ridge.
+    Stands in for the regression part of BSTS (no trend/seasonal components here).
+  \item \highlight{Tuned:} \texttt{lambda} ($=\lambda_1=\lambda_2$) $\in\{10^{-8}\dots1\}$ = prior precision
+    on the \emph{coefficients} (higher $\to$ stronger shrinkage toward 0); \texttt{alpha}
+    ($=\alpha_1=\alpha_2$) $\in\{10^{-8},10^{-6},10^{-4}\}$ = precision on the \emph{noise}. It is the least
+    reliable fit (its weights go outside the simplex --- the Russia path blow-up), so it is down-weighted.
 \end{itemize}
 
 % =====================================================================
