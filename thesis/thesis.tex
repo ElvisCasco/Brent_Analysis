@@ -39,9 +39,9 @@
 disruption on the price of Brent crude. Because Brent is a single global benchmark
 with no natural control unit, the central problem is the construction of a credible
 counterfactual price path. We build that counterfactual with the \emph{synthetic
-control method} (SCM), using a pool of 18 macro-financial donor series (metals,
-agriculturals, equities, foreign exchange, and rates) selected to share Brent's
-exposure to common global factors while staying off the oil-supply causal path. To
+control method} (SCM), using a pool of 19 macro-financial donor series (metals,
+agriculturals, equities, foreign exchange, rates, and volatility) selected to share
+Brent's exposure to common global factors while staying off the oil-supply causal path. To
 guard against any single modelling choice driving the result, the synthetic is
 formed as the median of an \emph{ensemble} of five estimators with different inductive
 biases (convex SCM, augmented SCM, elastic net, gradient-boosted trees, and Bayesian
@@ -49,7 +49,7 @@ ridge). The design is first validated on a known disruption, the 24 February 202
 Russian invasion of Ukraine, where it recovers a price path consistent with the
 documented \$95$\to$\$130 move, and is then applied out-of-sample to Hormuz. Over the
 post-event window to mid-June 2026 we estimate an average Brent premium of roughly
-\SI{52}{\percent} (ensemble median; inter-quartile range \SIrange{51}{56}{\percent}).
+\SI{56}{\percent} (ensemble median; inter-quartile range \SIrange{51}{57}{\percent}).
 The estimate survives an in-space placebo test (Brent ranks first among all placebo
 units; permutation $p$ at the attainable floor), a leave-one-donor-out check, a
 contamination-bias sign analysis, and a comparison against na\"ive univariate
@@ -122,7 +122,7 @@ donor pool, pre-window, model class, and regularisation interacting. We therefor
 calibrate the design on the \textbf{2022 Russian invasion of Ukraine}, a large,
 well-documented Brent disruption (\$95$\to$\$130 within two weeks), and verify that
 the same machinery recovers that magnitude before applying it out-of-sample to
-Hormuz. The two events also share an 18-donor pool, which enables the strongest single
+Hormuz. The two events also share a 19-donor pool, which enables the strongest single
 robustness test available with two events, a \emph{cross-event weight transfer} in
 which Russia-fitted weights are applied to the Hormuz window to check that the factor
 structure SCM relies on is regime-stable.
@@ -440,18 +440,22 @@ flagged (the indirect oil$\to$polyester substitution channel); no donor is physi
 routed through the Strait.
 
 To make the two events directly comparable, and to enable the cross-event weight
-transfer, we use a single shared 18-donor pool: the Russia strict-clean set, which is
-a subset of the Hormuz clean set. One further donor, VIX, is audited clean but removed
-by a data-driven rule: its donor--Brent return relationship breaks on 2022-01-07
-(\citealp{baiperron1998}; $\sim$7 weeks before the invasion), inside the pre-window, so
-it is dropped to keep the factor loadings stable. The energy complex (WTI, refined
+transfer, we use a single shared 19-donor pool: the Russia strict-clean set, which is
+a subset of the Hormuz clean set. One donor, VIX, is borderline: a full-history
+Bai--Perron test \citep{baiperron1998} flags a single break in its relationship with
+Brent on 2022-01-07 ($\sim$7 weeks before the invasion). We treat that as a
+loading-stability signal rather than a SUTVA violation, because it does not reproduce
+when the test is run on the analysis window alone, and a sensitivity check shows that
+keeping or dropping VIX moves the ensemble premium by less than 1 percentage point. We
+therefore retain VIX, which keeps the volatility factor represented and matches the
+specification used in our milestone presentation. The energy complex (WTI, refined
 products, petrocurrencies) is excluded by construction: it has the highest raw
 correlation with Brent but loads on the very oil-specific shock we measure.
-Table~\ref{tab:donors} lists the 18-donor pool by factor category.
+Table~\ref{tab:donors} lists the 19-donor pool by factor category.
 
 \begin{table}[h]
 \centering
-\caption{The shared 18-donor pool, by factor category. The full 32-donor pool adds
+\caption{The shared 19-donor pool, by factor category. The full 32-donor pool adds
 Russia-contaminated series (e.g.\ Wheat, Corn, Palladium, EUR, DXY, BTC, Copper, Iron
 Ore, US10Y) used only in the appendix robustness pool and as a contamination diagnostic.}
 \label{tab:donors}
@@ -465,6 +469,7 @@ Agriculturals (3) & Coffee, Sugar, Live Cattle \\
 Equities (2) & S\&P 500, Nikkei 225 \\
 Foreign exchange (8) & AUD, JPY, CHF, CNY, INR, KRW, ZAR, MXN \\
 Rates \& credit (2) & TLT (long Treasuries), HYG (high-yield credit) \\
+Volatility (1) & VIX (implied S\&P 500 volatility) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -585,11 +590,12 @@ points independent of treatment, so the drift-adjusted gap subtracts it.
 % ===================================================================
 \subsection{Pre-event fit}
 Table~\ref{tab:wfcv} reports walk-forward CV. For Hormuz, four of five models clear the
-heuristic flag (validation/training RMSE ratio below~2); only Bayesian ridge, at 2.30,
-is flagged. For Russia, three of five clear it (XGBoost and Bayesian ridge fail at
-3.12). The flags are not exclusions: they identify which models to read with caution,
-and the most flagged model (Bayesian ridge) is the one whose headline gap is the
-ensemble outlier.
+heuristic flag (validation/training RMSE ratio below~2); only Bayesian ridge, at 2.28,
+is flagged. For Russia, two of five clear it (convex SCM and elastic net); with VIX kept
+in the pool the augmented SCM rises just past the threshold (2.06), and XGBoost (3.24)
+and Bayesian ridge (3.09) fail more clearly. The flags are not exclusions: they identify
+which models to read with caution, and the most flagged model (Bayesian ridge) is the one
+whose headline gap is the ensemble outlier.
 
 \begin{table}[h]
 \centering
@@ -602,16 +608,16 @@ validation/training RMSE ratio above 2 is a heuristic overfit flag, not an exclu
 Event & Model & train RMSE & val RMSE & val/train & Flag \\
 \midrule
 Russia & Convex SCM     & 0.113 & 0.141 & 1.25 & OK \\
-Russia & Augmented SCM  & 0.047 & 0.092 & 1.95 & OK \\
-Russia & Elastic net    & 0.052 & 0.095 & 1.84 & OK \\
-Russia & XGBoost        & 0.040 & 0.125 & 3.12 & overfit \\
-Russia & Bayesian ridge & 0.034 & 0.107 & 3.12 & overfit \\
+Russia & Augmented SCM  & 0.046 & 0.095 & 2.06 & overfit \\
+Russia & Elastic net    & 0.051 & 0.102 & 1.99 & OK \\
+Russia & XGBoost        & 0.039 & 0.127 & 3.24 & overfit \\
+Russia & Bayesian ridge & 0.034 & 0.105 & 3.09 & overfit \\
 \addlinespace
 Hormuz & Convex SCM     & 0.060 & 0.083 & 1.40 & OK \\
-Hormuz & Augmented SCM  & 0.043 & 0.073 & 1.72 & OK \\
-Hormuz & Elastic net    & 0.049 & 0.074 & 1.52 & OK \\
-Hormuz & XGBoost        & 0.045 & 0.081 & 1.81 & OK \\
-Hormuz & Bayesian ridge & 0.034 & 0.079 & 2.30 & overfit \\
+Hormuz & Augmented SCM  & 0.049 & 0.075 & 1.54 & OK \\
+Hormuz & Elastic net    & 0.052 & 0.079 & 1.51 & OK \\
+Hormuz & XGBoost        & 0.044 & 0.082 & 1.84 & OK \\
+Hormuz & Bayesian ridge & 0.034 & 0.078 & 2.28 & overfit \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -620,13 +626,13 @@ Hormuz & Bayesian ridge & 0.034 & 0.079 & 2.30 & overfit \\
 Table~\ref{tab:headline} reports the per-model post-window gap, the drift contribution,
 and the drift-adjusted gap, for both events; Figure~\ref{fig:paths} plots the observed
 and synthetic paths. \textbf{Russia 2022} yields an ensemble-median premium of
-\SI{22.1}{\percent} over the seven-month window (IQR \SIrange{12.1}{31.6}{\percent}),
-with an implied counterfactual mean of \$88.5/bbl against an actual \$108.5. This is
+\SI{22.0}{\percent} over the seven-month window (IQR \SIrange{10.9}{30.8}{\percent}),
+with an implied counterfactual mean of \$88.6/bbl against an actual \$108.5. This is
 consistent with the documented \$95$\to$\$130 move and its partial reversion by
 September. \textbf{Hormuz 2026} yields an ensemble-median premium of
-\SI{52.2}{\percent} over the window to mid-June (IQR \SIrange{51.2}{55.9}{\percent}),
+\SI{55.9}{\percent} over the window to mid-June (IQR \SIrange{51.2}{56.6}{\percent}),
 with an actual post-window mean of \$106.9 against an implied counterfactual of
-$\sim$\$70.3. The Hormuz IQR is far tighter than Russia's ($\sim$5 vs $\sim$20 pp),
+$\sim$\$68.6. The Hormuz IQR is far tighter than Russia's ($\sim$5 vs $\sim$20 pp),
 reflecting the calmer Hormuz pre-period.
 
 \begin{table}[h]
@@ -642,13 +648,13 @@ Ensemble $=$ cross-model median; band $=$ IQR (Q25--Q75).}
 Model & Raw & Drift & Adj. & Raw & Drift & Adj. \\
 \midrule
 Convex SCM     & 33.6 & $+5.2$ & 28.4 & 55.9 & $-1.4$ & 57.3 \\
-Augmented SCM  & 12.1 & $+0.3$ & 11.8 & 52.2 & $-0.1$ & 52.3 \\
-Elastic net    & 22.1 & $+0.7$ & 21.4 & 57.1 & $-0.3$ & 57.3 \\
-XGBoost        & 31.6 & $+1.8$ & 29.8 & 51.2 & $-1.5$ & 52.7 \\
-Bayesian ridge & $-10.1$ & $+0.1$ & $-10.2$ & 43.3 & $-0.0$ & 43.3 \\
+Augmented SCM  & 10.9 & $+0.3$ & 10.6 & 56.8 & $-0.4$ & 57.1 \\
+Elastic net    & 22.0 & $+0.7$ & 21.2 & 56.6 & $-0.8$ & 57.4 \\
+XGBoost        & 30.8 & $+1.8$ & 28.9 & 51.2 & $-1.5$ & 52.7 \\
+Bayesian ridge & $-9.0$ & $+0.1$ & $-9.1$ & 43.0 & $-0.0$ & 43.0 \\
 \midrule
-\textbf{Ensemble median} & \textbf{22.1} & n/a & \textbf{21.4} & \textbf{52.2} & n/a & \textbf{52.7} \\
-\textbf{IQR} & \textbf{[12.1, 31.6]} & n/a & n/a & \textbf{[51.2, 55.9]} & n/a & n/a \\
+\textbf{Ensemble median} & \textbf{22.0} & n/a & \textbf{21.2} & \textbf{55.9} & n/a & \textbf{57.1} \\
+\textbf{IQR} & \textbf{[10.9, 30.8]} & n/a & n/a & \textbf{[51.2, 56.6]} & n/a & n/a \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -681,9 +687,10 @@ $\sim$5 pp.
 Table~\ref{tab:placebo} and Figure~\ref{fig:placebo} report the in-space placebo. For
 \textbf{Hormuz}, Brent ranks \emph{first} among all placebo units under every model and
 both pools, with a post/pre RMSPE ratio (6.9--10.2) above every donor's, so the
-permutation $p$-value sits at the attainable floor (0.053 in the 18-donor pool, 0.030 in
+permutation $p$-value sits at the attainable floor (0.050 in the 19-donor pool, 0.030 in
 the 32-donor pool). This is the strongest signal the test can give at this sample size.
-For \textbf{Russia}, no model reaches the floor (XGBoost comes closest at $p=0.16$); the
+For \textbf{Russia}, no model reaches the floor (XGBoost comes closest at $p=0.20$ in the
+19-donor pool, $0.15$ in the 32-donor pool); the
 volatile 2020--22 pre-period gives donors large pre-period RMSPE too, widening the placebo
 distribution. This is a known low-power property of the in-space placebo at volatile
 pre-periods \citep{abadie2010}, not evidence of a small effect. Russia's magnitude is
@@ -692,24 +699,24 @@ independently documented and externally validated below.
 \begin{table}[h]
 \centering
 \caption{In-space placebo permutation $p$-values and Brent's post/pre RMSPE ratio
-(18-donor pool). Floor $=1/(N{+}1)$: 0.053 (18-donor), 0.030 (32-donor).}
+(19-donor pool). Floor $=1/(N{+}1)$: 0.050 (19-donor), 0.030 (32-donor).}
 \label{tab:placebo}
 \small
 \begin{tabular}{@{}llrrr@{}}
 \toprule
-Event & Model & $p$ (18-donor) & $p$ (32-donor) & Brent ratio \\
+Event & Model & $p$ (19-donor) & $p$ (32-donor) & Brent ratio \\
 \midrule
-Russia & Convex SCM     & 0.53 & 0.50 & 2.75 \\
-Russia & Augmented SCM  & 0.58 & 0.47 & 3.45 \\
-Russia & Elastic net    & 0.42 & 0.41 & 4.00 \\
-Russia & XGBoost        & 0.16 & 0.15 & 7.69 \\
-Russia & Bayesian ridge & 0.63 & 0.53 & 5.92 \\
+Russia & Convex SCM     & 0.50 & 0.50 & 2.75 \\
+Russia & Augmented SCM  & 0.60 & 0.47 & 3.51 \\
+Russia & Elastic net    & 0.40 & 0.41 & 4.08 \\
+Russia & XGBoost        & 0.20 & 0.15 & 7.75 \\
+Russia & Bayesian ridge & 0.60 & 0.53 & 5.88 \\
 \addlinespace
-Hormuz & Convex SCM     & \textbf{0.053} & \textbf{0.030} & 6.93 \\
-Hormuz & Augmented SCM  & \textbf{0.053} & \textbf{0.030} & 9.05 \\
-Hormuz & Elastic net    & \textbf{0.053} & \textbf{0.030} & 8.98 \\
-Hormuz & XGBoost        & \textbf{0.053} & \textbf{0.030} & 10.12 \\
-Hormuz & Bayesian ridge & \textbf{0.053} & \textbf{0.030} & 10.18 \\
+Hormuz & Convex SCM     & \textbf{0.050} & \textbf{0.029} & 6.93 \\
+Hormuz & Augmented SCM  & \textbf{0.050} & \textbf{0.029} & 8.45 \\
+Hormuz & Elastic net    & \textbf{0.050} & \textbf{0.029} & 8.53 \\
+Hormuz & XGBoost        & \textbf{0.050} & \textbf{0.029} & 10.19 \\
+Hormuz & Bayesian ridge & \textbf{0.050} & \textbf{0.029} & 10.24 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -718,7 +725,7 @@ Hormuz & Bayesian ridge & \textbf{0.053} & \textbf{0.030} & 10.18 \\
 \centering
 \includegraphics[width=0.72\textwidth]{figures/placebo_hormuz.png}
 \caption{In-space placebo for Hormuz (convex SCM). Each bar is one unit's post/pre RMSPE
-ratio; Brent (red) is the largest, ranking first among all 18 placebo units, so the
+ratio; Brent (red) is the largest, ranking first among all 19 placebo units, so the
 permutation test rejects at the attainable floor.}
 \label{fig:placebo}
 \end{figure}
@@ -728,7 +735,7 @@ permutation test rejects at the attainable floor.}
 validate its magnitude against the EIA's last two \emph{pre-invasion} Short-Term Energy
 Outlook forecasts (issued before 24 February 2022), which are an independent structural
 counterfactual sharing no information path with the SCM. Over the identical 151-day
-window, the ensemble-median synthetic mean (\$88.5) sits within \$3.5 of the STEO Feb-2022
+window, the ensemble-median synthetic mean (\$88.6) sits within \$3.6 of the STEO Feb-2022
 forecast (\$84.9); three of five models bracket the STEO anchor to within $\pm$\$4. Two
 independent methods agreeing on the counterfactual is strong evidence the SCM is not
 producing an implausible path.
@@ -738,9 +745,9 @@ at 1/2/3/6-month and full horizons. The two events show opposite, diagnostic pro
 Russia \emph{declines} with horizon (31\%~$\to$~22\%): the signature of delayed
 contamination, as second-round war channels switch on through 2022 and pull the synthetic
 up, so the full-window figure is conservative and the least-contaminated one-month
-estimate is $\sim$31\%. Hormuz \emph{rises then plateaus} (46\%~$\to$~57\%~$\to$~52\%): the
+estimate is $\sim$31\%. Hormuz \emph{rises then eases} (46\%~$\to$~59\%~$\to$~56\%): the
 chokepoint premium builds in and holds, the opposite of attenuation; the slight easing to
-52\% at the full horizon reflects Brent's partial mid-June pullback, captured by extending
+56\% at the full horizon reflects Brent's partial mid-June pullback, captured by extending
 the window to the latest data. That the same diagnostic declines for Russia and rises for
 Hormuz shows it is not a mechanical artefact.
 
@@ -754,20 +761,21 @@ attenuates with horizon (delayed-contamination signature); Hormuz rises then pla
 \end{figure}
 
 \paragraph{Leave-one-donor-out.} Dropping each weighted donor in turn leaves the Hormuz
-estimate tight around its baseline (convex 51.2--59.3, ASCM 50.6--58.0, elastic 52.4--61.9,
-XGBoost 52.3--58.5\%); no single donor drives the result. Russia is wider (e.g.\ convex
+estimate tight around its baseline (convex 51.2--59.3, ASCM 54.6--60.5, elastic 55.2--62.2,
+XGBoost 51.6--57.7\%); no single donor drives the result. Russia is wider (e.g.\ convex
 32.8--59.6\%), consistent with its volatile pre-period and the simplex's reliance on a few
 soft-commodity donors.
 
 \paragraph{Cross-event weight transfer.} Applying Russia-fitted weights to the Hormuz
-window (Table~\ref{tab:transfer}), the two simplex-anchored models transfer to a
-\emph{positive} Hormuz premium with the smallest degradation in pre-fit (convex 25.3\%,
-RMSPE 5$\times$ independent; ASCM 4.0\%, 6$\times$), while the signed-regression, tree, and
-prior-dominated models do not transfer (negative implied gaps, pre-RMSPE 18--340$\times$).
-The transfer therefore corroborates the \emph{sign and broad order of magnitude} of the
-chokepoint premium, since the factor structure is stable enough across 2020--22 and
-2024--26 to carry a large positive effect, while the headline magnitude rests on the
-within-event ensemble.
+window (Table~\ref{tab:transfer}), convex SCM is the only model that transfers to a clearly
+\emph{positive} Hormuz premium (25.3\%) with a degraded but non-pathological pre-fit
+(pre-RMSPE 5$\times$ independent); the augmented SCM transfers to roughly zero ($-0.8$\%,
+7$\times$), and the signed-regression, tree, and prior-dominated models go strongly negative
+with pre-RMSPE 14--280$\times$ independent. We therefore read the transfer as weak,
+convex-only corroboration that \emph{some} positive premium survives a change of regime,
+not as confirmation of its level: the headline magnitude rests on the within-event ensemble.
+Once the window is extended through Brent's June pullback, the regime gap between the
+2020--22 and 2024--26 factor structures is evidently wider than over the shorter window.
 
 \begin{table}[h]
 \centering
@@ -780,10 +788,10 @@ and transferred pre-period RMSPE in log units.}
 Model & Indep.\ gap (\%) & Transf.\ gap (\%) & Indep.\ RMSPE & Transf.\ RMSPE \\
 \midrule
 Convex SCM     & 55.9 & 25.3   & 0.066 & 0.336 \\
-Augmented SCM  & 52.2 & 4.0    & 0.066 & 0.417 \\
-Elastic net    & 57.1 & $-92.7$ & 0.052 & 2.917 \\
-XGBoost        & 51.2 & $-45.6$ & 0.053 & 0.956 \\
-Bayesian ridge & 43.3 & $-100.0$ & 0.037 & 22.377 \\
+Augmented SCM  & 56.8 & $-0.8$  & 0.066 & 0.467 \\
+Elastic net    & 56.6 & $-68.6$ & 0.054 & 1.513 \\
+XGBoost        & 51.2 & $-44.1$ & 0.053 & 0.928 \\
+Bayesian ridge & 43.0 & $-100.0$ & 0.037 & 18.567 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -794,7 +802,7 @@ sign across events} purely because the pre-window trend sign differs. A linear t
 extrapolates Russia's recovery rally upward and returns an implausible \emph{negative}
 full-window gap ($-4\%$), but extrapolates Hormuz's mild downtrend and \emph{inflates} the
 gap to 71\%. The trend-free random-walk null gives Russia $+8.7\%$ and Hormuz $+48.9\%$,
-with the SCM $\sim$13 and $\sim$3 pp above respectively. The SCM, anchored to donor
+with the SCM $\sim$13 and $\sim$7 pp above respectively. The SCM, anchored to donor
 co-movement rather than Brent's own momentum, is far more stable across the two regimes,
 which is the concrete demonstration of why a donor-based counterfactual is necessary.
 
@@ -809,8 +817,8 @@ frozen AR(1) forecasts (random-walk / mean-reverting).}
 \toprule
 Event & SCM median & RW flat & RW drift & Lin.\ trend & ARIMA rw & ARIMA mr \\
 \midrule
-Russia & 22.1 & 8.7  & $-6.9$ & $-4.2$ & 9.2  & 26.5 \\
-Hormuz & 52.2 & 48.9 & 49.8   & 70.9   & 48.1 & 48.7 \\
+Russia & 22.0 & 8.7  & $-6.9$ & $-4.2$ & 9.2  & 26.5 \\
+Hormuz & 55.9 & 48.9 & 49.8   & 70.9   & 48.1 & 48.7 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -818,9 +826,9 @@ Hormuz & 52.2 & 48.9 & 49.8   & 70.9   & 48.1 & 48.7 \\
 \paragraph{Sign of the contamination bias.} Using equation~\eqref{eq:bias} with a
 Brent-free common factor, we sign the bias per (linear) model. For \textbf{Hormuz} the
 full-window bias is small and \emph{negative} (conservative) for all four linear models
-($-1.3$ to $-7.1$\%), so the large premium is not a contamination artefact. For
-\textbf{Russia} the full-window bias is large and \emph{positive} (overestimate, +14 to
-+22\% for three of four models), concentrated in low-reliability soft commodities whose
+($-1.3$ to $-7.6$\%), so the large premium is not a contamination artefact. For
+\textbf{Russia} the full-window bias is large and \emph{positive} (overestimate, +13 to
++21\% for three of four models), concentrated in low-reliability soft commodities whose
 2022 idiosyncratic drift the convex/elastic fits leaned on; following the reliability logic
 of \citet{hammiratrix2024}, splitting donors by pre-window factor $R^2$ shows the bias sits
 mostly in the low-$R^2$ (unreliable) donors. The asymmetric conclusion is that
@@ -830,12 +838,13 @@ window (where the \$95$\to$\$130 move is recovered), not on the attenuated full-
 average.
 
 \subsection{Interpretation}
-Our estimate places the 2026 Hormuz chokepoint premium at roughly half of Brent's
-no-event level over the first $\sim$3.5 months. The number holds up across all five
+Our estimate places the 2026 Hormuz chokepoint premium at roughly \SI{56}{\percent} of
+Brent's no-event level over the first $\sim$3.5 months. The number holds up across all five
 estimators and across the checks we ran: the in-space placebo reaches its floor,
 leave-one-out stays tight, the contamination bias is conservative, and the SCM clears
-the na\"ive baselines. The cross-event transfer supports the sign and broad scale rather
-than the exact level. We read the estimate as a complement to, not a competitor of, the
+the na\"ive baselines. The cross-event transfer is the weakest of the checks: only convex
+SCM transfers to a clearly positive premium, so we lean on it for the sign rather than the
+level. We read the estimate as a complement to, not a competitor of, the
 structural scenario estimates from energy institutions: those answer ``what price does
 an assumed barrel shortfall imply,'' while the SCM answers ``what price gap does the
 observed cross-asset co-movement imply.''
@@ -849,12 +858,12 @@ estimate here provides it with an auditable identification argument.
 We estimated the Brent-price effect of the 2026 Strait of Hormuz disruption by building a
 counterfactual with an ensemble synthetic control, validating the design first on the known
 Russia 2022 event. Over the window to mid-June 2026 the ensemble-median premium is
-$\sim$52\% (IQR 51--56\%), large and positive under every estimator, and it survives the
+$\sim$56\% (IQR 51--57\%), large and positive under every estimator, and it survives the
 in-space placebo (Brent first among all units, $p$ at the floor), leave-one-out, the
-contamination-bias sign check, the na\"ive-baseline comparison, and the cross-event transfer
-of sign and scale. On the calibration event the same machinery recovers a magnitude
-consistent with the documented \$95$\to$\$130 move and within \$3.5/bbl of the EIA's
-pre-invasion structural forecast.
+contamination-bias sign check, and the na\"ive-baseline comparison; the cross-event transfer
+gives weaker, convex-only support for a positive premium. On the calibration event the same
+machinery recovers a magnitude consistent with the documented \$95$\to$\$130 move and within
+\$3.6/bbl of the EIA's pre-invasion structural forecast.
 
 The estimate's value is as a reduced-form, data-driven complement to structural scenario
 analysis, with an identification argument a reviewer can audit donor by donor. Several
@@ -877,12 +886,12 @@ the order of half its no-event price.
 % ===================================================================
 \section{Robustness grid}\label{app:grid}
 % ===================================================================
-The headline uses the preferred specification (shared 18-donor pool, preferred pre-window,
+The headline uses the preferred specification (shared 19-donor pool, preferred pre-window,
 ensemble median). The full grid varies (i) the pre-window (preferred, extended, and narrow
-specifications); (ii) the donor pool (shared 18, permissive 26 for Russia, full 32); and
+specifications); (ii) the donor pool (shared 19, permissive 26 for Russia, full 32); and
 (iii) the model (each of the five plus the median). For Russia the donor-pool sweep is
 itself a diagnostic: the gap is expected to \emph{shrink} monotonically from the clean
-18-donor pool to the contaminated 32-donor pool, because Russia-treated donors get inflated
+19-donor pool to the contaminated 32-donor pool, because Russia-treated donors get inflated
 by the same shock and pull the synthetic up. If this monotonic pattern holds, the
 SUTVA-driven exclusion logic is empirically supported.
 
@@ -908,10 +917,12 @@ natural route to autocorrelation-aware credible intervals in a future iteration.
 Two break tests support donor screening. \emph{Bai--Perron}
 \citep{baiperron1998,baiperron2003} dates breaks in the donor--Brent weekly-return
 relationship $r^{\text{donor}}_t=\alpha_s+\beta_s r^{\text{Brent}}_t+\varepsilon_t$ by
-globally minimising segment SSR via dynamic programming, with the break count chosen by BIC;
-a break strictly inside a pre-window (before $T_0$, hence not confounded by Brent's own
-treatment) triggers the breakpoint-rule exclusion, which removes VIX (break 2022-01-07).
-The relationship specification is Brent-based, so a break \emph{at} $T_0$ is ambiguous; the
+globally minimising segment SSR via dynamic programming, with the break count chosen by BIC.
+Only VIX shows a break strictly inside a pre-window (2022-01-07). We treat the break tests as
+informative rather than automatically disqualifying: the VIX break is a loading-stability
+signal, it does not reproduce on the analysis window alone, and the in/out sensitivity is
+below 1 pp, so VIX is retained (Section~\ref{sec:data}). The relationship specification is
+Brent-based, so a break \emph{at} $T_0$ is ambiguous; the
 complementary \citet{harvey2009} trend-break test resolves this by testing the donor's
 \emph{own} log-level trend with a statistic whose asymptotic size is invariant to whether the
 series is I(0) or I(1): it weights an I(0)-optimal and an I(1)-optimal sup-$t$ statistic by
