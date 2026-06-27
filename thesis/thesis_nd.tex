@@ -587,16 +587,30 @@ Empirically, for Hormuz 31 of 32 donors agree between audit and tests (only Cott
 differs); for Russia the tests confirm the broad picture and add one flag (CNY)
 attributable to concurrent China dynamics rather than the war.
 
-The third level concerns \emph{inference}. We run the in-space placebo, refitting each donor as a placebo treated unit and ranking
-Brent's post/pre RMSPE ratio against the resulting distribution \citep{abadie2010} and
-reading the permutation $p$-value with the symmetry caveat of \citet{hahnshi2017}. We add
-the in-time placebo at a fake $T_0$ six months early, formalised as the mixed placebo test
-of \citet{chenyan2023}, and a leave-one-donor-out check. Separately, as an exploratory
-probe of regime stability rather than a validation test, we apply the weights fitted on
-one event to the other event's window and read how far the pre-period fit degrades. We
-report this transfer in Section~\ref{sec:results} for what it reveals about how regime-bound
-the factor structure is, not as evidence for the headline magnitude, which rests entirely
-on the separately fitted within-event ensemble.
+
+The third level concerns \emph{inference}. We run the in-space placebo, refitting each
+donor as a placebo treated unit and ranking Brent's post/pre RMSPE ratio against the
+resulting distribution \citep{abadie2010}, reading the permutation $p$-value with the
+symmetry caveat of \citet{hahnshi2017}. We add the in-time placebo at a fake $T_0$ six
+months early, formalised as the mixed placebo test of \citet{chenyan2023}, and a
+leave-one-donor-out check. Two further benchmarks sit alongside the formal tests: a
+deliberately contaminated set of na\"ive univariate counterfactuals (random walk, drift,
+linear trend, and an AIC-selected ARIMA that reduces to a driftless random walk in both
+events) as a floor, and the signed contamination-bias diagnostic of
+equation~\eqref{eq:bias}. Following \citet{roth2022,rambachanroth2023}, we report and
+interpret pre-period diagnostics rather than turning them into pass/fail thresholds, and
+we do not auto-exclude flagged models, because the cross-model IQR is itself the
+model-uncertainty band. Finally, where a model's pre-period gap series is not flat, we
+report a drift-adjusted gap alongside the raw one. We fit an ordinary least-squares trend
+to the pre-period gap, read off its slope $\hat\beta$ in percent per year, and subtract
+the portion that this pre-existing drift would contribute over the post-window on its
+own, namely $\hat\beta L$ percentage points for a post-window of length $L$ years. The
+adjustment isolates the part of the post-window gap that does not simply continue a
+pre-event trend. For both events it is small, moving the ensemble-median headline by
+about a percentage point, so the raw and adjusted figures tell the same story and we
+report both for transparency.
+
+
 
 % ===================================================================
 \section{Results}\label{sec:results}
@@ -649,8 +663,9 @@ implied counterfactual near \$68.6. The Hormuz band is far tighter than Russia's
 
 \begin{table}[h]
 \centering
-\caption{Headline post-event gaps (\%). Drift-adjusted $=$ raw $-$ drift contribution.
-Ensemble $=$ cross-model median, band $=$ IQR (Q25--Q75).}
+\caption{Headline post-event gaps (\%). Drift-adjusted $=$ raw gap minus the pre-period
+gap trend extrapolated over the post-window (see Section~\ref{sec:methods}). Ensemble $=$
+cross-model median, band $=$ IQR (Q25--Q75).}
 \label{tab:headline}
 \small
 \begin{tabular}{@{}lrr@{\hskip 1.6em}rr@{}}
