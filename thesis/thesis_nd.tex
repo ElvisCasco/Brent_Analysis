@@ -32,11 +32,15 @@
 \newcommand{\T}{\ensuremath{T_0}}
 
 \title{\textbf{Pricing a Chokepoint:\\ A Synthetic-Control Estimate of the Brent Crude Premium\\ from the 2026 Strait of Hormuz Disruption}}
-\author{Master Project, Data Science for Decision Making\\ Barcelona School of Economics}
+\author{Cherryl Chico, Elvis Casco, Nikoloz Darsalia\\[0.5em]
+Master Thesis, Data Science for Decision Making\\ Barcelona School of Economics}
 \date{June 2026}
 
 \begin{document}
+  % front matter (title, abstract, ToC) in roman numerals
+\pagenumbering{roman}
 \maketitle
+\thispagestyle{empty}
 
 \begin{abstract}
 \noindent Roughly a fifth of the world's seaborne crude passes through the Strait of
@@ -54,25 +58,55 @@ produced by energy institutions, and discuss its use as an input to strategic-re
 monetary, and fiscal decisions.
 \end{abstract}
 
-\tableofcontents
 \newpage
+\pagenumbering{roman} 
+\tableofcontents
+\clearpage
+\pagenumbering{arabic}   % body restarts at page 1 from the Introduction
 \input{sections/introduction}
+\newpage
 \input{sections/related_literature}
+\newpage
 \input{sections/conceptual_framework}
+\newpage
 \input{sections/data_and_methodology}
+\newpage
 \input{sections/donor_audit}
+\newpage
 \input{sections/results}
+\newpage
 \input{sections/conclusion}
-
+\newpage
 \bibliography{references}
 
 \clearpage
 \appendix
 \renewcommand{\thesection}{A.\arabic{section}}
+
+% ===== Appendices divider page (carries its own contents list) =====
+\thispagestyle{empty}
+\addcontentsline{toc}{section}{Appendices}
+% Hide the individual appendices from the main ToC. tocdepth is read while the ToC is
+% rendered, so we inject the change into the .toc stream right after the Appendices line.
+\addtocontents{toc}{\protect\setcounter{tocdepth}{0}}
+\vspace*{2cm}
+\begin{center}
+  {\Huge\bfseries Appendices}\par\medskip
+  \rule{0.35\textwidth}{0.4pt}
+\end{center}
+\vspace{1.6cm}
+\begin{center}
+\begin{minipage}{0.82\textwidth}\large
+\ref{app:ensemble}\quad\nameref{app:ensemble}\dotfill\pageref{app:ensemble}\par\medskip
+\ref{app:breaks}\quad\nameref{app:breaks}\dotfill\pageref{app:breaks}\par\medskip
+\ref{app:donoraudit}\quad\nameref{app:donoraudit}\dotfill\pageref{app:donoraudit}\par\medskip
+\ref{app:donorweights}\quad\nameref{app:donorweights}\dotfill\pageref{app:donorweights}
+\end{minipage}
+\end{center}
+\clearpage
+
 \input{sections/methodology}
-\input{sections/robustness_grid}
-\input{sections/bayesian_ridge_bsts}
-\input{sections/structural_break_tests}
+\input{sections/donor_battery_tests}
 \input{sections/donor_audit_catalog}
 \input{sections/donor_contribution_metrics}
 

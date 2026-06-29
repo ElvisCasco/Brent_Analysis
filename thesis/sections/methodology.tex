@@ -1,6 +1,21 @@
 
 % ===================================================================
-\section{What each estimator fits}\label{app:formulas}
+\section{Ensemble models}\label{app:ensemble}
+% ===================================================================
+The ensemble maps the donor pool to a synthetic Brent series through five estimators, each
+with a different inductive bias. Where the data underdetermine the counterfactual the five
+disagree in structured ways rather than failing in the same direction, and we read that spread
+as model uncertainty. The convex and elastic-net members are sparse and stay inside or close to
+the donor envelope, the augmented member adds a ridge layer that permits limited extrapolation,
+gradient boosting captures nonlinear interactions but cannot extrapolate past any donor's
+training range, and the Bayesian ridge retains every donor under smooth shrinkage. We fit each
+member on its own, combine them by the cross-sectional median, and report the per-model gaps in
+the body. This appendix gives the estimator definitions, the hyperparameter search and selected
+settings, the robustness grid that varies the main modelling choices, and a note on the Bayesian
+member and its relation to the full BSTS model.
+
+% ===================================================================
+\subsection{The five estimators}\label{app:formulas}
 % ===================================================================
 
 \paragraph{Convex SCM \citep{abadie2010}.} A simplex-constrained weighted average of donors,
@@ -64,10 +79,10 @@ posterior standard deviation. The Gaussian prior shrinks coefficients smoothly t
 never sets any to exactly zero, so --- unlike the convex and elastic-net members --- it performs
 no selection and retains every donor. This implements only the regression-on-donors term of the
 BSTS model of \citet{brodersen2015}; the trend, seasonal, and spike-and-slab components it omits,
-and why the proxy is adequate at this sample size, are discussed in the body.
+and why the proxy is adequate at this sample size, are discussed in Appendix~\ref{app:bsts}.
 
 % ===================================================================
-\section{Hyperparameter grids and selected configurations}\label{app:grids}
+\subsection{Hyperparameter grids and selected configurations}\label{app:grids}
 % ===================================================================
 Hyperparameters are chosen by the pooled validation RMSE of the expanding-window walk-forward
 cross-validation described in the body (each event tuned on its own pre-window), with the final
@@ -108,3 +123,31 @@ $\alpha=0.01,\;\rho=0.2$; XGBoost depth~3, learning rate~$0.1$, $\lambda_{\text{
 genuinely different regularisation strengths, as expected: Russia's larger convex residual asks
 the ASCM ridge layer for more freedom (small $\lambda$), while Hormuz's tighter convex fit
 tolerates heavy shrinkage. These are the settings behind the per-model gaps reported in the body.
+
+% ===================================================================
+\subsection{Robustness grid}\label{app:grid}
+% ===================================================================
+The headline uses the preferred specification (shared 19-donor pool, preferred pre-window,
+ensemble median). The full grid varies (i) the pre-window (preferred, extended, and narrow
+specifications); (ii) the donor pool (shared 19, permissive 26 for Russia, full 32); and
+(iii) the model (each of the five plus the median). For Russia the donor-pool sweep is
+itself a diagnostic: the gap is expected to \emph{shrink} monotonically from the clean
+19-donor pool to the contaminated 32-donor pool, because Russia-treated donors get inflated
+by the same shock and pull the synthetic up. If this monotonic pattern holds, the
+SUTVA-driven exclusion logic is empirically supported.
+
+% ===================================================================
+\subsection{Bayesian ridge and the full BSTS model}\label{app:bsts}
+% ===================================================================
+The fifth ensemble member implements only the regression-on-donors term $\beta'x_t$ of the
+Bayesian structural time-series model of \citet{brodersen2015}, with a conjugate
+Gaussian--Gamma prior. It omits the local-linear \emph{trend}, the \emph{seasonal}
+component, the \emph{spike-and-slab} donor selection, and the autocorrelation-aware
+posterior over the full state trajectory. At our sample size, with no strong weekly
+seasonality in daily oil prices, the regression term carries most of the signal, so the
+proxy is an adequate Bayesian-flavoured diversifier; but its credible intervals are Gaussian
+and ignore autocorrelation, and its donor ``importances'' are standardised-coefficient
+magnitudes, not true posterior inclusion probabilities. We therefore call it a Bayesian
+ridge regression rather than a BSTS, and read its placebo $p$-values as rank statistics
+rather than formal probabilities (Table~\ref{tab:placebo}). A full BSTS implementation is the
+natural route to autocorrelation-aware credible intervals in a future iteration.
