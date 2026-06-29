@@ -1,0 +1,31 @@
+% Donor selection funnel (Section Donor Selection).
+% Requires in the preamble: \usepackage{tikz}  \usetikzlibrary{arrows.meta}
+\begin{tikzpicture}[font=\footnotesize,>=Latex,
+   num/.style={anchor=west,inner sep=0pt},
+   lbl/.style={anchor=west,align=left,inner sep=1pt},
+   drp/.style={anchor=west,align=left,inner sep=1pt,text=red!55!black,text width=4.8cm}]
+  % funnel: top width 6 (x 0..6), bottom width 3 (x 1.5..4.5), height 6, 4 bands of 1.5
+  \fill[blue!12] (0,6) -- (6,6) -- (4.5,0) -- (1.5,0) -- cycle;
+  \draw[line width=1pt] (0,6) -- (6,6) -- (4.5,0) -- (1.5,0) -- cycle;
+  % band dividers, half-width hw(y)=1.5+0.25y
+  \draw (0.375,4.5) -- (5.625,4.5);
+  \draw (0.75,3.0)  -- (5.25,3.0);
+  \draw (1.125,1.5) -- (4.875,1.5);
+
+  % band centres y = 5.25, 3.75, 2.25, 0.75
+  \node[align=center,font=\bfseries] at (3,5.25) {Global Categories};
+  \node[num,font=\fontsize{15}{15}\bfseries] at (1.55,3.75) {32};
+  \node[lbl,text width=2.4cm] at (2.5,3.75) {candidate series spanning five factors};
+  \node[num,font=\fontsize{15}{15}\bfseries] at (1.65,2.25) {26};
+  \node[lbl,text width=2.1cm] at (2.6,2.25) {after direct exposures removed};
+  \node[num,font=\fontsize{15}{15}\bfseries] at (1.8,0.75) {19};
+  \node[lbl,text width=1.9cm] at (2.75,0.75) {shared clean pool, valid for both events};
+
+  % exclusion steps, beside the band each one arrives at
+  \node[drp] at (6.3,3.75) {{\bfseries exclude by construction}\\
+     energy complex, petrocurrencies, unstable FX, energy-heavy indices, thin or redundant series};
+  \node[drp] at (6.3,2.25) {{\bfseries exclude direct exposure}\\
+     Wheat, Corn, Palladium, EUR, DXY, BTC};
+  \node[drp] at (6.3,0.75) {{\bfseries keep valid for both events}\\
+     Copper, IronOre, Soybeans, EM equities, GBP, US10Y, Cotton};
+\end{tikzpicture}

@@ -238,6 +238,11 @@ def fig_donor_roles():
     plt.close(fig)
 
 
+# Note: the donor selection funnel (Section Donor Selection) is drawn directly in TikZ,
+# see thesis/figures/donor_waterfall.tex. It is a schematic with no data input, so it
+# lives in the LaTeX source rather than here.
+
+
 if __name__ == '__main__':
     fig_timeline()
     fig_paths()
