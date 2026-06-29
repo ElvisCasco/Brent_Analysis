@@ -64,7 +64,10 @@ monetary, and fiscal decisions.
 
 \bibliography{references}
 
+\clearpage
 \appendix
+\renewcommand{\thesection}{A.\arabic{section}}
+\input{sections/methodology}
 \input{sections/robustness_grid}
 \input{sections/bayesian_ridge_bsts}
 \input{sections/structural_break_tests}

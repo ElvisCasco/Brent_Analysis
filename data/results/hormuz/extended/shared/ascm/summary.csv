@@ -2,10 +2,10 @@ event,hormuz
 window,extended
 variant,shared
 model,ascm
-rmspe_pre_log,0.07006460766438229
-rmspe_pre_pct,7.257747574129159
+rmspe_pre_log,0.07006460772807971
+rmspe_pre_pct,7.257747580961205
 t0,2026-02-28 00:00:00
 t_pre_start,2023-12-01 00:00:00
 n_pre,567
-n_post,61
+n_post,77
 n_donors_active,19

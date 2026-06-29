@@ -2,10 +2,10 @@ event,hormuz
 window,extended
 variant,shared
 model,elastic_net
-rmspe_pre_log,0.048046640463684155
+rmspe_pre_log,0.04804664046368418
 rmspe_pre_pct,4.921959027148404
 t0,2026-02-28 00:00:00
 t_pre_start,2023-12-01 00:00:00
 n_pre,567
-n_post,61
+n_post,77
 n_donors_active,8

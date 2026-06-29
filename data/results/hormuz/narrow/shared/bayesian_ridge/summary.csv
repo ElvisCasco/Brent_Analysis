@@ -2,10 +2,10 @@ event,hormuz
 window,narrow
 variant,shared
 model,bayesian_ridge
-rmspe_pre_log,0.03573173945675354
+rmspe_pre_log,0.03573173945675355
 rmspe_pre_pct,3.6377789927854343
 t0,2026-02-28 00:00:00
 t_pre_start,2025-01-01 00:00:00
 n_pre,294
-n_post,61
+n_post,77
 n_donors_active,19

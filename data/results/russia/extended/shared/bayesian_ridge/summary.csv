@@ -2,8 +2,8 @@ event,russia
 window,extended
 variant,shared
 model,bayesian_ridge
-rmspe_pre_log,0.09345308327457724
-rmspe_pre_pct,9.795908948775157
+rmspe_pre_log,0.09345308327457684
+rmspe_pre_pct,9.79590894877511
 t0,2022-02-24 00:00:00
 t_pre_start,2020-01-01 00:00:00
 n_pre,546

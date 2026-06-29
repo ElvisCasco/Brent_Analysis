@@ -19,14 +19,14 @@
 17,russia,bayesian_ridge,1m,0.04376499831683882,4.473681112889971,overestimate
 18,russia,bayesian_ridge,3m,0.013887724716074148,1.3984607137577543,overestimate
 19,russia,bayesian_ridge,full,-0.07417690698029669,-7.149258013272252,underestimate (conservative)
-20,hormuz,convex_scm,1w,0.00931334778489862,0.9356851960000023,overestimate
-21,hormuz,convex_scm,1m,-0.015480212164179124,-1.5361009566352113,underestimate (conservative)
-22,hormuz,convex_scm,3m,-0.012885618821744943,-1.280295467602821,underestimate (conservative)
-23,hormuz,convex_scm,full,-0.012885618821744943,-1.280295467602821,underestimate (conservative)
-24,hormuz,ascm,1w,0.008181137518072446,0.8214694472547412,overestimate
-25,hormuz,ascm,1m,-0.01600165640458703,-1.5874310056371965,underestimate (conservative)
-26,hormuz,ascm,3m,-0.021317201949244344,-2.109159633697244,underestimate (conservative)
-27,hormuz,ascm,full,-0.021317201949244344,-2.109159633697244,underestimate (conservative)
+20,hormuz,convex_scm,1w,0.009313328654750288,0.9356832650853963,overestimate
+21,hormuz,convex_scm,1m,-0.015480249730569134,-1.536104655568371,underestimate (conservative)
+22,hormuz,convex_scm,3m,-0.012885668102798849,-1.2803003326137818,underestimate (conservative)
+23,hormuz,convex_scm,full,-0.012885668102798849,-1.2803003326137818,underestimate (conservative)
+24,hormuz,ascm,1w,0.008181106339090262,0.8214663037440006,overestimate
+25,hormuz,ascm,1m,-0.016001716783112917,-1.5874369476428618,underestimate (conservative)
+26,hormuz,ascm,3m,-0.02131727476637665,-2.1091667618272636,underestimate (conservative)
+27,hormuz,ascm,full,-0.02131727476637665,-2.1091667618272636,underestimate (conservative)
 28,hormuz,elastic_net,1w,-0.0016304492299258444,-0.16291207696739196,underestimate (conservative)
 29,hormuz,elastic_net,1m,-0.009769600698044983,-0.9722033180394551,underestimate (conservative)
 30,hormuz,elastic_net,3m,-0.02425112428902303,-2.39594285154614,underestimate (conservative)

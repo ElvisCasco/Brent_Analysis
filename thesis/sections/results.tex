@@ -7,16 +7,16 @@ events' pre-periods. For Hormuz, whose pre-period is calm, four of five models c
 heuristic overfit flag and the fifth sits only just past it. For Russia, whose pre-period
 spans the volatile 2020--22 recovery, more models trip the flag, because a noisy
 pre-period inflates validation error. The flags do not exclude any model. They mark which
-synthetics to read with more caution, and the most flagged model is also the one whose
-headline gap is the ensemble outlier, so the flag and the outlier tell a consistent story.
+synthetics to read with more caution, and the headline outlier in each event
+is among the flagged models, so the flags and the outlier tell a consistent story.
 
 \begin{table}[h]
 \centering
-\caption{Walk-forward cross-validation (5 expanding folds, 20-day horizons).}
+\caption{Walk-forward cross-validation (5 expanding folds, 20-day horizons). A
+validation/training RMSE ratio above 2 is a heuristic overfit flag, not an exclusion rule.}
 \label{tab:wfcv}
-\begin{threeparttable}
 \small
-\begin{tabular}{@{}llrrl@{}}
+\begin{tabular}{@{}llrl@{}}
 \toprule
 Event & Model & val/train RMSE & Flag \\
 \midrule
@@ -33,11 +33,6 @@ Hormuz & XGBoost        & 1.84 & OK \\
 Hormuz & Bayesian ridge & 2.28 & overfit \\
 \bottomrule
 \end{tabular}
-\begin{tablenotes}[flushleft]
-\footnotesize
-\item \textit{Notes.} A validation/training RMSE ratio above 2 is a heuristic overfit flag, not an exclusion rule.
-\end{tablenotes}
-\end{threeparttable}
 \end{table}
 
 \subsection{Headline estimates}
@@ -54,9 +49,10 @@ implied counterfactual near \$68.6. The Hormuz band is far tighter than Russia's
 
 \begin{table}[h]
 \centering
-\caption{Headline post-event gaps (\%).}
+\caption{Headline post-event gaps (\%). Drift-adjusted $=$ raw gap minus the pre-period
+gap trend extrapolated over the post-window (see Section~\ref{sec:methods}). Ensemble $=$
+cross-model median, band $=$ IQR (Q25--Q75).}
 \label{tab:headline}
-\begin{threeparttable}
 \small
 \begin{tabular}{@{}lrr@{\hskip 1.6em}rr@{}}
 \toprule
@@ -74,26 +70,16 @@ Bayesian ridge & $-9.0$ & $-9.1$ & 43.0 & 43.0 \\
 \textbf{IQR} & \textbf{[10.9, 30.8]} & n/a & \textbf{[51.2, 56.6]} & n/a \\
 \bottomrule
 \end{tabular}
-\begin{tablenotes}[flushleft]
-\footnotesize
-\item \textit{Notes.} Drift-adjusted $=$ raw gap minus the pre-period gap trend extrapolated over the post-window (Section~\ref{sec:methods}). Ensemble $=$ cross-model median; band $=$ IQR (Q25--Q75).
-\end{tablenotes}
-\end{threeparttable}
 \end{table}
 
 \begin{figure}[h]
 \centering
-\caption{Observed Brent versus the synthetic counterfactual.}
-\label{fig:paths}
 \includegraphics[width=\textwidth]{figures/counterfactual_paths.png}
-
-\smallskip
-\begin{minipage}{\textwidth}
-\footnotesize \textit{Notes.} Observed Brent is black. The thick blue line is the
-ensemble-median synthetic, the thin grey lines are the five individual models, and the
+\caption{Observed Brent (black) vs.\ the synthetic counterfactual. The thick blue line
+is the ensemble-median synthetic, thin grey lines are the five individual models, and the
 shaded region after $T_0$ (dashed red) is the estimated premium. The synthetics track
-Brent closely before the event and decouple sharply afterward.
-\end{minipage}
+Brent closely before the event and decouple sharply afterward.}
+\label{fig:paths}
 \end{figure}
 
 \paragraph{Economic reading of the model spread.} The cross-model dispersion has an
@@ -105,7 +91,7 @@ unconstrained Gaussian coefficients, loads heavily and with large opposing signs
 currencies. For Russia those currencies moved with the simultaneous and historically
 large Fed tightening cycle, a macro factor that has nothing to do with the invasion. That
 confound is why the Bayesian ridge becomes the Russia outlier, with a negative full-window
-gap, and why it carries the highest walk-forward flag. It is the expected behaviour of an
+gap, and why it carries a high walk-forward flag. It is the expected behaviour of an
 unregularised linear model in a pre-period that contains a strong non-event driver, and it
 is the reason the ensemble uses the median rather than the mean. For Hormuz, whose calmer
 pre-period has no analogous confound, the five models agree to within about 5 points.
