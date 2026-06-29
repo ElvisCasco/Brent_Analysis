@@ -8,137 +8,19 @@ themes recur and both follow from the factor model of Section~\ref{sec:theory}. 
 selection is an identification choice rather than a fit-maximising one, and the length
 of the estimation window is itself a SUTVA consideration, not merely a sample-size one.
 We describe here \emph{what} the pool and the methods are and \emph{why} they were
-chosen; the donor-by-donor audit that adjudicates which candidates survive is deferred
-to Section~\ref{sec:donoraudit}.
+chosen; 
 
-\subsection{Target and sources}
-The target is the daily \emph{Europe Brent Spot Price FOB} (EIA series RBRTEd), in
-USD per barrel, downloaded directly from the U.S.\ Energy Information Administration
-\citep{eia_brent}. The donor candidates are 32 macro-financial series from Yahoo
-Finance, and they are not an arbitrary collection: they are chosen to span the
-asset classes through which the common factors of equation~\eqref{eq:factor} move Brent.
-The 32 fall into seven broad categories---metals (6: copper, iron ore, silver, platinum,
-palladium, gold), agriculturals (7: soybeans, wheat, corn, coffee, sugar, cotton, live
-cattle), equities (3: S\&P~500, Nikkei~225, EM equities), foreign exchange (11: AUD, JPY,
-CHF, CNY, INR, KRW, ZAR, MXN, EUR, GBP, and the dollar basket DXY), rates and credit
-(3: the US 10-year yield, long Treasuries TLT, high-yield credit HYG), volatility (1: the
-VIX), and crypto (1: Bitcoin). Metals and equities proxy the global industrial cycle, FX
-the dollar and terms-of-trade channels, rates and credit the real-rate and risk-premium
-factors, and volatility the risk-appetite factor, so the candidate set covers all five
-drivers before any audit narrows it. The panel is updated incrementally so it keeps pace
-with new data. Table~\ref{tab:sources} summarises the sources. All are public and
-redistributable, and the panel is rebuilt from source on each run so the analysis is
-reproducible against the latest available data (here, through 22~June~2026 for Brent,
-the binding constraint given the EIA's roughly one-week publication lag, and
-26~June~2026 for the donors).
+\subsection{Target and Events}
+The target is the daily Europe Brent Spot Price FOB (EIA series RBRTEd), quoted in USD
+per barrel and downloaded directly from the U.S.\ Energy Information Administration
+\citep{eia_brent}. The latest available data is as of 22~June~2026, one-week publication lag. 
 
-\begin{table}[h]
-\centering
-\caption{Data sources.}
-\label{tab:sources}
-\begin{threeparttable}
-\small
-\begin{tabular}{@{}p{3.0cm}p{3.6cm}p{7.0cm}@{}}
-\toprule
-Object & Source & Contents \\
-\midrule
-Brent spot (target) & EIA, series RBRTEd & Europe Brent Spot FOB, USD/bbl, 1987--present\\
-Donor candidates (32) & Yahoo Finance & Metals, agriculturals, equities, FX, rates, credit, volatility, crypto\\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}[flushleft]
-\footnotesize
-\item \textit{Notes.} All series are daily and publicly redistributable.
-\end{tablenotes}
-\end{threeparttable}
-\end{table}
-
-\subsection{Donor pool: selection criteria and the shared-pool choice}
-Donor selection is central to identification (Section~\ref{sec:theory}), and it is
-governed by an explicit set of criteria rather than by raw correlation with Brent. A
-series qualifies only if it satisfies all four of the following:
-\begin{enumerate}
-\item \textbf{Common-factor co-movement.} It co-moves with Brent through the common
-global factors of equation~\eqref{eq:factor}, not through the oil-specific term. This is
-the positive case for inclusion: the pool is built to span the five drivers (global
-industrial cycle, the dollar, real rates, risk appetite, China demand) so the synthetic
-can reproduce Brent under any mix of them.
-\item \textbf{No interference (SUTVA).} It is \emph{not} physically routed through the
-disruption being attributed. This is the criterion that does the identifying work; it is
-enforced by a per-event audit that classifies each candidate as Clean, Mild, or Heavy
-according to its exposure to the focal event (Section~\ref{sec:donoraudit}).
-\item \textbf{Liquidity.} It is liquid and daily-traded, with a public, redistributable
-source.
-\item \textbf{History.} It has sufficient pre-event history for the events under study.
-\end{enumerate}
-
-The central design choice concerns \emph{which} pool to carry across the two events. We
-fit both Russia and Hormuz on a single shared pool, formed by retaining only the
-candidates that are Clean for \textbf{Russia 2022}, the more demanding of the two audits.
-Because the Russia strict-clean set is a subset of the Hormuz clean set, every member of
-the shared pool stays clean for both events, so the same basket is a valid counterfactual
-in each. The alternative, using each event's own maximal clean set, would maximise
-within-event fit but would prevent the cross-event weight-transfer check that is the
-strongest robustness test available with only two events (Section~\ref{sec:results}); we
-prefer the shared pool and treat the sacrificed Hormuz-clean donors as the price of
-comparability. The energy complex (WTI, refined products, petrocurrencies) is excluded
-by construction under criterion (ii): it has the highest raw correlation with Brent but
-loads on the very oil-specific shock $o_t$ we are trying to measure, so including it
-would choose fit over identification. The donor-by-donor execution of this audit, the
-resulting membership, and the empirical tests that confirm it are the subject of
-Section~\ref{sec:donoraudit}; the full per-event catalog of all 32 candidates is
-Table~\ref{tab:donoraudit} in Appendix~\ref{app:donoraudit}.
-
-\subsection{Window selection}
-The estimation window must be chosen, not maximised. For daily-traded benchmarks like
-Brent and its donors, a longer pre-history is not automatically better. These series
-pass through distinct market regimes, and a window that spans several of them risks
-teaching the synthetic a donor--Brent relationship that no longer holds in the
-projection period, a regime shift that re-enters as post-event interference and thus as
-a SUTVA violation. Our first task was therefore to locate the longest pre-window that
-contains \emph{no} prior shock or regime break, rather than the longest pre-window
-available. Each event then has such a pre-window (for fitting) and a post-window (for
-projecting the counterfactual), each $\sim$20 months. Following \citet{abadie2021}, the
-Russia pre-window starts 2020-07-01, deliberately \emph{after} the March--May 2020
-cluster (OPEC+ collapse, WTI-negative, acute COVID) that would otherwise impose an
-abnormal factor loading. The Russia post-window is truncated at 2022-09-30, the last
-business day before OPEC+'s October 2022 supply cut, a Brent-specific policy shock that
-would confound the invasion premium. The Hormuz post-window extends to the latest
-available data (2026-06-15). Table~\ref{tab:summary} reports summary statistics, and
-Figure~\ref{fig:timeline} plots the full Brent series with both events and the shaded
-pre- and post-windows. Brent roughly doubled after both focal shocks from a similar
-$\sim$\$75 base, but from very different pre-event trajectories: a steep 2020--22 recovery
-rally before Russia and a mild net decline through 2024--25 before Hormuz. This
-trajectory asymmetry is what makes a na\"ive trend-extrapolation counterfactual
-unreliable (Section~\ref{sec:results}).
-
-\begin{table}[h]
-\centering
-\caption{Summary statistics of Brent spot, by event sample.}
-\label{tab:summary}
-\begin{threeparttable}
-\small
-\begin{tabular}{@{}llrrrrr@{}}
-\toprule
-Event & Segment & $n$ (days) & Mean & SD & Min & Max \\
-\midrule
-\multirow{3}{*}{Russia 2022}
- & Full sample & 572 & 75.95 & 24.76 & 36.33 & 133.18 \\
- & Pre-window  & 421 & 64.26 & 16.39 & 36.33 & 101.66 \\
- & Post-window & 151 & 108.54 & 11.37 & 82.55 & 133.18 \\
-\addlinespace
-\multirow{3}{*}{Hormuz 2026}
- & Full sample & 520 & 76.98 & 14.23 & 59.93 & 138.21 \\
- & Pre-window  & 443 & 72.08 & 6.58 & 59.93 & 88.66 \\
- & Post-window & 77  & 105.14 & 13.72 & 76.49 & 138.21 \\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}[flushleft]
-\footnotesize
-\item \textit{Notes.} Prices in USD/barrel. Pre/post split at $T_0$; Russia $T_0$=2022-02-24, Hormuz $T_0$=2026-02-28.
-\end{tablenotes}
-\end{threeparttable}
-\end{table}
+Figure~\ref{fig:timeline} plots the Brent path from 2020 to 2026 against a curated
+timeline of candidate shocks. Brent roughly doubled after both focal shocks from a similar base near \$75, but reached each along a different trajectory, a steep 2020--22
+recovery before Russia and a mild net decline through 2024--25 before Hormuz. Reading the
+path against the timeline isolates the two events we study, Russia's invasion of Ukraine
+(24~February~2022) and the Strait of Hormuz crisis (28~February~2026), from the
+surrounding cluster of lesser shocks.
 
 \begin{figure}[h]
 \centering
@@ -161,12 +43,83 @@ curated by the authors (Appendix~\ref{app:donoraudit} for the donor-side audit).
 \end{minipage}
 \end{figure}
 
-The two pre-windows differ in a way that matters later. The Russia pre-period is
-volatile (SD~\$16.4, spanning the COVID recovery and the 2021 reflation rally), while the
-Hormuz pre-period is much calmer (SD~\$6.6). This difference drives much of the contrast
-in the two events' inference, because a volatile pre-period widens the placebo
-distribution and weakens Russia's permutation test even though its magnitude is
-well-documented.
+Around each event we choose an estimation window rather than maximise it. A longer
+pre-history is not automatically better, because Brent and its donors pass through
+distinct market regimes, and a pre-window spanning several of them teaches the synthetic a
+donor--Brent relationship that no longer holds in the projection period, a regime shift
+that re-enters as post-event interference and so as a SUTVA violation. For each event we
+therefore take the longest pre-window that contains no acute Brent-specific shock or
+regime break, and we keep the two close to equal in length, about 20 months each, so the
+cross-event comparison is not confounded by one event training on far more data
+\citep{abadie2021}.
+
+For Russia the pre-window runs from 2020-07-01 to the eve of the invasion. The start is
+placed deliberately after the March--May 2020 cluster, the Saudi--Russia price war (a),
+the onset of COVID (b), and the WTI-negative storage failure (c), in which Brent fell
+about 75 percent peak to trough while the donors fell only 30 to 35 percent. Including
+that period would teach the synthetic an abnormal Brent factor loading and carry it into
+the projection. The window does still contain the 2021 energy-cycle reflation (d), but we
+keep that on purpose. The reflation is a broad and gradual recovery shared across the
+commodity complex, so it enters through the donors' own co-movement rather than as a
+Brent-specific break, and the synthetic reproduces it. The Russia post-window then runs
+from the invasion to 2022-09-30, the last business day before OPEC+'s October 2022 supply
+cut, a Brent-specific policy shock that would confound the invasion premium. That leaves a
+post-window of about seven months.
+
+For Hormuz the pre-window runs from 2024-06-01 to the eve of the crisis, about 21 months,
+and is placed after the 2023 disruptions rather than across them. By mid-2024 the
+Israel--Hamas war (g) and the Red Sea diversion (h) had been absorbed, the diversion in
+particular having had roughly six months to transmit through tanker rates and oil-flow
+patterns, so the window sits inside a single mature post-diversion regime rather than
+spanning the break. The Hormuz post-window is still open, running from the crisis to the
+latest available data (2026-06-22), about three and a half months so far.
+
+\begin{table}[h]
+\centering
+\caption{Summary statistics of Brent spot, by event sample.}
+\label{tab:summary}
+\begin{threeparttable}
+\small
+\begin{tabular}{@{}lllrr@{}}
+\toprule
+Event & Segment & Period & $n$ (days) & Mean \\
+\midrule
+\multirow{3}{*}{Russia 2022}
+ & Full sample & 2020-07-01--2022-09-30 & 572 & 75.95 \\
+ & Pre-window  & 2020-07-01--2022-02-23 & 421 & 64.26 \\
+ & Post-window & 2022-02-24--2022-09-30 & 151 & 108.54 \\
+\addlinespace
+\multirow{3}{*}{Hormuz 2026}
+ & Full sample & 2024-06-01--2026-06-22 & 520 & 76.98 \\
+ & Pre-window  & 2024-06-01--2026-02-27 & 443 & 72.08 \\
+ & Post-window & 2026-02-28--2026-06-22 & 77  & 105.14 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes.} Prices in USD per barrel. Each post-window begins on the event date $T_0$, which is the pre/post split.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+Table~\ref{tab:summary} reports summary statistics by event sample. The two pre-windows
+hold comparable numbers of trading days, 421 for Russia and 443 for Hormuz, so each
+synthetic is fit on a similar sample. The post-windows are shorter and unequal, 151 days
+for Russia and 77 for Hormuz, the Hormuz post-window still accumulating as data arrive.
+
+\subsection{Donor pool}
+Donor selection is the central identification choice, and it operationalises the
+identifying assumptions of Section~\ref{sec:theory}. The candidate pool is 32
+macro-financial series from Yahoo Finance that span the asset classes through which the
+common factors move Brent. A series is admitted only if it meets the two identification
+conditions of Section~\ref{sec:theory}, common-factor spanning and SUTVA cleanliness,
+together with three practical filters, daily liquidity from a public redistributable
+source, enough pre-event history, and an uninterrupted daily series on Yahoo Finance over
+each event's full estimation window. We fit both events on a single shared pool rather than a
+separate pool per event, so the basket is held fixed across Russia and Hormuz and the two
+estimates stay directly comparable. Section~\ref{sec:donoraudit} implements these
+conditions as a per-event audit, forms that shared pool, and reports which candidates
+survive.
 
 
 \subsection{Estimators and the ensemble}\label{sec:methods}
@@ -181,7 +134,7 @@ different is far more likely to reflect a real effect than a single-model artefa
 report the cross-model \emph{median} as the headline, which is robust to any one model
 misbehaving, and the inter-quartile range as a model-uncertainty band that complements
 each model's own within-model interval.
-\begin{table}[t]
+\begin{table}[h]
 \centering
 \caption{The five-estimator ensemble.}
 \label{tab:models}
@@ -205,82 +158,86 @@ Bayesian ridge & Bayesian linear regression on donor levels (regression componen
 \end{threeparttable}
 \end{table}
 
-All five estimators (Table~\ref{tab:models}) take the same input (log donor levels) and
-target log Brent over the pre-window, then project the post-window counterfactual. The
-two events are estimated entirely separately: they share the same 19-donor pool and the
-same five-estimator pipeline, but each event trains its own models on its own pre-window,
-so no parameter learned on one event is carried to the other. \emph{Convex SCM} solves
-the classic nested optimisation: non-negative weights summing to one, chosen to minimise
-pre-period RMSPE \citep{abadie2010}. \emph{Augmented SCM} adds a ridge penalty that
-corrects for imperfect pre-fit and allows limited extrapolation \citep{benmichael2021}.
-The \emph{elastic net} relaxes the simplex to signed, sparse coefficients
-\citep{zouhastie2005,doudchenko2016}. \emph{XGBoost} fits shallow gradient-boosted trees
-\citep{chenguestrin2016}, deliberately constrained (depth-2 stumps, strong
-regularisation, row/column subsampling) for the small-sample regime. \emph{Bayesian
-ridge} is a conjugate Bayesian linear regression on donor levels, the regression
-component of BSTS \citep{brodersen2015}. Hyperparameters are tuned over small grids
-(3--9 configurations) to bound the selection bias of \citet{cawley2010}; the convex SCM
-has no tuned hyperparameter. Because the five estimators produce incommensurable weight vectors, a simplex for convex
-SCM, signed unconstrained coefficients for the regressions, and no linear weights at all
-for XGBoost, the ensemble operates on the \emph{gap series} each model implies rather
-than on the weights. The headline at every $t$ is the cross-model median gap, with the
-inter-quartile range as the model-uncertainty band.
+All five estimators take the same inputs, the log donor levels, and target log Brent. The
+two events are fit entirely separately. They share the 19-donor pool and the same
+pipeline, but each trains on its own pre-window, so no parameter learned on one event
+reaches the other. 
 
-A note on labelling: the fifth estimator is a Bayesian \emph{ridge} regression, not full
-Bayesian structural time series. It implements only the regression-on-donors component
-$\beta'x_t$ of \citet{brodersen2015} and omits the trend, seasonal, and spike-and-slab
-selection components. At our sample size, and with no strong weekly seasonality, the
-regression term carries most of the signal, but the model is best read as a
-Bayesian-flavoured diversifier rather than a state-space causal-impact estimator
-(Appendix~\ref{app:bsts}).
+We tune hyperparameters inside the
+pre-window with expanding-window walk-forward cross-validation
+\citep{bergmeir2012,hyndman2018}. The first fold trains on the first half of the pre-window
+and forecasts the next 20 business days, about a month. Each later fold extends the
+training block to the end of the previous forecast, refits, and forecasts the next 20 days,
+for five folds in all. We pool the five folds' validation residuals into one out-of-sample
+RMSE \citep{hyndman2018} and keep the configuration that minimises it. Grids stay narrow, one or two knobs per model over three to nine
+configurations tuned per event, to limit the search's own overfitting \citep{cawley2010}.
+Convex SCM has no tuned hyperparameter. 
+
+We then refit that configuration on the full pre-window to build the
+synthetic and project it onto the post-window. Each model thus implies its own gap series,
+the difference between observed and synthetic log Brent. At every $t$ the headline is the
+cross-model median gap across the five, and the inter-quartile range is the
+model-uncertainty band. The details of the models and hyperparameters tuning results are in Appendix~\ref{app:ensemble}.
 
 \subsection{Validation battery and its logic}
-A credible SCM estimate must clear three levels \citep{abadie2021}: pre-event fit, donor
-identification, and inference. We organise the validation around these three levels and
-run every test per model and per event.
+A credible SCM estimate must clear three levels \citep{abadie2021}, pre-event fit, donor
+identification, and inference. We run every test per model and per event, itemised by
+level below.
 
-The first level concerns \emph{fit}. Out-of-sample tracking is assessed by
-expanding-window walk-forward cross-validation \citep{hyndman2018,bergmeir2012}. Its role
-here is not model selection but evidence against over-fitting: a synthetic whose
-out-of-sample pre-period tracking matches its in-sample tracking is reproducing a stable
-donor--Brent relationship rather than memorising the pre-window, which is the empirical
-content of the common-factor spanning assumption.
+\paragraph{Fit.} One out-of-sample metric.
+\begin{itemize}
+\item \textbf{Walk-forward RMSE.} The expanding-window walk-forward cross-validation of
+Section~\ref{sec:methods} \citep{hyndman2018,bergmeir2012} doubles as the fit check. A
+synthetic whose out-of-sample pre-period tracking matches its in-sample tracking is
+reproducing a stable donor--Brent relationship rather than memorising the pre-window,
+which is the empirical content of common-factor spanning. It never selects among the five
+estimators, all of which are retained.
+\end{itemize}
 
-The second level concerns \emph{identification}, and is the donor-cleanliness battery
-that defends the no-interference (SUTVA) assumption. Before any model is fit, each
-donor's own return series is tested for a mean shift at $T_0$ using a permutation form of
-the known-break test of \citet{chow1960} (rather than the unknown-break test of
-\citet{andrews1993}, since the date is known), together with a Wilcoxon event-window test
-\citep{brownwarner1985}; a donor is flagged if either rejects after Benjamini--Hochberg
-FDR control \citep{benjaminihochberg1995}. Regime stability is checked with distance
-correlation across pre-period thirds \citep{szekely2007} and with Bai--Perron break
-dating \citep{baiperron1998,baiperron2003}, and an I(0)/I(1)-robust trend-break test
-\citep{harvey2009,kpss1992} confirms that no donor's own trend breaks at either $T_0$.
-This battery operates at the level of the individual donor, so its outcomes are reported
-with the donor audit (Section~\ref{sec:donoraudit}) rather than here.
+\paragraph{Identification.} This defends the no-interference (SUTVA) assumption at two
+levels.
+\begin{itemize}
+\item \textbf{Donor-level cleanliness battery.} Before any model is fit, each donor's own
+return series is tested for a mean shift at $T_0$ with a permutation form of the
+known-break test of \citet{chow1960} (the date is known, so not the unknown-break test of
+\citet{andrews1993}) and a Wilcoxon event-window test \citep{brownwarner1985}, a donor
+flagged if either rejects under Benjamini--Hochberg FDR control
+\citep{benjaminihochberg1995}. Loading stability is checked with distance correlation
+across pre-period thirds \citep{szekely2007}, Bai--Perron break dating
+\citep{baiperron1998,baiperron2003}, and an I(0)/I(1)-robust trend-break test
+\citep{harvey2009,kpss1992}. These operate on the individual donor, so their outcomes are
+reported with the donor audit (Section~\ref{sec:donoraudit}).
+\item \textbf{Model-level contamination bias.} For the synthetic as a whole, the signed
+diagnostic of equation~\eqref{eq:bias} gives the direction in which any residual donor
+contamination would move the estimate, so a surviving gap can be read as conservative or
+not.
+\end{itemize}
 
+\paragraph{Inference.} Several tests on the treated unit.
+\begin{itemize}
+\item \textbf{In-space placebo.} Refit each donor as a placebo treated unit and rank
+Brent's post/pre RMSPE ratio against the resulting distribution \citep{abadie2010},
+reading the permutation $p$-value with the symmetry caveat of \citet{hahnshi2017}.
+\item \textbf{In-time placebo.} Re-run at a fake $T_0$ six months early, formalised as the
+mixed placebo test of \citet{chenyan2023}.
+\item \textbf{Leave-one-donor-out.} Drop each donor in turn to confirm no single donor
+drives the gap.
+\item \textbf{Cross-event weight transfer.} Apply each model's Russia weights to Hormuz,
+the strongest robustness check available with only two events (Section~\ref{sec:results}).
+\item \textbf{Naive benchmarks.} A deliberately contaminated set of univariate
+counterfactuals (random walk, drift, linear trend, and an AIC-selected ARIMA that reduces
+to a driftless random walk in both events) as a floor.
+\end{itemize}
 
-The third level concerns \emph{inference}. We run the in-space placebo, refitting each
-donor as a placebo treated unit and ranking Brent's post/pre RMSPE ratio against the
-resulting distribution \citep{abadie2010}, reading the permutation $p$-value with the
-symmetry caveat of \citet{hahnshi2017}. We add the in-time placebo at a fake $T_0$ six
-months early, formalised as the mixed placebo test of \citet{chenyan2023}, and a
-leave-one-donor-out check. Two further benchmarks sit alongside the formal tests: a
-deliberately contaminated set of na\"ive univariate counterfactuals (random walk, drift,
-linear trend, and an AIC-selected ARIMA that reduces to a driftless random walk in both
-events) as a floor, and the signed contamination-bias diagnostic of
-equation~\eqref{eq:bias}. Following \citet{roth2022,rambachanroth2023}, we report and
-interpret pre-period diagnostics rather than turning them into pass/fail thresholds, and
-we do not auto-exclude flagged models, because the cross-model IQR is itself the
-model-uncertainty band. Finally, where a model's pre-period gap series is not flat, we
-report a drift-adjusted gap alongside the raw one. We fit an ordinary least-squares trend
-to the pre-period gap, read off its slope $\hat\beta$ in percent per year, and subtract
-the portion that this pre-existing drift would contribute over the post-window on its
-own, namely $\hat\beta L$ percentage points for a post-window of length $L$ years. The
-adjustment isolates the part of the post-window gap that does not simply continue a
-pre-event trend. For both events it is small, moving the ensemble-median headline by
-about a percentage point, so the raw and adjusted figures tell the same story and we
-report both for transparency.
+Following \citet{roth2022,rambachanroth2023}, we report and interpret these diagnostics
+rather than turning them into pass/fail thresholds, and we do not auto-exclude flagged
+models, because the cross-model IQR is itself the model-uncertainty band. Where a model's
+pre-period gap series is not flat, we also report a drift-adjusted gap. We fit an ordinary
+least-squares trend to the pre-period gap, read its slope $\hat\beta$ in percent per year,
+and subtract $\hat\beta L$ percentage points for a post-window of length $L$ years,
+isolating the part of the post-window gap that does not simply continue a pre-event trend.
+For both events it is small, moving the ensemble-median headline by about a percentage
+point, so we report both figures.
 
 
 
