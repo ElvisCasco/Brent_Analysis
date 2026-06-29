@@ -36,20 +36,19 @@ of Brent crude over a policy-relevant post-event window?}
 
 We deliberately target the \emph{total} causal effect rather than any single
 transmission channel, and we estimate it as a \emph{path} over the post-event window
-rather than a single number. The applications drive this choice. Emergency
+rather than a single number. The applications drive this choice for several reasons. First, emergency
 strategic-reserve releases are sized against an implied price displacement (the IEA
 coordinated the drawdown of some 180~million barrels after the 2022 invasion of Ukraine
-\citep{iea2022release}). The monetary-policy decision to look through an oil shock or to
-tighten turns on its size and persistence. Fiscal stabilisation in subsidising oil
-importers scales with the move. And sovereign hedging programmes price disruption
+\citep{iea2022release}); second, the monetary-policy decision to look through an oil shock or to
+tighten turns on its size and persistence; third, fiscal stabilisation in subsidising oil
+importers scales with the move; and fourth, sovereign hedging programmes price disruption
 scenarios against exactly such magnitudes (Mexico's annual ``Hacienda hedge'' is the
-largest such programme in the world \citep{jfi2023mexico}). Each lever acts on the trajectory of the effect, not on a peak-day figure.
-The object we need is therefore the average gap between observed Brent and the price
+largest such programme in the world \citep{jfi2023mexico}). Each lever acts on the trajectory of the effect, not on a peak-day figure, then the object we need is therefore the average gap between observed Brent and the price
 that would have prevailed absent the disruption, traced over the whole window.
 Recovering that counterfactual path, which has no directly observable analogue, is the
 methodological core of this paper.
 
-Standard observational designs cannot deliver it. Brent is a single, globally traded
+Standard observational designs cannot estimate properly the causal effect. Brent is a single, globally traded
 benchmark, which rules out difference-in-differences (no panel of comparable treated
 and control units), regression discontinuity (no running variable around a cutoff),
 and instrumental variables (no credible instrument for a one-off geopolitical event).
@@ -68,15 +67,15 @@ VARs \citep{kilian2009,baumeisterhamilton2019} decompose prices into supply, dem
 and inventory shocks but produce no counterfactual path and rely on identification
 restrictions with no settled precedent for a chokepoint event. And institutional
 scenario models propagate an assumed barrel shortfall through a supply--demand model,
-so their counterfactual is imposed rather than read from observed prices. We see these
-as complements rather than competitors. Our cross-asset, data-driven estimate and a
+so their counterfactual is imposed rather than read from observed prices. Given this situation, we see these
+as complements rather than competitors to our methodology. Our cross-asset, data-driven estimate and a
 structural scenario estimate answer different questions, the price gap implied by
 observed co-movement versus the price implied by an assumed shortfall, so their
 agreement is itself informative, and in practice the two can be used side by side.
 
 Methodologically, our closest neighbour is the SCM-on-price design of
 \citet{becker2021}. That work studies a regulated retail-fuel market with
-cross-country donor units. Neither is available here, since Brent is a global crude
+cross-country donor units; however, neither is available here, since Brent is a global crude
 benchmark and no untreated country or market can serve as a donor. We therefore replace
 geographic donors with cross-asset donors, including metals, agriculturals, equities,
 foreign exchange, rates, and volatility, and apply the design under an exogenous
@@ -89,20 +88,19 @@ pre-window, model class, and regularisation. We therefore benchmark the design o
 nearest comparable historical oil-supply shock, the 2022 Russian invasion of Ukraine
 (Brent \$95$\to$\$130 within two weeks \citep{eia_brent}), and check that the same machinery recovers
 that documented magnitude before estimating the Hormuz effect afresh on its own
-pre-window. We do not transfer the Russia fit to Hormuz. The two events sit in very
-different market regimes, and we estimate each one independently. Because both are fit
+pre-window. We do not transfer the Russia fit to Hormuz; instead of this, the two events sit in very
+different market regimes, and we estimate each one independently. What we try to find is a common pattern: if both are fit
 on a common 19-series donor pool, we can additionally compare the donor weights across
 regimes as a check on the stability of the factor structure SCM relies on.
 
 To prevent any single modelling choice from driving the result, the synthetic is formed
 as the median of an ensemble of five estimators with different inductive biases: convex
-SCM, augmented SCM, elastic net, gradient-boosted trees, and Bayesian ridge. Fitting a
-synthetic that tracks pre-event Brent closely is the easy part. The substantive work of
+SCM, augmented SCM, elastic net, gradient-boosted trees, and Bayesian ridge. The substantive work of
 this paper is the validation that challenges the donor pool and the no-interference
 assumption it rests on, namely placebo-based inference, leave-one-donor-out checks,
 structural-break tests, a signed contamination-bias analysis, and a comparison against
 na\"ive univariate counterfactuals. Our contribution is thus twofold: a data-driven
-Brent-price ATT for the Hormuz disruption that complements existing structural
+Brent-price average treatment effect on the treated (ATT) for the Hormuz disruption that complements structural
 estimates, and a transparent template for validating cross-asset synthetic control
 under a single-unit geopolitical treatment.
 

@@ -3,11 +3,12 @@
 % ===================================================================
 This section sets out the data-generating process we assume for Brent and derives the
 estimand and identifying assumptions from it. The factor model in
-Section~\ref{sec:theory}.1 is the organising device. It makes donor selection an economic
-exercise, renders each identifying assumption transparent, and gives the contamination
+Section~\ref{sec:theory}.1 is the organising device, treating donor selection an economic
+exercise, rendering each identifying assumption transparent, and giving the contamination
 bias an explicit sign. It also exposes the residual model uncertainty that motivates the
 ensemble estimator, whose construction we defer to the methodology
 (Section~\ref{sec:methods}).
+
 \subsection{A factor model of Brent}
 We decompose log Brent into a component spanned by global macro-financial factors common
 to many assets and an oil-specific component:
@@ -22,10 +23,12 @@ industrial cycle, the US dollar, real interest rates, global risk appetite, and 
 demand, each proxied by non-oil assets. The oil-specific term $o_t$ is the object of
 interest, the supply and chokepoint component a Hormuz disruption shifts. Each donor $j$
 admits its own factor representation $X_{jt}=\gamma_j'F_t+u_{jt}$ with, by construction,
-\emph{zero loading on} $o_t$. A clean donor is exposed to the same global factors as
+\emph{zero loading on} $o_t$, so a clean donor is exposed to the same global factors as
 Brent but is not physically routed through oil supply. A synthetic control is then a
 weighted donor basket $\hat p_t=\sum_j w_j X_{jt}$, and the logic of the method follows
-directly from \eqref{eq:factor}. If the weights reproduce Brent's factor loadings,
+directly from \eqref{eq:factor}. 
+
+If the weights reproduce Brent's factor loadings,
 $\sum_j w_j\gamma_j\approx\lambda$, the basket tracks Brent through the pre-window, where
 $o_t$ is small and stable. When a chokepoint shock fires, $o_t$ jumps for Brent but not
 for the basket, the two decouple, and that decoupling \emph{is} the estimated premium.
