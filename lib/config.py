@@ -50,7 +50,7 @@ PRE_WINDOWS = {
 # Hormuz: extends to latest data available (~3 months post-event).
 POST_END = {
     'russia': pd.Timestamp('2022-09-30'),   # before OPEC+ October 2022 cut
-    'hormuz': pd.Timestamp('2026-05-31'),   # end May (panel caps at Brent's last obs, currently 2026-04-27)
+    'hormuz': pd.Timestamp('2026-06-22'),   # latest data available (panel caps at Brent's last obs, currently 2026-06-22)
 }
 
 

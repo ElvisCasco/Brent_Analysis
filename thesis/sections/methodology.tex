@@ -1,0 +1,110 @@
+
+% ===================================================================
+\section{What each estimator fits}\label{app:formulas}
+% ===================================================================
+
+\paragraph{Convex SCM \citep{abadie2010}.} A simplex-constrained weighted average of donors,
+\begin{equation}
+\hat y_t = \sum_{j=1}^{J} w_j\, y_{j,t}, \qquad w_j \ge 0, \quad \sum_j w_j = 1 .
+\label{eq:convex}
+\end{equation}
+The weights read like portfolio shares and the synthetic cannot leave the donor envelope. The
+simplex constraint behaves like an $L_1$ ball, so the optimiser drives most $w_j$ to exactly
+zero: the fit is mechanically sparse and leans on the few donors whose convex combination best
+reproduces pre-period Brent.
+
+\paragraph{Augmented SCM \citep{benmichael2021}.} The convex base is kept and a ridge layer is
+added that extrapolates each donor's contribution beyond the simplex,
+\begin{equation}
+\hat y_t = \underbrace{\sum_j w_j\, y_{j,t}}_{\text{convex base}}
+\;+\; \underbrace{\sum_j \eta_j\, y_{j,t}}_{\text{ridge correction}},
+\qquad \eta = (X^\top X + \lambda I)^{-1} X^\top r,
+\label{eq:ascm}
+\end{equation}
+where $r$ is the pre-period residual left by the convex base and $X$ the donor matrix. The
+effective weight is $w_j+\eta_j$; the $\eta_j$ are unconstrained, which is what permits limited
+extrapolation outside the donor hull. Large $\lambda$ shrinks the ridge layer toward zero and
+recovers convex SCM; small $\lambda$ gives it more freedom.
+
+\paragraph{Elastic net \citep{doudchenko2016,zouhastie2005}.} A signed linear regression with a
+combined $L_1+L_2$ penalty,
+\begin{equation}
+\hat y_t = \beta_0 + \sum_j \beta_j\, y_{j,t}, \qquad
+\min_\beta \;\tfrac{1}{2N}\lVert y - X\beta\rVert_2^2
+\;+\; \alpha\Big[\rho\lVert\beta\rVert_1 + \tfrac{1-\rho}{2}\lVert\beta\rVert_2^2\Big].
+\label{eq:enet}
+\end{equation}
+The $L_1$ term drives some coefficients to exactly zero (selection); the $L_2$ term shrinks the
+rest and stabilises the fit under donor collinearity. Here $\alpha$ is the overall penalty
+strength and $\rho$ the $L_1$ share ($\rho=0$ pure ridge, $\rho=1$ pure lasso).
+
+\paragraph{Gradient boosting (XGBoost) \citep{chenguestrin2016}.} A sum of $K$ shallow
+regression trees fit sequentially to residuals,
+\begin{equation}
+\hat y_t = \sum_{k=1}^{K} f_k(\mathbf{y}_{\cdot,t}),
+\qquad f_k \in \{\text{trees of depth} \le d\},
+\label{eq:xgb}
+\end{equation}
+with $L_2$ regularisation on leaf weights and a learning rate $\eta$. It is not a closed-form
+regression: at each split the builder picks the donor and threshold that most reduce the
+residual. It captures nonlinear interactions but, by construction, cannot extrapolate outside
+the training range of any donor --- the one member that brackets the extrapolating linear
+models from below.
+
+\paragraph{Bayesian ridge \citep{brodersen2015}.} The OLS regression equation with a Gaussian
+prior on the coefficients and Gamma priors on the precisions,
+\begin{equation}
+y_t = \beta_0 + \sum_j \beta_j\, y_{j,t} + \varepsilon_t,\quad
+\varepsilon_t\sim\mathcal{N}(0,1/\alpha);\qquad
+\beta_j\mid\lambda \sim \mathcal{N}(0,1/\lambda),\quad \lambda,\alpha\sim\text{Gamma}(\cdot).
+\label{eq:bridge}
+\end{equation}
+The posterior over $\beta$ is conjugate and closed-form, so $\hat y_t$ carries a native
+posterior standard deviation. The Gaussian prior shrinks coefficients smoothly toward zero but
+never sets any to exactly zero, so --- unlike the convex and elastic-net members --- it performs
+no selection and retains every donor. This implements only the regression-on-donors term of the
+BSTS model of \citet{brodersen2015}; the trend, seasonal, and spike-and-slab components it omits,
+and why the proxy is adequate at this sample size, are discussed in the body.
+
+% ===================================================================
+\section{Hyperparameter grids and selected configurations}\label{app:grids}
+% ===================================================================
+Hyperparameters are chosen by the pooled validation RMSE of the expanding-window walk-forward
+cross-validation described in the body (each event tuned on its own pre-window), with the final
+model refit on the full pre-window. Table~\ref{tab:grids} lists the search grids as run in the
+fitting pipeline, restricted to the one or two knobs that materially change each model's fit; the
+selection (winner's-curse) bias of \citet{cawley2010} grows with the number of configurations
+tested, which is why the grids stay narrow. Convex SCM has no tuned hyperparameter: it draws 120
+importance matrices $V$ from a Dirichlet, re-fits weights per $V$, and retains the $V$ with lowest
+pre-period RMSPE.
+
+\begin{table}[h]
+\centering
+\caption{Hyperparameter search grids as run in the fitting pipeline (the grids that produced the
+reported fits). Selection is by pooled walk-forward validation RMSE, per event; Convex SCM is
+untuned. XGBoost uses early stopping (20 rounds) on each fold's validation window, with the
+median best iteration carried to the final refit.}
+\label{tab:grids}
+\small
+\begin{tabular}{@{}lp{10.8cm}@{}}
+\toprule
+Estimator & Search grid \\
+\midrule
+Convex SCM     & None tuned; 120 Dirichlet draws of the importance matrix $V$, best by pre-period RMSPE.\\
+Augmented SCM  & Ridge penalty $\lambda \in \{0.01,\,0.1,\,1,\,10,\,100\}$ (5).\\
+Elastic net    & $\alpha \in \{0.001,\,0.01,\,0.05,\,0.1,\,0.5\}$ $\times$ $\rho \in \{0.2,\,0.5,\,0.8\}$ (15).\\
+XGBoost        & \texttt{max\_depth} $\in \{2,3,4\}$ $\times$ \texttt{learning\_rate} $\in \{0.001,\,0.005,\,0.01,\,0.03,\,0.1\}$ $\times$ \texttt{reg\_lambda} $\in \{1,10\}$ (30); \texttt{n\_estimators}\,$=$\,1000 with early stopping after 20 rounds, \texttt{gamma}\,$=$\,0.1.\\
+Bayesian ridge & Weight precision $\lambda \in \{10^{-8},10^{-6},10^{-4},10^{-2},1\}$ $\times$ noise precision $\alpha \in \{10^{-8},10^{-6},10^{-4}\}$ (15).\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\emph{Selected configurations} (lowest pooled validation RMSE, read from the saved fits).
+\textbf{Russia:} ASCM $\lambda=0.1$; elastic net $\alpha=0.001,\;\rho=0.2$; XGBoost depth~2,
+learning rate~$0.1$, $\lambda_{\text{reg}}=1$ (early-stopped near 32 trees); Bayesian ridge
+$\lambda=1,\;\alpha=10^{-4}$. \textbf{Hormuz:} ASCM $\lambda=10$; elastic net
+$\alpha=0.01,\;\rho=0.2$; XGBoost depth~3, learning rate~$0.1$, $\lambda_{\text{reg}}=10$
+(early-stopped near 10 trees); Bayesian ridge $\lambda=1,\;\alpha=10^{-8}$. The two events select
+genuinely different regularisation strengths, as expected: Russia's larger convex residual asks
+the ASCM ridge layer for more freedom (small $\lambda$), while Hormuz's tighter convex fit
+tolerates heavy shrinkage. These are the settings behind the per-model gaps reported in the body.

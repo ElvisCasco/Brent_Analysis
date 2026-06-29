@@ -2,15 +2,15 @@
 \section{Introduction}
 \label{sec:intro}
 
-The Strait of Hormuz is the narrowest binding constraint in the global oil system.
+The Strait of Hormuz is the narrowest binding constraint in the actual global oil system.
 Roughly one-fifth of world petroleum-liquids consumption transits the lane between
 Iran and Oman \citep{eia_hormuz2025}, carrying crude from Saudi Arabia, Iraq, the
 United Arab Emirates, Kuwait, Iran, and Qatar to seaborne markets. What makes the
-chokepoint so consequential is the absence of a redundant route. The Saudi East--West
+chokepoint so important is the absence of a redundant route: the Saudi East--West
 and UAE Habshan--Fujairah pipelines together divert only a small fraction of this
 volume overland---about 2.6~million b/d of spare capacity against the roughly
 20~million b/d that transits the strait \citep{eia_hormuz2025}---and no maritime bypass
-exists, so the overwhelming majority of Gulf crude has nowhere else to go. This leaves Hormuz the single strongest bottleneck in the
+exists, so the majority of Gulf crude has nowhere else to go. This leaves Hormuz the single strongest bottleneck in the
 world's oil-transport network. The lane has seen periodic near-misses, among them the
 1980s tanker war, the 2019 Abqaiq strike, and recurring tensions through the mid-2020s,
 each producing a transient risk-premium spike but never an actual closure. The
@@ -20,12 +20,14 @@ risk.
 Because crude oil is an input to almost every industry and a cost borne across nearly
 all economies, a disruption on this scale was always going to move prices, and Brent
 duly rose sharply in the days that followed. We study Brent rather than another
-benchmark for two reasons. While the major crude indices are highly correlated and the
+benchmark for two reasons: while the major crude indices are highly correlated and the
 choice between them is largely immaterial, Brent is the reference price against which
-the majority of internationally traded crude is settled, and we use its spot quotation
-rather than a futures contract. Yet the raw price jump is uninformative on its own. It
+the majority of internationally traded crude is settled; also, we use its spot quotation
+rather than a futures contract. 
+
+Yet the raw price jump is uninformative on its own, because it
 conflates the disruption with everything else moving markets at the same time, and it
-says nothing about how the effect evolves. This motivates a causal question:
+says nothing about how the effect evolves. For this reason, we pose a causal question:
 
 \begin{quote}
 \emph{What is the causal effect of the 2026 Strait of Hormuz disruption on the price
@@ -51,16 +53,15 @@ Standard observational designs cannot deliver it. Brent is a single, globally tr
 benchmark, which rules out difference-in-differences (no panel of comparable treated
 and control units), regression discontinuity (no running variable around a cutoff),
 and instrumental variables (no credible instrument for a one-off geopolitical event).
-The \emph{synthetic control method} \citep{abadie2010,abadie2021} is built for exactly
-this situation. It forms a weighted basket of donor series whose pre-event co-movement
-with the outcome is high and projects that basket forward as the counterfactual. It
+We choose the \emph{synthetic control method} \citep{abadie2010,abadie2021} because it is built for situations similar to the Hormuz disruption: it forms a weighted basket of donor series whose pre-event co-movement
+with the outcome is high and projects that basket forward as the counterfactual. With this, it
 yields a full counterfactual path rather than a point estimate, makes its identifying
 assumptions auditable through the donor pool, and requires no structural stance on
 whether the move is supply, risk premium, or expectations, since its estimand is a
 reduced-form total effect.
 
 The tools most commonly used to analyze such price shocks include event studies,
-structural VARs, and institutional scenario models. However, they tend to address
+structural VARs, and institutional scenario models, however, they tend to address
 narrower or different questions. Event studies measure abnormal returns in a short
 window around the event but yield no multi-month path and miss persistence. Structural
 VARs \citep{kilian2009,baumeisterhamilton2019} decompose prices into supply, demand,
