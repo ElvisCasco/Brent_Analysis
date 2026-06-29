@@ -7,13 +7,13 @@ proxy the counterfactual, and the validation battery that defends the estimate. 
 themes recur and both follow from the factor model of Section~\ref{sec:theory}. Donor
 selection is an identification choice rather than a fit-maximising one, and the length
 of the estimation window is itself a SUTVA consideration, not merely a sample-size one.
-We describe here \emph{what} the pool and the methods are and \emph{why} they were
-chosen; 
+We describe here what the pool and the methods are and why they were
+chosen.
 
 \subsection{Target and Events}
 The target is the daily Europe Brent Spot Price FOB (EIA series RBRTEd), quoted in USD
-per barrel and downloaded directly from the U.S.\ Energy Information Administration
-\citep{eia_brent}. The latest available data is as of 22~June~2026, one-week publication lag. 
+per barrel and downloaded directly from the U.S.\ Energy Information Administration (EIA)
+\citep{eia_brent}. The latest available data is as of 22~June~2026, a one-week publication lag.
 
 Figure~\ref{fig:timeline} plots the Brent path from 2020 to 2026 against a curated
 timeline of candidate shocks. Brent roughly doubled after both focal shocks from a similar base near \$75, but reached each along a different trajectory, a steep 2020--22
@@ -30,7 +30,7 @@ surrounding cluster of lesser shocks.
 
 \smallskip
 \begin{minipage}{0.92\textwidth}
-\footnotesize \textit{Notes.} Lettered markers date the curated timeline events; the two
+\footnotesize \textit{Notes.} Lettered markers date the curated timeline events. The two
 focal events (\textbf{e}, \textbf{i}) are bold dashed lines, the rest grey dotted.
 (a)~Saudi--Russia price war, 8 Mar 2020; (b)~COVID-19 pandemic, 11 Mar 2020;
 (c)~WTI-negative, 20 Apr 2020; (d)~energy-cycle reflation, 1 Oct 2021;
@@ -38,7 +38,7 @@ focal events (\textbf{e}, \textbf{i}) are bold dashed lines, the rest grey dotte
 (g)~Israel--Hamas war, 7 Oct 2023; (h)~Red Sea diversion, 19 Nov 2023;
 (i)~\textbf{Strait of Hormuz crisis, 28 Feb 2026}. Shaded bands are each focal event's
 preferred-specification estimation windows: blue the pre-window (fitting), red the
-post-window (projection). \textit{Source:} Brent, EIA series RBRTEd; event timeline
+post-window (projection). \textit{Source:} Brent, EIA series RBRTEd. Event timeline
 curated by the authors (Appendix~\ref{app:donoraudit} for the donor-side audit).
 \end{minipage}
 \end{figure}
@@ -131,8 +131,8 @@ plausible cases (Table~\ref{tab:models}): a simplex-constrained average, a
 ridge-extrapolating correction, a sparse signed regression, a nonlinear tree ensemble,
 and a Bayesian linear model. An estimated premium that survives across biases this
 different is far more likely to reflect a real effect than a single-model artefact. We
-report the cross-model \emph{median} as the headline, which is robust to any one model
-misbehaving, and the inter-quartile range as a model-uncertainty band that complements
+report the cross-model median as the headline, which is robust to any one model
+misbehaving, and the interquartile range (IQR) as a model-uncertainty band that complements
 each model's own within-model interval.
 \begin{table}[h]
 \centering
@@ -148,12 +148,12 @@ Convex SCM & Non-negative donor weights summing to one, synthetic inside the don
 Augmented SCM & Convex SCM plus ridge bias-correction, limited extrapolation outside the hull & \citet{benmichael2021}\\
 Elastic net & Signed, sparse$+$ridge regression, lasso term drops donors entirely & \citet{doudchenko2016}\\
 Gradient boosting (XGBoost) & Nonlinear, tree-based, captures interactions, cannot extrapolate beyond the training range & \citet{chenguestrin2016}\\
-Bayesian ridge & Bayesian linear regression on donor levels (regression component of BSTS), conjugate Gaussian--Gamma prior & \citet{brodersen2015}\\
+Bayesian ridge & Bayesian linear regression on donor levels (regression component of a Bayesian structural time series, BSTS, model), conjugate Gaussian--Gamma prior & \citet{brodersen2015}\\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[flushleft]
 \footnotesize
-\item \textit{Notes.} Each estimator contributes a distinct inductive bias; the headline is the cross-model median gap across the five.
+\item \textit{Notes.} Each estimator contributes a distinct inductive bias. The headline is the cross-model median gap across the five.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}
@@ -169,14 +169,14 @@ pre-window with expanding-window walk-forward cross-validation
 and forecasts the next 20 business days, about a month. Each later fold extends the
 training block to the end of the previous forecast, refits, and forecasts the next 20 days,
 for five folds in all. We pool the five folds' validation residuals into one out-of-sample
-RMSE \citep{hyndman2018} and keep the configuration that minimises it. Grids stay narrow, one or two knobs per model over three to nine
+root-mean-square error (RMSE) \citep{hyndman2018} and keep the configuration that minimises it. Grids stay narrow, one or two knobs per model over three to nine
 configurations tuned per event, to limit the search's own overfitting \citep{cawley2010}.
 Convex SCM has no tuned hyperparameter. 
 
 We then refit that configuration on the full pre-window to build the
 synthetic and project it onto the post-window. Each model thus implies its own gap series,
 the difference between observed and synthetic log Brent. At every $t$ the headline is the
-cross-model median gap across the five, and the inter-quartile range is the
+cross-model median gap across the five, and the interquartile range is the
 model-uncertainty band. The details of the models and hyperparameters tuning results are in Appendix~\ref{app:ensemble}.
 
 \subsection{Validation battery and its logic}
@@ -194,14 +194,14 @@ which is the empirical content of common-factor spanning. It never selects among
 estimators, all of which are retained.
 \end{itemize}
 
-\paragraph{Identification.} This defends the no-interference (SUTVA) assumption at two
-levels.
+\paragraph{Identification.} This defends the no-interference (SUTVA) assumption and the
+regime-stability assumption, across donor- and model-level diagnostics.
 \begin{itemize}
 \item \textbf{Donor-level cleanliness battery.} Before any model is fit, each donor's own
 return series is tested for a mean shift at $T_0$ with a permutation form of the
 known-break test of \citet{chow1960} (the date is known, so not the unknown-break test of
 \citet{andrews1993}) and a Wilcoxon event-window test \citep{brownwarner1985}, a donor
-flagged if either rejects under Benjamini--Hochberg FDR control
+flagged if either rejects under Benjamini--Hochberg false-discovery-rate (FDR) control
 \citep{benjaminihochberg1995}. Loading stability is checked with distance correlation
 across pre-period thirds \citep{szekely2007}, Bai--Perron break dating
 \citep{baiperron1998,baiperron2003}, and an I(0)/I(1)-robust trend-break test
@@ -211,6 +211,12 @@ reported with the donor audit (Section~\ref{sec:donoraudit}).
 diagnostic of equation~\eqref{eq:bias} gives the direction in which any residual donor
 contamination would move the estimate, so a surviving gap can be read as conservative or
 not.
+\item \textbf{Post-window horizon sensitivity.} Re-summarising the gap at 1/2/3/6-month and
+full horizons traces how any delayed contamination accrues over the projection, since
+a gap that declines with horizon is its signature (Section~\ref{sec:results}).
+\item \textbf{Cross-event weight transfer.} Applying each model's Russia weights to Hormuz
+probes regime stability, the third identifying assumption. We read it as an exploratory
+probe rather than a pass/fail test (Section~\ref{sec:results}).
 \end{itemize}
 
 \paragraph{Inference.} Several tests on the treated unit.
@@ -222,11 +228,19 @@ reading the permutation $p$-value with the symmetry caveat of \citet{hahnshi2017
 mixed placebo test of \citet{chenyan2023}.
 \item \textbf{Leave-one-donor-out.} Drop each donor in turn to confirm no single donor
 drives the gap.
-\item \textbf{Cross-event weight transfer.} Apply each model's Russia weights to Hormuz,
-the strongest robustness check available with only two events (Section~\ref{sec:results}).
-\item \textbf{Naive benchmarks.} A deliberately contaminated set of univariate
-counterfactuals (random walk, drift, linear trend, and an AIC-selected ARIMA that reduces
-to a driftless random walk in both events) as a floor.
+\end{itemize}
+
+\paragraph{Corroboration and baselines.} Two checks sit outside the three levels.
+\begin{itemize}
+\item \textbf{External (Russia).} The ensemble-median Russia counterfactual is compared
+against the EIA's last pre-invasion Short-Term Energy Outlook forecasts, an independent
+structural counterfactual that shares no information path with the SCM
+(Section~\ref{sec:results}).
+\item \textbf{Naive floor.} A deliberately contaminated set of donor-free univariate
+counterfactuals (random walk, drift, linear trend, and an autoregressive integrated
+moving average, ARIMA, model selected by the Akaike information criterion, AIC, that
+reduces to a driftless random walk in both events), a lower bound the donor machinery
+should beat (Section~\ref{sec:results}).
 \end{itemize}
 
 Following \citet{roth2022,rambachanroth2023}, we report and interpret these diagnostics
