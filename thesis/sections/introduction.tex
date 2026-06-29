@@ -52,7 +52,7 @@ Standard observational designs cannot estimate properly the causal effect. Brent
 benchmark, which rules out difference-in-differences (no panel of comparable treated
 and control units), regression discontinuity (no running variable around a cutoff),
 and instrumental variables (no credible instrument for a one-off geopolitical event).
-We choose the \emph{synthetic control method} \citep{abadie2010,abadie2021} because it is built for situations similar to the Hormuz disruption: it forms a weighted basket of donor series whose pre-event co-movement
+We choose the \emph{synthetic control method} (SCM) \citep{abadie2010,abadie2021} because it is built for situations similar to the Hormuz disruption: it forms a weighted basket of donor series whose pre-event co-movement
 with the outcome is high and projects that basket forward as the counterfactual. With this, it
 yields a full counterfactual path rather than a point estimate, makes its identifying
 assumptions auditable through the donor pool, and requires no structural stance on
