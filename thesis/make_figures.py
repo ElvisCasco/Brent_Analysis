@@ -155,11 +155,95 @@ def fig_placebo():
     plt.close(fig)
 
 
+# ---------- Figure 5 (appendix): donor paths by contribution role ----------
+# Visual proof of the two-role taxonomy in Section~\ref{sec:results}. Each row plots the
+# quantity its role is *defined* on, so the panels map one-to-one onto the rho_lvl / div
+# columns of the donor-contribution table (App. donor_contribution_metrics):
+#   trend carriers -> rebased levels (level co-movement, incl. inverse movers)
+#   late divergers -> running standardised cumulative idiosyncratic residual after T0
+# A variance-tracker role was dropped: no donor's daily-return corr with Brent exceeds
+# ~0.30 (Russia) / ~0.17 (Hormuz), so the category had no members (see results.tex).
+# Both roles are picked by consensus WEIGHT (w_mean), not by the raw metric. Weight is what
+# the role is defined on: a linear level correlation misses donors like the Hormuz yen that
+# carry large weight as a near-flat level anchor (w_mean 0.21, rho_lvl only 0.21), and a
+# diverger only matters if a model loads it. CNY (Russia) and INR (Hormuz) have the largest
+# |div| but ~0 weight, so they are excluded -- their divergence does not move the estimate.
+ROLE_DONORS = {
+    # (role -> {event -> [exemplar donors]}); see contribution table values in comments.
+    'trend':   {'russia': ['Coffee', 'Sugar', 'SP500'],          # w_mean 0.22/0.16/0.13
+                'hormuz': ['Gold', 'JPY', 'Sugar', 'Coffee']},   # w_mean 0.26/0.21/0.17/0.14
+    'diverge': {'russia': ['JPY', 'KRW'],                        # weighted divergers w 0.056/0.044, div +5.0/+3.5
+                'hormuz': ['Gold']},                             # only weighted Hormuz diverger w 0.26, div -2.5
+}
+ROLE_TITLE = {'trend': 'Trend carriers', 'diverge': 'Late divergers'}
+# 19-donor shared pool (same grouping as the heatmap) for the leave-one-out common factor.
+ROLE_POOL = ['Silver', 'Platinum', 'Gold', 'Coffee', 'Sugar', 'LiveCattle', 'SP500',
+             'Nikkei', 'AUD', 'JPY', 'CHF', 'CNY', 'INR', 'KRW', 'ZAR', 'MXN', 'TLT',
+             'HYG', 'VIX']
+
+
+def _div_series(donor, factor_pre, factor_post, z_pre, z_post):
+    """Running standardised cumulative idiosyncratic residual for one donor, post-T0.
+    Mirrors scripts/donor_contribution_analysis.py: beta on the pre-window LOO factor,
+    residual = standardised post return - beta*factor, then cumsum / sqrt(n_post)."""
+    zd_pre = z_pre[donor].loc[factor_pre.index]
+    beta = np.cov(zd_pre, factor_pre)[0, 1] / np.var(factor_pre)
+    resid = z_post[donor].loc[factor_post.index] - beta * factor_post
+    return resid.cumsum() / np.sqrt(len(resid))
+
+
+def fig_donor_roles():
+    from lib.data import load_donors
+    brent = load_brent()['Brent'].astype(float)
+    donors = load_donors()
+    roles = ['trend', 'diverge']
+    fig, axes = plt.subplots(len(roles), 2, figsize=(11, 7.6), sharex='col')
+    for j, ev in enumerate(['russia', 'hormuz']):
+        s, t0 = PRE_WINDOWS[ev]['preferred'][0], T0[ev]
+        e = POST_END[ev]
+        sub = pd.concat([brent.rename('Brent'), donors[ROLE_POOL]], axis=1).loc[s:e].dropna()
+        # Pre-window standardisation + leave-one-out common factor (Brent-free).
+        pool_ret = np.log(sub[ROLE_POOL]).diff()
+        mu, sd = pool_ret.loc[s:t0].mean(), pool_ret.loc[s:t0].std(ddof=0)
+        z_pre = ((pool_ret.loc[s:t0] - mu) / sd).dropna()
+        z_post = ((pool_ret.loc[t0:e] - mu) / sd).dropna()
+
+        for i, role in enumerate(roles):
+            ax = axes[i, j]
+            ax.axvline(t0, color='firebrick', ls='--', lw=1.0)
+            dons = ROLE_DONORS[role][ev]
+            if role == 'trend':
+                reb = 100 * sub[['Brent'] + dons] / sub[['Brent'] + dons].iloc[0]
+                ax.plot(reb.index, reb['Brent'], color='black', lw=1.8, label='Brent', zorder=3)
+                for d, c in zip(dons, ['C0', 'C1', 'C2', 'C3', 'C4']):
+                    ax.plot(reb.index, reb[d], color=c, lw=1.1, label=d)
+                ax.set_ylabel('Trend carriers\nrebased level (start = 100)' if j == 0 else '')
+            else:  # diverge
+                for d, c in zip(dons, ['C0', 'C1', 'C2']):
+                    others = [o for o in ROLE_POOL if o != d]
+                    fp, fq = z_pre[others].mean(axis=1), z_post[others].mean(axis=1)
+                    div = _div_series(d, fp, fq, z_pre, z_post)
+                    ax.plot(div.index, div.values, color=c, lw=1.2, label=d)
+                ax.axhline(0, color='grey', lw=0.8, ls=':')
+                ax.set_ylabel('Late divergers\ncum. idiosyncratic resid.' if j == 0 else '')
+            if i == 0:
+                ax.set_title(EVTITLE[ev])
+            ax.legend(loc='best', frameon=False, fontsize=8)
+            if i == len(roles) - 1:
+                ax.set_xlabel('Date')
+                for lab in ax.get_xticklabels():
+                    lab.set_rotation(30); lab.set_ha('right')
+    fig.tight_layout()
+    fig.savefig(FIG / 'donor_roles.png')
+    plt.close(fig)
+
+
 if __name__ == '__main__':
     fig_timeline()
     fig_paths()
     fig_sensitivity()
     fig_placebo()
+    fig_donor_roles()
     print('figures written to', FIG)
     for p in sorted(FIG.glob('*.png')):
         print('  ', p.name)

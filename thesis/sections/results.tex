@@ -96,42 +96,15 @@ unregularised linear model in a pre-period that contains a strong non-event driv
 is the reason the ensemble uses the median rather than the mean. For Hormuz, whose calmer
 pre-period has no analogous confound, the five models agree to within about 5 points.
 
-\subsection{Donor weights and contributions}
-The previous paragraph attributed the model spread to regularisation meeting a confounded
-pre-period; the donor weights show which donors that disagreement runs through.
-Figure~\ref{fig:heatmap} reports each model's normalised donor weights for both events.
-Two features stand out. The pool is \emph{sparse}: every model concentrates on a handful
-of donors and leaves most at zero. And the models \emph{disagree on which handful} ---
-convex SCM and XGBoost concentrate weight on two to four donors, augmented SCM and the
-elastic net spread it across the FX block, and the Bayesian ridge loads currencies the
-others ignore. Russia leans on soft commodities (Coffee, Sugar) and the S\&P~500; Hormuz
-leans on Gold and the yen.
-
-How a donor contributes sorts into three descriptive roles. \textbf{Trend carriers} track
-Brent's slow level path: Coffee, Sugar and the S\&P~500 for Russia (pre-window
-level correlations near $0.9$), Gold and Sugar for Hormuz. Because Brent drifted
-\emph{down} through 2024--25, the strongest Hormuz trackers (Gold, Coffee) move
-\emph{inversely}, so the synthetic reproduces the decline by loading oppositely-moving
-donors. \textbf{Variance trackers} follow Brent's day-to-day fluctuation, but here the
-ceiling is low: no donor's daily-return correlation with Brent exceeds about $0.30$
-(Russia) or $0.17$ (Hormuz), so the synthetic reproduces Brent's \emph{path} far better
-than its daily \emph{variance}. \textbf{Late divergers} are clean at \T{} but decouple
-from the pool's common factor over the post-window. For Russia the EM and Asian FX block
-(CNY, JPY, KRW, INR) diverges most, the delayed discounted-crude and terms-of-trade
-channel audited in Section~\ref{sec:donoraudit}; for Hormuz the diverger is Gold itself,
-on its post-strike safe-haven bid.
-
-These roles explain the cross-model spread, and hence the headline IQR. The donors the
-models disagree on most are precisely the influential ones that also diverge late: Gold
-for Hormuz, which carries both the largest consensus weight and the largest across-model
-weight dispersion in the pool, and the FX block for Russia. The inter-quartile band is
-therefore not random model noise but the models disagreeing over how much to trust a few
-influential donors whose post-window paths are idiosyncratic or contaminated. This is the
-mechanism behind the two design choices already made: reporting the cross-model median
-rather than the mean (robust to one model over-loading a diverging donor), and reading
-the Russia full-window gap as the more contaminated of the two estimates. The per-donor
-weight, trend, variance, and divergence diagnostics behind this paragraph are tabulated in
-Appendix~\ref{app:donorweights}.
+\subsection{Donor contributions}
+To understand why the Russia ensemble is dispersed while Hormuz is comparatively
+concentrated, we look at the donor contributions behind each model. Figure~\ref{fig:heatmap}
+reports each model's normalised donor weights for both events.
+The pool is sparse, so most models concentrate on a handful of donors and leave
+the rest at or near zero, but they disagree on which handful. Convex SCM and XGBoost
+concentrate weight on two to four donors, augmented SCM and the elastic net spread it
+across the FX block, and the Bayesian ridge, which shrinks but never zeroes a donor,
+keeps weight on the whole pool including currencies the others ignore.
 
 \begin{figure}[h]
 \centering
@@ -150,6 +123,67 @@ comparable selection weights (Appendix~\ref{app:bsts}). \textit{Source:}
 \texttt{scripts/donor\_contribution\_analysis.py}.
 \end{minipage}
 \end{figure}
+
+How a donor contributes sorts into two descriptive roles, each visible as a row of
+Figure~\ref{fig:donorroles}.
+\begin{itemize}
+\item \textbf{Trend carriers} carry the largest donor weights, so their combination sets
+  the synthetic's slow level path. Membership here follows the weight rather than a level
+  correlation, since a linear correlation misses donors that contribute through more than
+  straight-line co-movement. For Russia the carriers (Coffee, Sugar and the S\&P~500) climb
+  alongside Brent. For Hormuz, Brent drifts down through 2024--25 while Gold and Coffee
+  rise, so the synthetic reproduces the decline by loading donors that move the opposite
+  way, and the yen, the second-heaviest donor, stays almost flat and anchors the level.
+\item \textbf{Late divergers} sit on the pool's common factor at \T{} and then peel away over the post-window, shown in the bottom row where each line leaves zero after the cutoff. The role is defined by this behaviour and then attributed to a cause donor by
+  donor, and the row plots only the divergers that also carry weight, since a donor that
+  decouples but is never loaded cannot move the estimate. For Russia the weight sits on the
+  Asian currencies, the yen and the Korean won, which the Fed tightening cycle pulled away
+  from the rest of the pool from March 2022. Because the Bayesian ridge loads these
+  currencies far more heavily than the other models, with convex SCM putting no weight on
+  them at all, their post-event divergence falls mainly on its synthetic, which is what
+  makes the Bayesian ridge the Russia outlier in Table~\ref{tab:headline}. The renminbi and
+  rupee decouple further still
+  on the discounted-crude terms-of-trade channel audited in Section~\ref{sec:donoraudit},
+  but the models barely load them, so their divergence is left out of the figure and does
+  not reach the gap. For Hormuz the single weighted diverger is Gold, falling away on its
+  post-strike safe-haven bid.
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\caption{Donor paths by contribution role.}
+\label{fig:donorroles}
+\includegraphics[width=\textwidth]{figures/donor_roles.png}
+
+\smallskip
+\begin{minipage}{\textwidth}
+\footnotesize \textit{Notes.} Rows are the two roles and columns are the two events. The
+dashed red line marks $T_0$. Trend carriers (top) are the highest-weight donors per event,
+each rebased to 100 at the pre-window start. For Russia they co-move with Brent in levels,
+while for Hormuz the heaviest movers (Gold, Coffee) run inversely as Brent drifts down and
+the yen sits almost flat as a level anchor. Late divergers (bottom) are the weighted donors
+that also decouple late, plotted as the standardised cumulative residual of the donor's
+return on a leave-one-out, Brent-free common factor. Each sits near zero at $T_0$ and
+decouples afterward. Donors with a large residual but negligible weight (CNY and INR) are
+omitted because the models do not load them. The per-donor weights and diagnostics behind both rows are in
+Appendix~\ref{app:donorweights}. Generated by \texttt{thesis/make\_figures.py}.
+\end{minipage}
+\end{figure}
+
+What separates the models is how much weight they place on a few influential donors and
+how those donors behave after the event. The Hormuz estimate is driven by the models that
+lean on Gold, and the Russia estimate by those that lean on the diverging currencies, so
+the disagreement across models traces back to a handful of heavy donors rather than to
+noise. This matters for the causal effect because the premium is the gap between actual
+Brent and the synthetic, and that gap is a clean counterfactual only while the donors hold
+their pre-event relationship to Brent. Once a loaded donor decouples after \T{}, the part
+of the synthetic resting on it stops standing in for Brent and the donor's own drift leaks
+into the estimated effect, growing as the window lengthens. For Russia the currencies drift
+in the conservative direction, lifting the synthetic and trimming the measured premium, so
+the contamination works against a large effect rather than inventing one. This is why the
+ensemble takes the median and why the Russia full-window gap is read as the more
+contaminated of the two estimates. The per-donor diagnostics are in
+Appendix~\ref{app:donorweights}.
 
 \subsection{Inference: the in-space placebo}
 Table~\ref{tab:placebo} and Figure~\ref{fig:placebo} report the in-space placebo. For
