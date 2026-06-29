@@ -82,6 +82,9 @@ monetary, and fiscal decisions.
 \clearpage
 \appendix
 \renewcommand{\thesection}{A.\arabic{section}}
+% Appendix tables numbered A.1, A.2, ... (continuous within the appendix)
+\setcounter{table}{0}
+\renewcommand{\thetable}{A.\arabic{table}}
 
 % ===== Appendices divider page (carries its own contents list) =====
 \thispagestyle{empty}
@@ -97,17 +100,23 @@ monetary, and fiscal decisions.
 \vspace{1.6cm}
 \begin{center}
 \begin{minipage}{0.82\textwidth}\large
-\ref{app:ensemble}\quad\nameref{app:ensemble}\dotfill\pageref{app:ensemble}\par\medskip
+\ref{app:ensemble}\quad\nameref{app:ensemble}\dotfill\pageref{app:ensemble}\par\smallskip
+{\normalsize\hspace{1.5em}Table~\ref{tab:grids}\quad\nameref{tab:grids}\dotfill\pageref{tab:grids}}\par\medskip
 \ref{app:breaks}\quad\nameref{app:breaks}\dotfill\pageref{app:breaks}\par\medskip
-\ref{app:donoraudit}\quad\nameref{app:donoraudit}\dotfill\pageref{app:donoraudit}\par\medskip
-\ref{app:donorweights}\quad\nameref{app:donorweights}\dotfill\pageref{app:donorweights}
+\ref{app:donoraudit}\quad\nameref{app:donoraudit}\dotfill\pageref{app:donoraudit}\par\smallskip
+{\normalsize\hspace{1.5em}Table~\ref{tab:donoraudit}\quad\nameref{tab:donoraudit}\dotfill\pageref{tab:donoraudit}}\par\medskip
+\ref{app:donorweights}\quad\nameref{app:donorweights}\dotfill\pageref{app:donorweights}\par\smallskip
+{\normalsize\hspace{1.5em}Table~\ref{tab:donorweights}\quad\nameref{tab:donorweights}\dotfill\pageref{tab:donorweights}}
 \end{minipage}
 \end{center}
 \clearpage
 
 \input{sections/methodology}
+\clearpage
 \input{sections/donor_battery_tests}
+\clearpage
 \input{sections/donor_audit_catalog}
+\clearpage
 \input{sections/donor_contribution_metrics}
 
 \end{document}
