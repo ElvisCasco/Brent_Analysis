@@ -12,6 +12,7 @@
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{threeparttable}
 \usepackage{array}
 \usepackage{multirow}
 \usepackage{siunitx}
@@ -58,12 +59,13 @@ monetary, and fiscal decisions.
 
 The Strait of Hormuz is the narrowest binding constraint in the global oil system.
 Roughly one-fifth of world petroleum-liquids consumption transits the lane between
-Iran and Oman, carrying crude from Saudi Arabia, Iraq, the United Arab Emirates,
-Kuwait, Iran, and Qatar to seaborne markets. What makes the chokepoint so
-consequential is the absence of a redundant route. The Saudi East--West and UAE
-Habshan--Fujairah pipelines together divert only a small fraction of this volume
-overland, and no maritime bypass exists, so the overwhelming majority of Gulf crude
-has nowhere else to go. This leaves Hormuz the single strongest bottleneck in the
+Iran and Oman \citep{eia_hormuz2025}, carrying crude from Saudi Arabia, Iraq, the
+United Arab Emirates, Kuwait, Iran, and Qatar to seaborne markets. What makes the
+chokepoint so consequential is the absence of a redundant route. The Saudi East--West
+and UAE Habshan--Fujairah pipelines together divert only a small fraction of this
+volume overland---about 2.6~million b/d of spare capacity against the roughly
+20~million b/d that transits the strait \citep{eia_hormuz2025}---and no maritime bypass
+exists, so the overwhelming majority of Gulf crude has nowhere else to go. This leaves Hormuz the single strongest bottleneck in the
 world's oil-transport network. The lane has seen periodic near-misses, among them the
 1980s tanker war, the 2019 Abqaiq strike, and recurring tensions through the mid-2020s,
 each producing a transient risk-premium spike but never an actual closure. The
@@ -88,11 +90,13 @@ of Brent crude over a policy-relevant post-event window?}
 We deliberately target the \emph{total} causal effect rather than any single
 transmission channel, and we estimate it as a \emph{path} over the post-event window
 rather than a single number. The applications drive this choice. Emergency
-strategic-reserve releases are sized against an implied price displacement. The
-monetary-policy decision to look through an oil shock or to tighten turns on its size
-and persistence. Fiscal stabilisation in subsidising oil importers scales with the
-move. And sovereign hedging programmes price disruption scenarios against exactly such
-magnitudes. Each lever acts on the trajectory of the effect, not on a peak-day figure.
+strategic-reserve releases are sized against an implied price displacement (the IEA
+coordinated the drawdown of some 180~million barrels after the 2022 invasion of Ukraine
+\citep{iea2022release}). The monetary-policy decision to look through an oil shock or to
+tighten turns on its size and persistence. Fiscal stabilisation in subsidising oil
+importers scales with the move. And sovereign hedging programmes price disruption
+scenarios against exactly such magnitudes (Mexico's annual ``Hacienda hedge'' is the
+largest such programme in the world \citep{jfi2023mexico}). Each lever acts on the trajectory of the effect, not on a peak-day figure.
 The object we need is therefore the average gap between observed Brent and the price
 that would have prevailed absent the disruption, traced over the whole window.
 Recovering that counterfactual path, which has no directly observable analogue, is the
@@ -137,7 +141,7 @@ design is valid in this setting as about the number it produces.
 A single estimate, however, cannot be told apart from an artefact of the donor pool,
 pre-window, model class, and regularisation. We therefore benchmark the design on the
 nearest comparable historical oil-supply shock, the 2022 Russian invasion of Ukraine
-(Brent \$95$\to$\$130 within two weeks), and check that the same machinery recovers
+(Brent \$95$\to$\$130 within two weeks \citep{eia_brent}), and check that the same machinery recovers
 that documented magnitude before estimating the Hormuz effect afresh on its own
 pre-window. We do not transfer the Russia fit to Hormuz. The two events sit in very
 different market regimes, and we estimate each one independently. Because both are fit
@@ -158,10 +162,10 @@ under a single-unit geopolitical treatment.
 
 The remainder of the paper reviews the relevant literature (Section~\ref{sec:lit}),
 sets out the factor model, estimand, and identifying assumptions
-(Section~\ref{sec:theory}), describes the data and donor audit (Section~\ref{sec:data}),
-details the empirical strategy and validation battery (Section~\ref{sec:methods}), and
-reports results for both events (Section~\ref{sec:results}) before concluding
-(Section~\ref{sec:conclusion}).
+(Section~\ref{sec:theory}), describes the data, the estimators, and the validation
+battery (Section~\ref{sec:data}), audits the donor pool donor by donor
+(Section~\ref{sec:donoraudit}), and reports results for both events
+(Section~\ref{sec:results}) before concluding (Section~\ref{sec:conclusion}).
 
 
 % ===================================================================
@@ -254,12 +258,13 @@ Benjamini--Hochberg \citep{benjaminihochberg1995}.
 % ===================================================================
 \section{Conceptual Framework}\label{sec:theory}
 % ===================================================================
-This section sets out the data-generating process we assume for Brent, derives the
-estimand and identifying assumptions from it, and explains why an \emph{ensemble} of
-estimators is the appropriate proxy when the functional form of the counterfactual is
-unknown. The factor model in Section~\ref{sec:theory}.1 is the organising device. It
-makes donor selection an economic exercise, renders each identifying assumption
-transparent, and gives the contamination bias an explicit sign.
+This section sets out the data-generating process we assume for Brent and derives the
+estimand and identifying assumptions from it. The factor model in
+Section~\ref{sec:theory}.1 is the organising device. It makes donor selection an economic
+exercise, renders each identifying assumption transparent, and gives the contamination
+bias an explicit sign. It also exposes the residual model uncertainty that motivates the
+ensemble estimator, whose construction we defer to the methodology
+(Section~\ref{sec:methods}).
 \subsection{A factor model of Brent}
 We decompose log Brent into a component spanned by global macro-financial factors common
 to many assets and an oil-specific component:
@@ -349,132 +354,104 @@ break tests. \emph{Delayed} contamination accrues over the post-window, enters t
 the projection, biases the gap toward zero, and grows with horizon, so a gap that
 \emph{declines} as the window lengthens is its signature, and the short-horizon gap is
 the least-contaminated estimate.
-\subsection{Why an ensemble}
-A single specification cannot be trusted because the counterfactual's functional form is
-unknown. Equation~\eqref{eq:factor} need not be linear in the donors, and the
-convex-hull restriction of classical SCM may or may not bind. Rather than commit to one
-form, we proxy the counterfactual with five estimators whose inductive biases bracket the
-plausible cases (Table~\ref{tab:models}): a simplex-constrained average, a
-ridge-extrapolating correction, a sparse signed regression, a nonlinear tree ensemble,
-and a Bayesian linear model. An estimated premium that survives across biases this
-different is far more likely to reflect a real effect than a single-model artefact. We
-report the cross-model \emph{median} as the headline, which is robust to any one model
-misbehaving, and the inter-quartile range as a model-uncertainty band that complements
-each model's own within-model interval.
-\begin{table}[t]
-\centering
-\caption{The five-estimator ensemble. Each contributes a distinct inductive bias, and
-the headline is the cross-model median gap.}
-\label{tab:models}
-\small
-\begin{tabular}{@{}p{2.6cm}p{7.4cm}p{4.0cm}@{}}
-\toprule
-Estimator & Inductive bias & Reference \\
-\midrule
-Convex SCM & Non-negative donor weights summing to one, synthetic inside the donor convex hull & \citet{abadie2010}\\
-Augmented SCM & Convex SCM plus ridge bias-correction, limited extrapolation outside the hull & \citet{benmichael2021}\\
-Elastic net & Signed, sparse$+$ridge regression, lasso term drops donors entirely & \citet{doudchenko2016}\\
-Gradient boosting (XGBoost) & Nonlinear, tree-based, captures interactions, cannot extrapolate beyond the training range & \citet{chenguestrin2016}\\
-Bayesian ridge & Bayesian linear regression on donor levels (regression component of BSTS), conjugate Gaussian--Gamma prior & \citet{brodersen2015}\\
-\bottomrule
-\end{tabular}
-\end{table}
-A note on labelling: the fifth estimator is a Bayesian \emph{ridge} regression, not full
-Bayesian structural time series. It implements only the regression-on-donors component
-$\beta'x_t$ of \citet{brodersen2015} and omits the trend, seasonal, and spike-and-slab
-selection components. At our sample size, and with no strong weekly seasonality, the
-regression term carries most of the signal, but the model is best read as a
-Bayesian-flavoured diversifier rather than a state-space causal-impact estimator
-(Appendix~\ref{app:bsts}).
+A final source of error is neither identification nor contamination but
+\emph{specification}: the counterfactual's functional form is unknown, so no single
+estimator is privileged. We address this irreducible model uncertainty with an ensemble
+of five estimators rather than one, a methodological choice we set out with the
+estimators themselves in Section~\ref{sec:methods}.
 
 % ===================================================================
-\section{Data}\label{sec:data}
+\section{Data and Methodology}\label{sec:data}
 % ===================================================================
-This section describes the outcome series, the donor candidates and the per-event
-cleanliness audit that selects among them, and the sample windows over which each event
-is fit and projected. Two themes recur and both follow from the factor model of
-Section~\ref{sec:theory}. Donor selection is an identification choice rather than a
-fit-maximising one, and the length of the estimation window is itself a SUTVA
-consideration, not merely a sample-size one.
+This section sets out the foundations of the empirical design: the data we use, the
+choices that govern the donor pool and the estimation windows, the estimators that
+proxy the counterfactual, and the validation battery that defends the estimate. Two
+themes recur and both follow from the factor model of Section~\ref{sec:theory}. Donor
+selection is an identification choice rather than a fit-maximising one, and the length
+of the estimation window is itself a SUTVA consideration, not merely a sample-size one.
+We describe here \emph{what} the pool and the methods are and \emph{why} they were
+chosen; the donor-by-donor audit that adjudicates which candidates survive is deferred
+to Section~\ref{sec:donoraudit}.
 
-\subsection{Outcome and sources}
-The outcome is the daily \emph{Europe Brent Spot Price FOB} (EIA series RBRTEd), in
+\subsection{Target and sources}
+The target is the daily \emph{Europe Brent Spot Price FOB} (EIA series RBRTEd), in
 USD per barrel, downloaded directly from the U.S.\ Energy Information Administration
 \citep{eia_brent}. The donor candidates are 32 macro-financial series from Yahoo
-Finance (futures, ETFs, FX, rates, volatility), updated incrementally so the panel
-keeps pace with new data. Table~\ref{tab:sources} summarises the sources. All are public
-and redistributable, and the panel is rebuilt from source on each run so the analysis is
+Finance, and they are not an arbitrary collection: they are chosen to span the
+asset classes through which the common factors of equation~\eqref{eq:factor} move Brent.
+The 32 fall into seven broad categories---metals (6: copper, iron ore, silver, platinum,
+palladium, gold), agriculturals (7: soybeans, wheat, corn, coffee, sugar, cotton, live
+cattle), equities (3: S\&P~500, Nikkei~225, EM equities), foreign exchange (11: AUD, JPY,
+CHF, CNY, INR, KRW, ZAR, MXN, EUR, GBP, and the dollar basket DXY), rates and credit
+(3: the US 10-year yield, long Treasuries TLT, high-yield credit HYG), volatility (1: the
+VIX), and crypto (1: Bitcoin). Metals and equities proxy the global industrial cycle, FX
+the dollar and terms-of-trade channels, rates and credit the real-rate and risk-premium
+factors, and volatility the risk-appetite factor, so the candidate set covers all five
+drivers before any audit narrows it. The panel is updated incrementally so it keeps pace
+with new data. Table~\ref{tab:sources} summarises the sources. All are public and
+redistributable, and the panel is rebuilt from source on each run so the analysis is
 reproducible against the latest available data (here, through 15~June~2026 for Brent,
 the binding constraint given the EIA's roughly one-week publication lag, and
 23~June~2026 for the donors).
 
 \begin{table}[h]
 \centering
-\caption{Data sources. All series are daily and publicly redistributable.}
+\caption{Data sources.}
 \label{tab:sources}
+\begin{threeparttable}
 \small
 \begin{tabular}{@{}p{3.0cm}p{3.6cm}p{7.0cm}@{}}
 \toprule
 Object & Source & Contents \\
 \midrule
-Brent spot (outcome) & EIA, series RBRTEd & Europe Brent Spot FOB, USD/bbl, 1987--present\\
+Brent spot (target) & EIA, series RBRTEd & Europe Brent Spot FOB, USD/bbl, 1987--present\\
 Donor candidates (32) & Yahoo Finance & Metals, agriculturals, equities, FX, rates, credit, volatility, crypto\\
 \bottomrule
 \end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes.} All series are daily and publicly redistributable.
+\end{tablenotes}
+\end{threeparttable}
 \end{table}
 
-\subsection{The donor pool and the SUTVA audit}
-Donor selection is central to identification (Section~\ref{sec:theory}). A series
-qualifies only if it (i) co-moves with Brent through common global factors, (ii) is
-\emph{not} physically routed through the disruption being attributed, (iii) is liquid
-and daily-traded, and (iv) has sufficient pre-history. Criterion (ii) is the SUTVA
-(no-interference) condition and is enforced by a per-event audit that classifies each
-donor as Clean, Mild, or Heavy. For \textbf{Russia 2022}, 13 of 32 donors are flagged
-through identifiable channels, namely Russia/Ukraine grain exports (Wheat, Corn),
-palladium supply concentration, the EU energy-crisis pass-through to EUR and the dollar
-basket, and a sanctions-evasion narrative for Bitcoin. For \textbf{Hormuz 2026}, only
-Cotton is flagged (the indirect oil$\to$polyester substitution channel), and no donor is
-physically routed through the Strait.
+\subsection{Donor pool: selection criteria and the shared-pool choice}
+Donor selection is central to identification (Section~\ref{sec:theory}), and it is
+governed by an explicit set of criteria rather than by raw correlation with Brent. A
+series qualifies only if it satisfies all four of the following:
+\begin{enumerate}
+\item \textbf{Common-factor co-movement.} It co-moves with Brent through the common
+global factors of equation~\eqref{eq:factor}, not through the oil-specific term. This is
+the positive case for inclusion: the pool is built to span the five drivers (global
+industrial cycle, the dollar, real rates, risk appetite, China demand) so the synthetic
+can reproduce Brent under any mix of them.
+\item \textbf{No interference (SUTVA).} It is \emph{not} physically routed through the
+disruption being attributed. This is the criterion that does the identifying work; it is
+enforced by a per-event audit that classifies each candidate as Clean, Mild, or Heavy
+according to its exposure to the focal event (Section~\ref{sec:donoraudit}).
+\item \textbf{Liquidity.} It is liquid and daily-traded, with a public, redistributable
+source.
+\item \textbf{History.} It has sufficient pre-event history for the events under study.
+\end{enumerate}
 
-To make the two events directly comparable, we fit both on a single shared 19-donor
-pool, formed by retaining only the donors rated Clean for Russia, the more demanding of
-the two audits. This reduces the 32 candidates to 19, and because the Russia
-strict-clean set is itself a subset of the Hormuz clean set, every member stays clean
-for both events. Cotton, flagged Mild for Hormuz, is therefore excluded on the strength
-of the Russia audit rather than retained, so its indirect channel never enters the
-shared pool. One donor, VIX, is borderline. A full-history Bai--Perron test
-\citep{baiperron1998} flags a single break in its relationship with Brent on 2022-01-07,
-about 7 weeks before the invasion. We treat that as a loading-stability signal rather
-than a SUTVA violation, because it does not reproduce when the test is run on the
-analysis window alone, and a sensitivity check shows that keeping or dropping VIX moves
-the ensemble premium by less than 1 percentage point. We therefore retain VIX, which
-keeps the volatility factor represented. The energy complex (WTI, refined products,
-petrocurrencies) is excluded by construction. It has the highest raw correlation with
-Brent but loads on the very oil-specific shock we measure. Table~\ref{tab:donors} lists
-the 19-donor pool by factor category.
+The central design choice concerns \emph{which} pool to carry across the two events. We
+fit both Russia and Hormuz on a single shared pool, formed by retaining only the
+candidates that are Clean for \textbf{Russia 2022}, the more demanding of the two audits.
+Because the Russia strict-clean set is a subset of the Hormuz clean set, every member of
+the shared pool stays clean for both events, so the same basket is a valid counterfactual
+in each. The alternative, using each event's own maximal clean set, would maximise
+within-event fit but would prevent the cross-event weight-transfer check that is the
+strongest robustness test available with only two events (Section~\ref{sec:results}); we
+prefer the shared pool and treat the sacrificed Hormuz-clean donors as the price of
+comparability. The energy complex (WTI, refined products, petrocurrencies) is excluded
+by construction under criterion (ii): it has the highest raw correlation with Brent but
+loads on the very oil-specific shock $o_t$ we are trying to measure, so including it
+would choose fit over identification. The donor-by-donor execution of this audit, the
+resulting membership, and the empirical tests that confirm it are the subject of
+Section~\ref{sec:donoraudit}; the full per-event catalog of all 32 candidates is
+Table~\ref{tab:donoraudit} in Appendix~\ref{app:donoraudit}.
 
-\begin{table}[h]
-\centering
-\caption{The shared 19-donor pool, by factor category. The full 32-donor pool adds
-Russia-contaminated series (e.g.\ Wheat, Corn, Palladium, EUR, DXY, BTC, Copper, Iron
-Ore, US10Y) used only in the appendix robustness pool and as a contamination diagnostic.}
-\label{tab:donors}
-\small
-\begin{tabular}{@{}lp{10.5cm}@{}}
-\toprule
-Category & Donors (shared pool) \\
-\midrule
-Metals (3) & Silver, Platinum, Gold \\
-Agriculturals (3) & Coffee, Sugar, Live Cattle \\
-Equities (2) & S\&P 500, Nikkei 225 \\
-Foreign exchange (8) & AUD, JPY, CHF, CNY, INR, KRW, ZAR, MXN \\
-Rates \& credit (2) & TLT (long Treasuries), HYG (high-yield credit) \\
-Volatility (1) & VIX (implied S\&P 500 volatility) \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{Sample windows and summary statistics}
+\subsection{Window selection}
 The estimation window must be chosen, not maximised. For daily-traded benchmarks like
 Brent and its donors, a longer pre-history is not automatically better. These series
 pass through distinct market regimes, and a window that spans several of them risks
@@ -490,13 +467,18 @@ abnormal factor loading. The Russia post-window is truncated at 2022-09-30, the 
 business day before OPEC+'s October 2022 supply cut, a Brent-specific policy shock that
 would confound the invasion premium. The Hormuz post-window extends to the latest
 available data (2026-06-15). Table~\ref{tab:summary} reports summary statistics, and
-Figure~\ref{fig:timeline} plots the full Brent series with both events.
+Figure~\ref{fig:timeline} plots the full Brent series with both events and the shaded
+pre- and post-windows. Brent roughly doubled after both focal shocks from a similar
+$\sim$\$75 base, but from very different pre-event trajectories: a steep 2020--22 recovery
+rally before Russia and a mild net decline through 2024--25 before Hormuz. This
+trajectory asymmetry is what makes a na\"ive trend-extrapolation counterfactual
+unreliable (Section~\ref{sec:results}).
 
 \begin{table}[h]
 \centering
-\caption{Summary statistics of Brent spot (USD/barrel) over each event sample.
-Pre/post split at $T_0$. Russia: $T_0$=2022-02-24; Hormuz: $T_0$=2026-02-28.}
+\caption{Summary statistics of Brent spot, by event sample.}
 \label{tab:summary}
+\begin{threeparttable}
 \small
 \begin{tabular}{@{}llrrrrr@{}}
 \toprule
@@ -513,17 +495,32 @@ Event & Segment & $n$ (days) & Mean & SD & Min & Max \\
  & Post-window & 72  & 106.92 & 12.31 & 77.24 & 138.21 \\
 \bottomrule
 \end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes.} Prices in USD/barrel. Pre/post split at $T_0$; Russia $T_0$=2022-02-24, Hormuz $T_0$=2026-02-28.
+\end{tablenotes}
+\end{threeparttable}
 \end{table}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.92\textwidth]{figures/brent_timeline.png}
-\caption{Brent crude spot price, 2020--2026, with the two focal event dates. Brent
-roughly doubled after both shocks from a similar $\sim$\$75 base, but from very
-different pre-event trajectories, a steep 2020--22 recovery rally before Russia and a
-mild net decline through 2024--25 before Hormuz. This trajectory asymmetry is what makes
-a na\"ive trend-extrapolation counterfactual unreliable (Section~\ref{sec:results}).}
+\caption{Brent crude spot price and the curated event timeline, 2020--2026.}
 \label{fig:timeline}
+\includegraphics[width=0.92\textwidth]{figures/brent_timeline.png}
+
+\smallskip
+\begin{minipage}{0.92\textwidth}
+\footnotesize \textit{Notes.} Lettered markers date the curated timeline events; the two
+focal events (\textbf{e}, \textbf{i}) are bold dashed lines, the rest grey dotted.
+(a)~Saudi--Russia price war, 8 Mar 2020; (b)~COVID-19 pandemic, 11 Mar 2020;
+(c)~WTI-negative, 20 Apr 2020; (d)~energy-cycle reflation, 1 Oct 2021;
+(e)~\textbf{Russia invades Ukraine, 24 Feb 2022}; (f)~Russia oil price cap, 5 Dec 2022;
+(g)~Israel--Hamas war, 7 Oct 2023; (h)~Red Sea diversion, 19 Nov 2023;
+(i)~\textbf{Strait of Hormuz crisis, 28 Feb 2026}. Shaded bands are each focal event's
+preferred-specification estimation windows: blue the pre-window (fitting), red the
+post-window (projection). \textit{Source:} Brent, EIA series RBRTEd; event timeline
+curated by the authors (Appendix~\ref{app:donoraudit} for the donor-side audit).
+\end{minipage}
 \end{figure}
 
 The two pre-windows differ in a way that matters later. The Russia pre-period is
@@ -534,10 +531,42 @@ distribution and weakens Russia's permutation test even though its magnitude is
 well-documented.
 
 
-% ===================================================================
-\section{Empirical Strategy and Validation}\label{sec:methods}
-% ===================================================================
-\subsection{Estimators}
+\subsection{Estimators and the ensemble}\label{sec:methods}
+A single specification cannot be trusted because the counterfactual's functional form is
+unknown. Equation~\eqref{eq:factor} need not be linear in the donors, and the
+convex-hull restriction of classical SCM may or may not bind. Rather than commit to one
+form, we proxy the counterfactual with five estimators whose inductive biases bracket the
+plausible cases (Table~\ref{tab:models}): a simplex-constrained average, a
+ridge-extrapolating correction, a sparse signed regression, a nonlinear tree ensemble,
+and a Bayesian linear model. An estimated premium that survives across biases this
+different is far more likely to reflect a real effect than a single-model artefact. We
+report the cross-model \emph{median} as the headline, which is robust to any one model
+misbehaving, and the inter-quartile range as a model-uncertainty band that complements
+each model's own within-model interval.
+\begin{table}[t]
+\centering
+\caption{The five-estimator ensemble.}
+\label{tab:models}
+\begin{threeparttable}
+\small
+\begin{tabular}{@{}p{2.6cm}p{7.4cm}p{4.0cm}@{}}
+\toprule
+Estimator & Inductive bias & Reference \\
+\midrule
+Convex SCM & Non-negative donor weights summing to one, synthetic inside the donor convex hull & \citet{abadie2010}\\
+Augmented SCM & Convex SCM plus ridge bias-correction, limited extrapolation outside the hull & \citet{benmichael2021}\\
+Elastic net & Signed, sparse$+$ridge regression, lasso term drops donors entirely & \citet{doudchenko2016}\\
+Gradient boosting (XGBoost) & Nonlinear, tree-based, captures interactions, cannot extrapolate beyond the training range & \citet{chenguestrin2016}\\
+Bayesian ridge & Bayesian linear regression on donor levels (regression component of BSTS), conjugate Gaussian--Gamma prior & \citet{brodersen2015}\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes.} Each estimator contributes a distinct inductive bias; the headline is the cross-model median gap across the five.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
 All five estimators (Table~\ref{tab:models}) take the same input (log donor levels) and
 target log Brent over the pre-window, then project the post-window counterfactual. The
 two events are estimated entirely separately: they share the same 19-donor pool and the
@@ -558,6 +587,14 @@ SCM, signed unconstrained coefficients for the regressions, and no linear weight
 for XGBoost, the ensemble operates on the \emph{gap series} each model implies rather
 than on the weights. The headline at every $t$ is the cross-model median gap, with the
 inter-quartile range as the model-uncertainty band.
+
+A note on labelling: the fifth estimator is a Bayesian \emph{ridge} regression, not full
+Bayesian structural time series. It implements only the regression-on-donors component
+$\beta'x_t$ of \citet{brodersen2015} and omits the trend, seasonal, and spike-and-slab
+selection components. At our sample size, and with no strong weekly seasonality, the
+regression term carries most of the signal, but the model is best read as a
+Bayesian-flavoured diversifier rather than a state-space causal-impact estimator
+(Appendix~\ref{app:bsts}).
 
 \subsection{Validation battery and its logic}
 A credible SCM estimate must clear three levels \citep{abadie2021}: pre-event fit, donor
@@ -580,12 +617,9 @@ the known-break test of \citet{chow1960} (rather than the unknown-break test of
 FDR control \citep{benjaminihochberg1995}. Regime stability is checked with distance
 correlation across pre-period thirds \citep{szekely2007} and with Bai--Perron break
 dating \citep{baiperron1998,baiperron2003}, and an I(0)/I(1)-robust trend-break test
-\citep{harvey2009,kpss1992} confirms that no donor's own trend breaks at either $T_0$;
-the single VIX relationship-break noted in Section~\ref{sec:data} falls $\sim$7 weeks
-\emph{before} the Russia $T_0$, not at it, and does not recur on the analysis window.
-Empirically, for Hormuz 31 of 32 donors agree between audit and tests (only Cotton
-differs); for Russia the tests confirm the broad picture and add one flag (CNY)
-attributable to concurrent China dynamics rather than the war.
+\citep{harvey2009,kpss1992} confirms that no donor's own trend breaks at either $T_0$.
+This battery operates at the level of the individual donor, so its outcomes are reported
+with the donor audit (Section~\ref{sec:donoraudit}) rather than here.
 
 
 The third level concerns \emph{inference}. We run the in-space placebo, refitting each
@@ -613,6 +647,107 @@ report both for transparency.
 
 
 % ===================================================================
+\section{Donor Audit}\label{sec:donoraudit}
+% ===================================================================
+This section applies the selection criteria of Section~\ref{sec:data} donor by donor.
+It reports which candidates are retained and which are dropped under each event's
+cleanliness audit, states the shared pool that results, gives the positive case for the
+families excluded by construction, and closes with the empirical donor-level tests that
+confirm the a-priori audit. The full per-event catalog of all 32 candidates, with each
+one's factor loading and Clean/Mild/Heavy status for both events, is
+Table~\ref{tab:donoraudit} in Appendix~\ref{app:donoraudit}; the discussion here is
+organised by audit tier and by the reason for exclusion.
+
+\subsection{The per-event cleanliness audit}
+Each candidate is scored against the focal event on a three-level scale: \textbf{Clean}
+(no direct supply or demand exposure to the event), \textbf{Mild} (a secondary or
+terms-of-trade channel, bias possible but small), and \textbf{Heavy} (direct exposure, a
+SUTVA violation). The two events stress the pool very differently. For \textbf{Russia
+2022}, 13 of the 32 candidates carry an identifiable channel to the war: 6 are Heavy and
+7 are Mild. The Heavy set is Wheat and Corn (Russia and Ukraine together supply roughly a
+third of world wheat exports and an eighth of corn), Palladium (Russia is around
+40\,\% of supply), the euro and the dollar basket (the European energy-crisis
+pass-through dominates both), and Bitcoin (the sanctions-evasion narrative of March
+2022). The Mild set is Copper, Iron Ore, Soybeans, and EM equities (terms-of-trade and
+EM-growth exposure), sterling (UK gas exposure), the US 10-year yield (the
+European-inflation channel), and Cotton (the indirect oil$\to$polyester substitution
+channel). For \textbf{Hormuz 2026} the audit is far cleaner: no candidate is physically
+routed through the Strait, and only Cotton is flagged Mild, again on the oil$\to$polyester
+channel rather than any Gulf-trade exposure.
+
+\subsection{The retained shared pool}
+The shared pool is the Russia strict-clean set, the 19 candidates rated Clean for the
+more demanding event (Table~\ref{tab:donors}). Retaining the Russia-clean set drops the
+13 Russia-flagged candidates (the 6 Heavy and 7 Mild above); because that set is a subset
+of the Hormuz-clean set, all 19 stay clean for both events. Cotton illustrates the logic:
+it is Mild for both events, so even though Hormuz alone would tolerate it under a
+permissive variant, it is excluded on the strength of the Russia audit and its indirect
+channel never enters the shared pool. One retained donor, VIX, is borderline. A
+full-history Bai--Perron test \citep{baiperron1998} dates a single break in its
+relationship with Brent on 2022-01-07, about seven weeks \emph{before} the invasion. We
+read that as a loading-stability signal rather than a SUTVA violation, because it does not
+recur when the test is run on the analysis window alone, and a sensitivity check shows
+that keeping or dropping VIX moves the ensemble premium by less than one percentage point.
+We therefore retain VIX, which keeps the volatility factor represented.
+
+\begin{table}[h]
+\centering
+\caption{The retained shared 19-donor pool, by factor category.}
+\label{tab:donors}
+\begin{threeparttable}
+\small
+\begin{tabular}{@{}lp{10.5cm}@{}}
+\toprule
+Category & Donors (shared pool) \\
+\midrule
+Metals (3) & Silver, Platinum, Gold \\
+Agriculturals (3) & Coffee, Sugar, Live Cattle \\
+Equities (2) & S\&P 500, Nikkei 225 \\
+Foreign exchange (8) & AUD, JPY, CHF, CNY, INR, KRW, ZAR, MXN \\
+Rates \& credit (2) & TLT (long Treasuries), HYG (high-yield credit) \\
+Volatility (1) & VIX (implied S\&P 500 volatility) \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes.} The full 32-candidate pool adds the Russia-contaminated series (Wheat, Corn, Palladium, EUR, DXY, BTC, Copper, Iron Ore, Soybeans, EM equities, GBP, US10Y, Cotton), used only as an appendix robustness pool and contamination diagnostic. Full per-event catalog: Table~\ref{tab:donoraudit}.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\subsection{Candidates excluded by construction}
+Several families never reach the per-event audit because criterion (ii) rules them out a
+priori. The \emph{energy complex} (WTI, Henry Hub natural gas, refined products, EIA
+ex-SPR inventories) has the highest pre-period correlation with Brent and would give the
+lowest pre-period RMSPE, yet every member is driven by the same oil-specific shock $o_t$
+we are trying to measure, so each would mechanically shrink the estimated premium toward
+zero. \emph{Petrocurrencies} (CAD, NOK, BRL, COP, MYR, and the suspended RUB) are
+excluded for the same reason in FX form: their value is partly set by oil through the
+exporter's terms of trade, which places them on the oil causal path. \emph{Unstable or
+idiosyncratic FX} (TRY, ARS, EGP) are dropped because their volatility is dominated by
+domestic crisis dynamics that add noise rather than shared-factor signal.
+\emph{Energy-heavy equity indices} (DAX, FTSE~100, TSX~60) carry direct energy-sector or
+European-energy-crisis exposure, and KOSPI and Hang Seng are redundant with the KRW and
+CNY factors. \emph{Thin or discontinuous commodities} (cocoa, orange juice, lean hogs,
+lumber) are too idiosyncratic or break contract continuity in the pre-period. Finally,
+MSCI World is dropped as redundant with the S\&P 500, with which it correlates above 0.95.
+Appendix~\ref{app:donoraudit} records each rejected family with its specific reason.
+
+\subsection{Empirical confirmation of the audit}
+The a-priori audit is the primary identification defence; the donor-level battery of
+Section~\ref{sec:methods} is its empirical check, and the two agree closely. For
+\textbf{Hormuz 2026}, 31 of the 32 candidates agree between the qualitative audit and the
+model-agnostic tests at $T_0$; only Cotton differs, and its Mild rating is an economic
+causal-channel call that the contemporaneous tests are not expected to reproduce for an
+indirect, lagged channel. For \textbf{Russia 2022} the tests confirm the broad picture
+and add a single flag on CNY, which is attributable to the concurrent China zero-COVID
+dynamics rather than to the war. The regime-stability tests behave consistently: the only
+within-pre-window relationship break the Bai--Perron procedure dates among retained
+donors is the VIX break of 2022-01-07 discussed above, which falls before $T_0$ and is
+treated as informative rather than exclusionary. The empirical battery therefore
+corroborates the cleanliness of the retained pool without overturning any audit call.
+
+% ===================================================================
 \section{Results}\label{sec:results}
 % ===================================================================
 \subsection{Pre-event fit}
@@ -626,9 +761,9 @@ headline gap is the ensemble outlier, so the flag and the outlier tell a consist
 
 \begin{table}[h]
 \centering
-\caption{Walk-forward cross-validation (5 expanding folds, 20-day horizons). A
-validation/training RMSE ratio above 2 is a heuristic overfit flag, not an exclusion rule.}
+\caption{Walk-forward cross-validation (5 expanding folds, 20-day horizons).}
 \label{tab:wfcv}
+\begin{threeparttable}
 \small
 \begin{tabular}{@{}llrrl@{}}
 \toprule
@@ -647,6 +782,11 @@ Hormuz & XGBoost        & 1.84 & OK \\
 Hormuz & Bayesian ridge & 2.28 & overfit \\
 \bottomrule
 \end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes.} A validation/training RMSE ratio above 2 is a heuristic overfit flag, not an exclusion rule.
+\end{tablenotes}
+\end{threeparttable}
 \end{table}
 
 \subsection{Headline estimates}
@@ -663,10 +803,9 @@ implied counterfactual near \$68.6. The Hormuz band is far tighter than Russia's
 
 \begin{table}[h]
 \centering
-\caption{Headline post-event gaps (\%). Drift-adjusted $=$ raw gap minus the pre-period
-gap trend extrapolated over the post-window (see Section~\ref{sec:methods}). Ensemble $=$
-cross-model median, band $=$ IQR (Q25--Q75).}
+\caption{Headline post-event gaps (\%).}
 \label{tab:headline}
+\begin{threeparttable}
 \small
 \begin{tabular}{@{}lrr@{\hskip 1.6em}rr@{}}
 \toprule
@@ -684,16 +823,26 @@ Bayesian ridge & $-9.0$ & $-9.1$ & 43.0 & 43.0 \\
 \textbf{IQR} & \textbf{[10.9, 30.8]} & n/a & \textbf{[51.2, 56.6]} & n/a \\
 \bottomrule
 \end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes.} Drift-adjusted $=$ raw gap minus the pre-period gap trend extrapolated over the post-window (Section~\ref{sec:methods}). Ensemble $=$ cross-model median; band $=$ IQR (Q25--Q75).
+\end{tablenotes}
+\end{threeparttable}
 \end{table}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=\textwidth]{figures/counterfactual_paths.png}
-\caption{Observed Brent (black) vs.\ the synthetic counterfactual. The thick blue line
-is the ensemble-median synthetic, thin grey lines are the five individual models, and the
-shaded region after $T_0$ (dashed red) is the estimated premium. The synthetics track
-Brent closely before the event and decouple sharply afterward.}
+\caption{Observed Brent versus the synthetic counterfactual.}
 \label{fig:paths}
+\includegraphics[width=\textwidth]{figures/counterfactual_paths.png}
+
+\smallskip
+\begin{minipage}{\textwidth}
+\footnotesize \textit{Notes.} Observed Brent is black. The thick blue line is the
+ensemble-median synthetic, the thin grey lines are the five individual models, and the
+shaded region after $T_0$ (dashed red) is the estimated premium. The synthetics track
+Brent closely before the event and decouple sharply afterward.
+\end{minipage}
 \end{figure}
 
 \paragraph{Economic reading of the model spread.} The cross-model dispersion has an
@@ -710,6 +859,61 @@ unregularised linear model in a pre-period that contains a strong non-event driv
 is the reason the ensemble uses the median rather than the mean. For Hormuz, whose calmer
 pre-period has no analogous confound, the five models agree to within about 5 points.
 
+\subsection{Donor weights and contributions}
+The previous paragraph attributed the model spread to regularisation meeting a confounded
+pre-period; the donor weights show which donors that disagreement runs through.
+Figure~\ref{fig:heatmap} reports each model's normalised donor weights for both events.
+Two features stand out. The pool is \emph{sparse}: every model concentrates on a handful
+of donors and leaves most at zero. And the models \emph{disagree on which handful} ---
+convex SCM and XGBoost concentrate weight on two to four donors, augmented SCM and the
+elastic net spread it across the FX block, and the Bayesian ridge loads currencies the
+others ignore. Russia leans on soft commodities (Coffee, Sugar) and the S\&P~500; Hormuz
+leans on Gold and the yen.
+
+How a donor contributes sorts into three descriptive roles. \textbf{Trend carriers} track
+Brent's slow level path: Coffee, Sugar and the S\&P~500 for Russia (pre-window
+level correlations near $0.9$), Gold and Sugar for Hormuz. Because Brent drifted
+\emph{down} through 2024--25, the strongest Hormuz trackers (Gold, Coffee) move
+\emph{inversely}, so the synthetic reproduces the decline by loading oppositely-moving
+donors. \textbf{Variance trackers} follow Brent's day-to-day fluctuation, but here the
+ceiling is low: no donor's daily-return correlation with Brent exceeds about $0.30$
+(Russia) or $0.17$ (Hormuz), so the synthetic reproduces Brent's \emph{path} far better
+than its daily \emph{variance}. \textbf{Late divergers} are clean at \T{} but decouple
+from the pool's common factor over the post-window. For Russia the EM and Asian FX block
+(CNY, JPY, KRW, INR) diverges most, the delayed discounted-crude and terms-of-trade
+channel audited in Section~\ref{sec:donoraudit}; for Hormuz the diverger is Gold itself,
+on its post-strike safe-haven bid.
+
+These roles explain the cross-model spread, and hence the headline IQR. The donors the
+models disagree on most are precisely the influential ones that also diverge late: Gold
+for Hormuz, which carries both the largest consensus weight and the largest across-model
+weight dispersion in the pool, and the FX block for Russia. The inter-quartile band is
+therefore not random model noise but the models disagreeing over how much to trust a few
+influential donors whose post-window paths are idiosyncratic or contaminated. This is the
+mechanism behind the two design choices already made: reporting the cross-model median
+rather than the mean (robust to one model over-loading a diverging donor), and reading
+the Russia full-window gap as the more contaminated of the two estimates. The per-donor
+weight, trend, variance, and divergence diagnostics behind this paragraph are tabulated in
+Appendix~\ref{app:donorweights}.
+
+\begin{figure}[h]
+\centering
+\caption{Donor weights by model and event.}
+\label{fig:heatmap}
+\includegraphics[width=\textwidth]{figures/donor_importance_heatmap.png}
+
+\smallskip
+\begin{minipage}{\textwidth}
+\footnotesize \textit{Notes.} Each cell is a donor's weight in one model, taken in
+absolute value and normalised to sum to one within that model; darker is larger, grey is
+an unused (zero-weight) donor. Rows are the 19-donor shared pool grouped by category;
+columns are the five estimators. The Bayesian ridge is shown for completeness but is
+excluded from the consensus weight used in the text, as its coefficients are not
+comparable selection weights (Appendix~\ref{app:bsts}). \textit{Source:}
+\texttt{scripts/donor\_contribution\_analysis.py}.
+\end{minipage}
+\end{figure}
+
 \subsection{Inference: the in-space placebo}
 Table~\ref{tab:placebo} and Figure~\ref{fig:placebo} report the in-space placebo. For
 \textbf{Hormuz} the result is as strong as the test allows. Brent ranks first among all
@@ -725,9 +929,9 @@ independently below.
 
 \begin{table}[h]
 \centering
-\caption{In-space placebo permutation $p$-values and Brent's post/pre RMSPE ratio
-(19-donor pool). Floor $=1/(N{+}1)$: 0.050 (19-donor), 0.030 (32-donor).}
+\caption{In-space placebo: permutation $p$-values and Brent's post/pre RMSPE ratio.}
 \label{tab:placebo}
+\begin{threeparttable}
 \small
 \begin{tabular}{@{}llrrr@{}}
 \toprule
@@ -742,15 +946,25 @@ Hormuz & XGBoost        & \textbf{0.050} & \textbf{0.029} & 10.19 \\
 Hormuz & Bayesian ridge & \textbf{0.050} & \textbf{0.029} & 10.24 \\
 \bottomrule
 \end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes.} Floor $=1/(N{+}1)$: 0.050 (19-donor pool), 0.030 (32-donor pool).
+\end{tablenotes}
+\end{threeparttable}
 \end{table}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.72\textwidth]{figures/placebo_hormuz.png}
-\caption{In-space placebo for Hormuz (convex SCM). Each bar is one unit's post/pre RMSPE
-ratio. Brent (red) is the largest and ranks first among all 19 placebo units, so the
-permutation test rejects at the attainable floor.}
+\caption{In-space placebo for Hormuz (convex SCM).}
 \label{fig:placebo}
+\includegraphics[width=0.72\textwidth]{figures/placebo_hormuz.png}
+
+\smallskip
+\begin{minipage}{0.72\textwidth}
+\footnotesize \textit{Notes.} Each bar is one unit's post/pre RMSPE ratio. Brent (red) is
+the largest and ranks first among all 19 placebo units, so the permutation test rejects at
+the attainable floor.
+\end{minipage}
 \end{figure}
 
 \subsection{Robustness}
@@ -777,11 +991,16 @@ mechanical artefact.
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.78\textwidth]{figures/postwindow_sensitivity.png}
-\caption{Ensemble-median gap by post-event horizon (shaded $=$ IQR across models). Russia
-attenuates with horizon, the delayed-contamination signature, while Hormuz rises and then
-plateaus as the premium builds in and holds.}
+\caption{Ensemble-median gap by post-event horizon.}
 \label{fig:sensitivity}
+\includegraphics[width=0.78\textwidth]{figures/postwindow_sensitivity.png}
+
+\smallskip
+\begin{minipage}{0.78\textwidth}
+\footnotesize \textit{Notes.} The shaded band is the IQR across models. Russia attenuates
+with horizon, the delayed-contamination signature, while Hormuz rises and then plateaus as
+the premium builds in and holds.
+\end{minipage}
 \end{figure}
 
 \paragraph{Leave-one-donor-out.} Dropping each weighted donor in turn leaves the focal
@@ -811,9 +1030,9 @@ separately is the correct choice, not as confirmation of the level.
 
 \begin{table}[h]
 \centering
-\caption{Cross-event weight stability probe: Russia-fitted weights applied to Hormuz.
-Independent and transferred pre-period RMSPE in log units.}
+\caption{Cross-event weight stability probe: Russia-fitted weights applied to Hormuz.}
 \label{tab:transfer}
+\begin{threeparttable}
 \small
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
@@ -826,6 +1045,11 @@ XGBoost        & 51.2 & $-44.1$ & 0.053 & 0.928 \\
 Bayesian ridge & 43.0 & $-100.0$ & 0.037 & 18.567 \\
 \bottomrule
 \end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes.} Independent and transferred pre-period RMSPE in log units.
+\end{tablenotes}
+\end{threeparttable}
 \end{table}
 
 \paragraph{Na\"ive counterfactual floor.} We compare the SCM against donor-free univariate
@@ -846,11 +1070,9 @@ thus corroborate each other, one from a donor-free direction and one from a dono
 
 \begin{table}[h]
 \centering
-\caption{SCM vs.\ na\"ive univariate counterfactuals, full-window gap (\%). RW flat and
-RW drift are the random-walk carry and the drifted random walk, Lin.\ trend is the linear
-pre-trend extrapolation, and ARIMA is the AIC-selected model, which reduces to a driftless
-random walk for both events.}
+\caption{SCM vs.\ na\"ive univariate counterfactuals, full-window gap (\%).}
 \label{tab:naive}
+\begin{threeparttable}
 \small
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
@@ -860,6 +1082,11 @@ Russia & 22.0 & 8.7  & $-6.9$ & $-4.2$ \\
 Hormuz & 55.9 & 48.9 & 49.8   & 70.9   \\
 \bottomrule
 \end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes.} RW flat and RW drift are the random-walk carry and the drifted random walk; Lin.\ trend is the linear pre-trend extrapolation. An AIC-selected ARIMA reduces to a driftless random walk for both events (RW flat column).
+\end{tablenotes}
+\end{threeparttable}
 \end{table}
 
 \paragraph{Sign of the contamination bias.} This last check is a deliberately naive and
@@ -900,24 +1127,6 @@ reserve releases, monetary pass-through, and fiscal buffers, the relevant input 
 integrated path-level premium, and the estimate here supplies it together with an auditable
 identification argument.
 
-\subsection{Limitations}
-Four limitations bound what we can claim. First, the design has a single treated unit and a
-short post-period, which caps the power of permutation inference. The Hormuz placebo reaches
-0.050, which is the best value attainable at this sample size rather than a conventional
-rejection, so we read it as the strongest available signal and not as a small p-value in the
-usual sense. Second, the estimand is a reduced-form total effect. It captures the full price
-gap but does not separate the premium into a physical-supply component, a risk-premium
-component, and an expectations component, which some policy uses would want to distinguish.
-Third, the Hormuz event is recent and has no documented post-event counterfactual of its own,
-so its validation is internal and rests on the Russia case as a calibration by analogy rather
-than on an external ground truth. Fourth, the factor structure is regime-bound, as the weak
-cross-event transfer shows directly. The estimate is valid for the regime of this event and
-should not be read as a general chokepoint premium that would recur unchanged in a different
-macro environment. Underlying all four is that donor cleanliness is only partly testable. The
-no-interference assumption concerns an unobserved counterfactual donor path, and the
-contamination-sign diagnostic is naive and directional, so it bounds the likely direction of
-any residual bias without proving that none exists.
-
 % ===================================================================
 \section{Conclusion}\label{sec:conclusion}
 % ===================================================================
@@ -948,12 +1157,22 @@ decision to look through or tighten, fiscal buffering in oil importers, and sove
 all act on the magnitude and persistence of the price move, and a counterfactual path lets a
 decision maker read both at once and update as new data arrive.
 
-Several limitations bound the estimate. The design has a single treated unit and a short
-post-window, so the inference tests are under-powered and the placebo can only reach its
-floor. The estimand is a reduced-form total effect and does not separate supply, risk, and
-expectations. The Hormuz event is recent and has no external counterfactual of its own, so
-its validation is internal and leans on the Russia benchmark by analogy. The factor structure
-is regime-bound, as the weak cross-event transfer shows. None of these overturns the central
+Several limitations bound the estimate. First, the design has a single treated unit and a
+short post-period, which caps the power of permutation inference: the Hormuz placebo reaches
+0.050, the best value attainable at this sample size rather than a conventional rejection, so
+we read it as the strongest available signal and not as a small $p$-value in the usual sense.
+Second, the estimand is a reduced-form total effect; it captures the full price gap but does
+not separate the premium into a physical-supply component, a risk-premium component, and an
+expectations component, which some policy uses would want to distinguish. Third, the Hormuz
+event is recent and has no documented post-event counterfactual of its own, so its validation
+is internal and rests on the Russia case as a calibration by analogy rather than on an
+external ground truth. Fourth, the factor structure is regime-bound, as the weak cross-event
+transfer shows directly, so the estimate is valid for the regime of this event and should not
+be read as a general chokepoint premium that would recur unchanged in a different macro
+environment. Underlying all four, donor cleanliness is only partly testable: the
+no-interference assumption concerns an unobserved counterfactual donor path, and the
+contamination-sign diagnostic is naive and directional, so it bounds the likely direction of
+any residual bias without proving that none exists. None of these overturns the central
 finding. The observed co-movement of global markets with Brent implies that the 2026 Hormuz
 disruption added a large and robust premium to crude, on the order of half its no-event price,
 and the estimate is meaningful and usable for the decisions that depend on it.
@@ -1000,7 +1219,7 @@ globally minimising segment SSR via dynamic programming, with the break count ch
 Only VIX shows a break strictly inside a pre-window (2022-01-07). We treat the break tests as
 informative rather than automatically disqualifying: the VIX break is a loading-stability
 signal, it does not reproduce on the analysis window alone, and the in/out sensitivity is
-below 1 pp, so VIX is retained (Section~\ref{sec:data}). The relationship specification is
+below 1 pp, so VIX is retained (Section~\ref{sec:donoraudit}). The relationship specification is
 Brent-based, so a break \emph{at} $T_0$ is ambiguous; the
 complementary \citet{harvey2009} trend-break test resolves this by testing the donor's
 \emph{own} log-level trend with a statistic whose asymptotic size is invariant to whether the
@@ -1008,5 +1227,137 @@ series is I(0) or I(1): it weights an I(0)-optimal and an I(1)-optimal sup-$t$ s
 KPSS stationarity weights \citep{kpss1992}. Empirically all 32 donors are classified I(1)-like
 and none rejects a trend break within $\pm$8 weeks of either $T_0$, so no retained donor was
 itself trend-treated by either event.
+
+% ===================================================================
+\section{Donor audit catalog}\label{app:donoraudit}
+% ===================================================================
+Table~\ref{tab:donoraudit} is the full per-event catalog underlying the audit of
+Section~\ref{sec:donoraudit}. Each of the 32 candidates is listed with the common factor
+it loads on with Brent and its Clean (C), Mild (M), or Heavy (H) status for each event;
+the final column marks membership in the retained shared 19-donor pool. Status follows
+the donor catalog maintained alongside the analysis code.
+
+\begin{table}[h]
+\centering
+\caption{Per-event donor audit catalog.}
+\label{tab:donoraudit}
+\begin{threeparttable}
+\footnotesize
+\begin{tabular}{@{}llccc@{}}
+\toprule
+Donor & Factor it loads on with Brent & RU 2022 & HZ 2026 & In 19 \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{Metals}}\\
+Copper      & Global industrial cycle (``Dr Copper'')        & M & C & \\
+Iron Ore    & China industrial demand                        & M & C & \\
+Silver      & Precious + industrial dual factor              & C & C & Yes \\
+Platinum    & Auto catalysts / South Africa PGM              & C & C & Yes \\
+Palladium   & Auto catalysts (Russia $\sim$40\,\% supply)    & H & C & \\
+Gold        & Real rates / safe-haven premium                & C & C & Yes \\
+\addlinespace
+\multicolumn{5}{@{}l}{\textit{Agriculturals}}\\
+Soybeans    & Global trade activity, China demand            & M & C & \\
+Wheat       & Russia+Ukraine $\sim$30\,\% world exports      & H & C & \\
+Corn        & Ukraine $\sim$13\,\% world corn exports        & H & C & \\
+Coffee      & Brazil/Vietnam concentrated; climate           & C & C & Yes \\
+Sugar       & Brazil/India concentrated                      & C & C & Yes \\
+Cotton      & Oil$\to$polyester substitution (indirect oil)  & M & M & \\
+Live Cattle & North-American livestock cycle                 & C & C & Yes \\
+\addlinespace
+\multicolumn{5}{@{}l}{\textit{Equities}}\\
+S\&P 500    & US growth / equity risk premium                & C & C & Yes \\
+Nikkei 225  & Japan growth / safe-haven equity               & C & C & Yes \\
+EM equities & Broad emerging markets (held Russia weight)    & M & C & \\
+\addlinespace
+\multicolumn{5}{@{}l}{\textit{Foreign exchange}}\\
+EUR         & Eurozone growth (EU energy crisis)             & H & C & \\
+GBP         & UK growth (UK gas exposure)                    & M & C & \\
+AUD         & Australia / China-demand commodity FX          & C & C & Yes \\
+JPY         & Safe-haven FX                                  & C & C & Yes \\
+CHF         & Safe-haven FX                                  & C & C & Yes \\
+CNY         & China managed currency                         & C & C & Yes \\
+INR         & India growth / EM                              & C & C & Yes \\
+KRW         & Korea manufacturing                            & C & C & Yes \\
+ZAR         & EM commodities (PGMs, gold)                    & C & C & Yes \\
+MXN         & EM / Mexico                                    & C & C & Yes \\
+DXY         & Trade-weighted dollar (EUR dominant)           & H & C & \\
+\addlinespace
+\multicolumn{5}{@{}l}{\textit{Rates \& credit}}\\
+US 10Y      & Real risk-free rate / growth (Europe inflation)& M & C & \\
+TLT         & Long-duration US Treasuries                    & C & C & Yes \\
+HYG         & US high-yield credit / risk premium            & C & C & Yes \\
+\addlinespace
+\multicolumn{5}{@{}l}{\textit{Volatility}}\\
+VIX         & Implied S\&P 500 volatility (inverse)          & C & C & Yes \\
+\addlinespace
+\multicolumn{5}{@{}l}{\textit{Crypto}}\\
+Bitcoin     & Digital risk-asset / liquidity (sanctions Mar 2022) & H & C & \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes.} C = Clean (retained for that event); M = Mild (secondary/terms-of-trade channel, excluded from the strict-clean pool); H = Heavy (direct exposure, SUTVA violation, excluded). The shared 19-donor pool is the Russia strict-clean set; ``Yes'' in the last column marks its members.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+% ===================================================================
+\section{Donor contribution metrics}\label{app:donorweights}
+% ===================================================================
+Table~\ref{tab:donorweights} reports the per-donor diagnostics behind the donor-weights
+subsection (Section~\ref{sec:results}). For each donor and event: the consensus weight
+$\bar w$ (mean normalised $|$weight$|$ across the four comparable models, Bayesian ridge
+excluded), the across-model dispersion $\sigma_w$, the pre-window trend correlation
+$\rho_{\text{lvl}}=\mathrm{corr}(\log\text{Brent},\log\text{donor})$, the variance
+correlation $\rho_{\text{ret}}=\mathrm{corr}(\Delta\log\text{Brent},\Delta\log\text{donor})$,
+and the standardised post-window idiosyncratic divergence ``div'' (cumulative residual of
+the donor's standardised return on a leave-one-out common factor, Brent-free). All are
+descriptive. Generated by \texttt{scripts/donor\_contribution\_analysis.py}.
+
+\begin{table}[h]
+\centering
+\caption{Per-donor contribution diagnostics, by event.}
+\label{tab:donorweights}
+\begin{threeparttable}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}l rrrrr rrrrr@{}}
+\toprule
+& \multicolumn{5}{c}{Russia 2022} & \multicolumn{5}{c}{Hormuz 2026} \\
+\cmidrule(lr){2-6}\cmidrule(lr){7-11}
+Donor & $\bar w$ & $\sigma_w$ & $\rho_{\text{lvl}}$ & $\rho_{\text{ret}}$ & div
+      & $\bar w$ & $\sigma_w$ & $\rho_{\text{lvl}}$ & $\rho_{\text{ret}}$ & div \\
+\midrule
+Silver & 0.03 & 0.03 & $-$0.05 & 0.07 & $-$1.57 & 0.01 & 0.01 & $-$0.56 & 0.12 & $-$1.27 \\
+Platinum & 0.09 & 0.07 & 0.48 & 0.18 & $-$1.39 & 0.03 & 0.05 & $-$0.58 & 0.08 & $-$1.55 \\
+Gold & 0.03 & 0.03 & $-$0.54 & $-$0.01 & $-$1.62 & 0.26 & 0.26 & $-$0.76 & 0.14 & $-$2.50 \\
+Coffee & 0.22 & 0.19 & 0.88 & 0.11 & $-$1.59 & 0.14 & 0.15 & $-$0.70 & 0.01 & $-$0.62 \\
+Sugar & 0.16 & 0.16 & 0.88 & 0.18 & $-$0.74 & 0.17 & 0.14 & 0.63 & 0.14 & 0.43 \\
+LiveCattle & 0.03 & 0.02 & 0.90 & 0.09 & $-$0.98 & 0.00 & 0.01 & $-$0.70 & 0.11 & 0.33 \\
+SP500 & 0.13 & 0.20 & 0.93 & 0.28 & $-$2.74 & 0.00 & 0.00 & $-$0.63 & 0.17 & 0.81 \\
+Nikkei & 0.01 & 0.01 & 0.79 & 0.12 & $-$0.45 & 0.01 & 0.01 & $-$0.46 & 0.03 & 0.65 \\
+AUD & 0.01 & 0.02 & 0.21 & 0.03 & $-$1.43 & 0.00 & 0.00 & 0.06 & 0.02 & 0.06 \\
+JPY & 0.06 & 0.03 & 0.85 & 0.07 & 5.04 & 0.21 & 0.17 & 0.22 & 0.03 & 0.45 \\
+CHF & 0.00 & 0.01 & 0.21 & 0.06 & 1.42 & 0.00 & 0.01 & 0.72 & 0.04 & 1.06 \\
+CNY & 0.01 & 0.01 & $-$0.84 & $-$0.05 & 6.02 & 0.00 & 0.00 & 0.38 & 0.03 & $-$0.19 \\
+INR & 0.00 & 0.00 & 0.16 & 0.01 & 2.48 & 0.00 & 0.01 & $-$0.65 & 0.06 & 2.09 \\
+KRW & 0.04 & 0.04 & 0.22 & 0.09 & 3.49 & 0.00 & 0.01 & $-$0.39 & 0.11 & 0.77 \\
+ZAR & 0.06 & 0.05 & $-$0.61 & 0.05 & 1.98 & 0.00 & 0.01 & 0.37 & $-$0.05 & 0.19 \\
+MXN & 0.00 & 0.01 & $-$0.52 & 0.01 & 0.37 & 0.03 & 0.05 & 0.21 & $-$0.02 & $-$0.07 \\
+TLT & 0.08 & 0.05 & $-$0.80 & $-$0.24 & $-$2.21 & 0.09 & 0.09 & 0.48 & $-$0.20 & $-$0.69 \\
+HYG & 0.02 & 0.02 & 0.46 & 0.30 & $-$4.22 & 0.00 & 0.00 & $-$0.57 & 0.14 & $-$0.20 \\
+VIX & 0.01 & 0.01 & $-$0.56 & $-$0.28 & 0.20 & 0.03 & 0.03 & $-$0.28 & $-$0.12 & $-$0.61 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes.} $\bar w$ and $\sigma_w$ are the mean and standard deviation of the
+normalised $|$weight$|$ across convex SCM, augmented SCM, elastic net, and XGBoost. A
+large $|$div$|$ ($\gtrsim 2$) flags a donor that decoupled from the pool's common factor
+after $T_0$. Trend correlations $\rho_{\text{lvl}}$ are over non-stationary levels and
+should be read qualitatively.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
 
 \end{document}
