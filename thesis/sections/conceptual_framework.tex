@@ -3,7 +3,7 @@
 % ===================================================================
 This section sets out the data-generating process we assume for Brent and derives the
 estimand and identifying assumptions from it. The factor model in
-Section~\ref{sec:theory}.1 is the organising device, treating donor selection an economic
+Section~\ref{sec:theory}.1 is the organising device, treating donor selection as an economic
 exercise, rendering each identifying assumption transparent, and giving the contamination
 bias an explicit sign. It also exposes the residual model uncertainty that motivates the
 ensemble estimator, whose construction we defer to the methodology
@@ -36,6 +36,7 @@ Donor selection is therefore the economic exercise of spanning $F_t$ while exclu
 $o_t$, that is, choosing identification over fit. This is precisely why the energy
 complex (WTI, refined products, petrocurrencies), despite the highest raw correlation
 with Brent, is excluded by design. It loads on the very $o_t$ we are trying to measure.
+
 \subsection{Potential outcomes and the estimand}
 Equation~\eqref{eq:factor} describes the observed price, while the causal question
 concerns the price that would have prevailed without the event. Let $Y_t^N$ be Brent's
@@ -44,7 +45,9 @@ at \T{}. The treated-unit effect is $\tau_t=Y_t^I-Y_t^N$ for $t\ge$\T{}. With on
 treated unit, $Y_t^N$ is never observed after \T{}. The synthetic supplies the missing
 term, $\hat Y_t^N=\sum_j w_j X_{jt}$, and the estimated effect is the gap
 $\hat\tau_t=Y_t^I-\hat Y_t^N$, reported in percent as
-$\text{gap}_t=100\,[\exp(Y_t^I-\hat Y_t^N)-1]$. We summarise the post-window by the
+$\text{gap}_t=100\,[\exp(Y_t^I-\hat Y_t^N)-1]$. 
+
+We summarise the post-window by the
 \emph{average treatment effect on the treated},
 \begin{equation}
 \widehat{\text{ATT}} \;=\; \frac{1}{|W|}\sum_{t\in[\T{},\,\T{}+W]} \text{gap}_t .
@@ -53,6 +56,7 @@ We prefer the ATT to the peak or terminal gap for two reasons. It integrates ove
 entire path, including any reversion, which is the object that reserve sizing, monetary
 pass-through, and fiscal buffering act on, and averaging dampens single-day jumps from
 liquidity or futures-roll mechanics.
+
 \subsection{Identifying assumptions}
 Because the synthetic stands in for an unobserved counterfactual, the estimate is only as
 credible as the assumptions that license it, and the factor model makes each one
@@ -60,15 +64,15 @@ explicit and checkable.
 \begin{enumerate}
 \item \textbf{Common-factor spanning (pre-period fit).} The donor basket must reproduce
 Brent's factor loadings, so that good pre-event tracking reflects shared $F_t$ rather
-than coincidence. Checked by pre-period RMSPE, walk-forward cross-validation, and moment
+than coincidence. This is checked by using pre-period RMSPE, walk-forward cross-validation, and moment
 matching.
 \item \textbf{Donor cleanliness (SUTVA / no interference).} No donor may carry the
-treatment. The loading $\gamma_j$ must not load on $o_t$, and donor $j$ must not be hit
-through a channel specific to the focal event. Defended by an a-priori audit and
-confirmed by model-agnostic break tests at \T{}.
+treatment, so the loading $\gamma_j$ must not load on $o_t$, and donor $j$ must not be hit
+through a channel specific to the focal event. We used an a-priori audit and
+confirmed results with model-agnostic break tests at \T{}.
 \item \textbf{Regime stability.} The loadings $\lambda,\gamma_j$ must hold across the
 pre-window and the projection window, so that a basket which tracked Brent before \T{}
-remains a valid counterfactual after it. Checked by distance-correlation and
+remains a valid counterfactual after it. This is checked by distance-correlation and
 structural-break diagnostics, and, across events, by comparing donor weights between
 regimes.
 \end{enumerate}
@@ -88,18 +92,22 @@ The bias is \emph{minus} the weight-averaged donor contamination. Its sign is th
 an empirical matter rather than an assumption. If contaminated donors are pushed
 \emph{up} (oil-linked terms-of-trade, inflation$\to$rates), the synthetic is pulled up
 and the ATT is \emph{under}-estimated, which is conservative. If they are pushed
-\emph{down} (demand crowd-out, risk-off), the ATT is over-estimated. The identity
+\emph{down} (demand crowd-out, risk-off), then the ATT is \emph{over}-estimated. 
+
+The identity
 \eqref{eq:bias} is exact, but $\delta_{jt}$ is itself unobserved, so signing the bias in
 practice requires estimating each $\delta_{jt}$ against a Brent-free reference, a
 deliberately naïve construction whose assumptions and limits we set out, and apply, in
 Section~\ref{sec:results}. What the theory delivers here is the \emph{structure}, which
-is which way a given contamination pushes the estimate, not a certified magnitude. The
-same identity also distinguishes two regimes of contamination by timing.
+is which way a given contamination pushes the estimate, not a certified magnitude. 
+
+The same identity also distinguishes two regimes of contamination by timing.
 \emph{Contemporaneous} contamination occurs at \T{} and is screened by the audit and
 break tests. \emph{Delayed} contamination accrues over the post-window, enters through
 the projection, biases the gap toward zero, and grows with horizon, so a gap that
 \emph{declines} as the window lengthens is its signature, and the short-horizon gap is
 the least-contaminated estimate.
+
 A final source of error is neither identification nor contamination but
 \emph{specification}: the counterfactual's functional form is unknown, so no single
 estimator is privileged. We address this irreducible model uncertainty with an ensemble

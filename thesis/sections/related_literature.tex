@@ -16,13 +16,17 @@ and \citet{abadie2010}, who build the counterfactual as a convex combination of
 untreated donors matched on pre-treatment outcomes and formalise permutation (placebo)
 inference for the single-unit case. \citet{abadie2015} extend it to comparative
 politics, and \citet{abadie2021} codifies the practical requirements we adopt: a long,
-shock-free pre-window, donors clean of the treatment (the SCM analogue of SUTVA), and a
-good pre-treatment fit as a precondition for credibility. A subsequent literature
+shock-free pre-window, donors clean of the treatment (the SCM analogue of Stable Unit Treatment Value Assumption, SUTVA), and a
+good pre-treatment fit as a precondition for credibility. 
+
+A subsequent literature
 relaxes the convex-hull restriction. The augmented SCM of \citet{benmichael2021} adds a
 ridge bias-correction permitting limited extrapolation when the treated unit lies
 outside the donor hull, \citet{doudchenko2016} embed SCM, difference-in-differences, and
 regression in a common regularised-regression family that allows unconstrained weights,
-and \citet{athey2021mc} recast the problem as matrix completion. A caution runs through
+and \citet{athey2021mc} recast the problem as matrix completion. 
+
+A caution runs through
 all of it. Convex SCM weights are \emph{non-unique} when donors are correlated
 \citep{abadielhour2021}, so many weight vectors yield near-identical fit and individual
 weights should not be over-interpreted. We use this entire toolbox by running an
