@@ -145,12 +145,17 @@ def fig_placebo():
     df = pd.read_csv(f, index_col=0)
     df = df.sort_values('ratio')
     is_brent = df.index.astype(str).str.contains('Brent', case=False)
-    fig, ax = plt.subplots(figsize=(7, 3.6))
+    fig, ax = plt.subplots(figsize=(8.2, 4.2))
     colors = ['firebrick' if b else 'grey' for b in is_brent]
     ax.bar(range(len(df)), df['ratio'].values, color=colors)
     ax.set_xlabel('Placebo units (donors) and Brent, sorted by post/pre RMSPE ratio')
     ax.set_ylabel('Post/pre RMSPE ratio')
-    ax.set_xticks([])
+    ax.set_xticks(range(len(df)))
+    ax.set_xticklabels(df.index.astype(str), rotation=90, fontsize=8)
+    for lab, b in zip(ax.get_xticklabels(), is_brent):
+        if b:
+            lab.set_color('firebrick')
+            lab.set_fontweight('bold')
     fig.savefig(FIG / 'placebo_hormuz.png')
     plt.close(fig)
 
