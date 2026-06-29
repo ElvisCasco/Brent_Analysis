@@ -8,20 +8,61 @@ questions. The first is whether a donor jumps at the event, a direct reading of 
 no-interference assumption. The second is whether the donor's relationship with Brent stays
 stable across the fitting window, since an unstable loading would distort the synthetic.
 Every test is model-agnostic and works one donor at a time, so it confirms or supplements the
-audit rather than replacing it.
+audit rather than replacing it. Throughout we write $r_{j,t}$ for donor $j$'s daily log-return,
+$y_t$ for Brent's, $T_0$ for the known cutoff, and $m=32$ for the number of candidates.
 
 \subsection{Interference at the event}
-We test each donor's own daily log-returns for a shift at the known cutoff in two ways. A
-permutation mean-shift test compares the pre-cutoff and post-cutoff means against the
-distribution obtained by reshuffling the pre and post labels, the known-date counterpart of
-the asymptotic break test of \citet{andrews1993} without its normality assumption. A Wilcoxon
-event-window test compares the mean return in a short window around the cutoff against a
-sixty-day pre-window control. A donor is flagged as potentially treated when either test
-rejects after a Benjamini--Hochberg false-discovery correction at the ten percent level
-\citep{benjaminihochberg1995}. A two-sample Kolmogorov--Smirnov test on the pre and post
-return distributions is reported alongside but kept out of the flag rule, because at these
-sample sizes it rejects on any broad macro-regime shift rather than on event-treatment of the
-individual donor.
+These tests read each donor's own returns for a shift at $T_0$, with $n_{\text{pre}}$ and
+$n_{\text{post}}$ the counts of pre-cutoff and post-cutoff observations. Two tests carry the
+flag and a third is reported alongside.
+
+\begin{enumerate}
+\item \textbf{Permutation mean-shift test.} The statistic is the post-minus-pre difference in
+mean return,
+\begin{equation}
+d_j=\frac{1}{n_{\text{post}}}\sum_{t>T_0} r_{j,t}\;-\;\frac{1}{n_{\text{pre}}}\sum_{t\le T_0} r_{j,t}.
+\label{eq:permshift}
+\end{equation}
+Its null distribution comes from reshuffling the pre and post labels $B$ times and recomputing
+the statistic on each draw, which gives the p-value
+\begin{equation}
+p_j=\frac{1}{B}\sum_{b=1}^{B}\mathbf{1}\big\{\,|d_j^{(b)}|\ge|d_j|\,\big\}.
+\label{eq:permp}
+\end{equation}
+This is the known-date permutation counterpart of the structural-break test of
+\citet{andrews1993} and needs no normality assumption.
+
+\item \textbf{Wilcoxon event-window test.} Let $E$ be a short window of returns around $T_0$ and
+$C$ a sixty-day pre-window control, with sizes $n_E$ and $n_C$ and pooled size $N=n_E+n_C$.
+Ranking the pooled returns and summing the ranks that fall in $E$ gives the rank-sum
+\begin{equation}
+W=\sum_{t\in E}\operatorname{rank}(r_{j,t}),\qquad \mathbb{E}_0[W]=\tfrac{1}{2}\,n_E(N+1),
+\label{eq:wilcoxon}
+\end{equation}
+and the two-sided p-value follows from the Mann--Whitney null. Working in ranks makes it robust
+to the heavy tails of daily returns.
+
+\item \textbf{Benjamini--Hochberg correction.} Each test returns one p-value per donor across the
+$m$ candidates. Ordering them $p_{(1)}\le\dots\le p_{(m)}$, the procedure rejects every hypothesis
+up to
+\begin{equation}
+k^\star=\max\Big\{\,k:\;p_{(k)}\le\tfrac{k}{m}\,q\,\Big\},\qquad q=0.10,
+\label{eq:bh}
+\end{equation}
+which controls the false-discovery rate at $q$ \citep{benjaminihochberg1995}. A donor is flagged
+as potentially treated when either the permutation or the Wilcoxon test rejects after this
+correction.
+
+\item \textbf{Kolmogorov--Smirnov distance} (reported, not in the flag rule). The two-sample
+statistic is the largest gap between the pre and post empirical distributions of the donor's
+returns,
+\begin{equation}
+D_j=\sup_x\big|\hat F^{\text{pre}}_j(x)-\hat F^{\text{post}}_j(x)\big|.
+\label{eq:ks}
+\end{equation}
+At these sample sizes it rejects on any broad macro-regime shift rather than on event-treatment
+of the individual donor, so we report it but keep it out of the flag rule.
+\end{enumerate}
 
 For Hormuz 2026 the battery agrees with the audit on 31 of the 32 candidates, with no flag
 surviving the correction. The single disagreement is Cotton, which the audit drops on the
@@ -34,25 +75,60 @@ zero-COVID dynamics rather than to the invasion. The Kolmogorov--Smirnov test fl
 regime shift that justifies keeping it out of the flag rule.
 
 \subsection{Stability of the donor-Brent relationship}
-Three tests check that the relationship holds across the pre-window. A distance-correlation
-test \citep{szekely2007} splits each pre-window into thirds and reports the largest change in
-the donor-Brent distance correlation across them, read as a narrative flag rather than an
-exclusion. Bai--Perron break dating \citep{baiperron1998,baiperron2003} searches the
-full-history return relationship for break dates by globally minimising segment sum of
-squares, with the number of breaks set by BIC. Most donor breaks predate both pre-windows,
-clustering at the post-crisis normalisation and the 2020 COVID crash, and the COVID break
-falls just before the Russia pre-window start, which vindicates that start date. Inside the
-pre-windows the dating flags two Russia donors, Wheat, which the audit already excludes, and
-the VIX on 2022-01-07 about seven weeks before the invasion, and three Hormuz donors, Silver,
-Platinum, and EM equities, on a common September 2024 precious-metals move with none near the
-cutoff. A break inside the pre-window is informative rather than disqualifying, so no donor is
-removed by this test and the VIX is retained.
+Three tests check that the donor-Brent relationship holds across the pre-window.
 
-Because the relationship specification regresses on Brent, a break dated at the cutoff itself
-is ambiguous, since Brent is treated there too. The Harvey--Leybourne--Taylor trend-break test
-\citep{harvey2009} resolves this by testing each donor's own log-level trend with a statistic
-whose size is the same whether the series is stationary or integrated, weighting a
-stationary-optimal and an integrated-optimal statistic by KPSS stationarity weights
-\citep{kpss1992}. All 32 donors classify as integrated, so the test avoids the spurious trend
-breaks a naive levels regression would find, and no donor's own trend breaks within eight
-weeks of either cutoff. No retained donor was itself trend-treated by either event.
+\begin{enumerate}
+\item \textbf{Distance-correlation change.} The distance correlation \citep{szekely2007} measures
+general dependence and is zero only under independence. From the pairwise distances
+$a_{kl}=|r_{j,k}-r_{j,l}|$ and $b_{kl}=|y_k-y_l|$, double-centred into $A_{kl}$ and $B_{kl}$, it is
+\begin{equation}
+\operatorname{dCor}(r_j,y)=\frac{\operatorname{dCov}(r_j,y)}{\sqrt{\operatorname{dVar}(r_j)\,\operatorname{dVar}(y)}},
+\qquad
+\operatorname{dCov}^2(r_j,y)=\frac{1}{n^2}\sum_{k,l}A_{kl}B_{kl}.
+\label{eq:dcor}
+\end{equation}
+Splitting the pre-window into thirds $I_1,I_2,I_3$ and computing the distance correlation on each,
+the statistic is the largest change across them, $\max_{a<b}|\operatorname{dCor}_a-\operatorname{dCor}_b|$.
+We read it as a narrative flag rather than an exclusion.
+
+\item \textbf{Bai--Perron break dating.} Fitting the donor-Brent return relationship
+$r_{j,t}=\alpha_i+\beta_i y_t+u_t$ with $m$ unknown breaks that partition the sample, the break
+dates minimise the global segment sum of squares,
+\begin{equation}
+(\hat T_1,\dots,\hat T_m)=\arg\min_{T_1<\dots<T_m}\sum_{i=1}^{m+1}\sum_{t=T_{i-1}+1}^{T_i}
+\big(r_{j,t}-\alpha_i-\beta_i y_t\big)^2,
+\label{eq:baiperron}
+\end{equation}
+with the number of breaks chosen by BIC \citep{baiperron1998,baiperron2003}.
+
+\item \textbf{Harvey--Leybourne--Taylor trend-break test.} Because the relationship above
+regresses on Brent, a break dated at the cutoff is ambiguous, since Brent is treated there too.
+This test instead reads the donor's own log-level trend and is robust to whether the series is
+stationary or integrated. It combines a statistic $t_0$ that is optimal under stationarity with a
+statistic $t_1$ that is optimal under a unit root,
+\begin{equation}
+\mathcal{T}_\lambda=(1-\lambda)\,t_0+\lambda\,t_1,
+\label{eq:hlt}
+\end{equation}
+where the weight $\lambda$ is driven by a KPSS stationarity statistic so the test keeps the same
+asymptotic size in either case \citep{harvey2009}. The KPSS input is
+\begin{equation}
+\eta_j=\frac{1}{T^2\hat\omega^2}\sum_{t=1}^{T}S_t^2,\qquad S_t=\sum_{i=1}^{t}\hat e_i,
+\label{eq:kpss}
+\end{equation}
+the scaled partial sums of the residuals $\hat e$ from regressing the donor level on a constant
+and trend, with $\hat\omega^2$ a long-run variance estimate \citep{kpss1992}. The exact weight
+function is given in \citet{harvey2009}.
+\end{enumerate}
+
+Most donor breaks predate both pre-windows, clustering at the post-crisis normalisation and the
+2020 COVID crash, and the COVID break falls just before the Russia pre-window start, which
+vindicates that start date. Inside the pre-windows the dating flags two Russia donors, Wheat,
+which the audit already excludes, and the VIX on 2022-01-07 about seven weeks before the
+invasion, and three Hormuz donors, Silver, Platinum, and EM equities, on a common September 2024
+precious-metals move with none near the cutoff. A break inside the pre-window is informative
+rather than disqualifying, so no donor is removed by this test and the VIX is retained.
+
+For the trend-break test all 32 donors classify as integrated, so it avoids the spurious trend
+breaks a naive levels regression would find, and no donor's own trend breaks within eight weeks
+of either cutoff. No retained donor was itself trend-treated by either event.
