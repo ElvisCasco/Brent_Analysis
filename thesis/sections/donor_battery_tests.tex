@@ -1,0 +1,58 @@
+% ===================================================================
+\section{Donor-level battery tests}\label{app:breaks}
+% ===================================================================
+The qualitative audit of Section~\ref{sec:donoraudit} is the primary identification defence.
+This appendix reports its empirical counterpart, a battery of donor-level tests run on each
+candidate's own return or level series before any model is fit. The battery asks two
+questions. The first is whether a donor jumps at the event, a direct reading of the
+no-interference assumption. The second is whether the donor's relationship with Brent stays
+stable across the fitting window, since an unstable loading would distort the synthetic.
+Every test is model-agnostic and works one donor at a time, so it confirms or supplements the
+audit rather than replacing it.
+
+\subsection{Interference at the event}
+We test each donor's own daily log-returns for a shift at the known cutoff in two ways. A
+permutation mean-shift test compares the pre-cutoff and post-cutoff means against the
+distribution obtained by reshuffling the pre and post labels, the known-date counterpart of
+the asymptotic break test of \citet{andrews1993} without its normality assumption. A Wilcoxon
+event-window test compares the mean return in a short window around the cutoff against a
+sixty-day pre-window control. A donor is flagged as potentially treated when either test
+rejects after a Benjamini--Hochberg false-discovery correction at the ten percent level
+\citep{benjaminihochberg1995}. A two-sample Kolmogorov--Smirnov test on the pre and post
+return distributions is reported alongside but kept out of the flag rule, because at these
+sample sizes it rejects on any broad macro-regime shift rather than on event-treatment of the
+individual donor.
+
+For Hormuz 2026 the battery agrees with the audit on 31 of the 32 candidates, with no flag
+surviving the correction. The single disagreement is Cotton, which the audit drops on the
+indirect oil-to-polyester channel that the contemporaneous tests are not built to reproduce.
+For Russia 2022 the tests miss the audit's directly exposed donors, because at about 415
+pre-period observations the war-driven moves are not extreme enough to survive the correction
+across the candidate set, and they add one flag on CNY that traces to the concurrent China
+zero-COVID dynamics rather than to the invasion. The Kolmogorov--Smirnov test flags roughly
+21 of the 32 Russia donors, far more than the audit, which is the over-rejection on the 2022
+regime shift that justifies keeping it out of the flag rule.
+
+\subsection{Stability of the donor-Brent relationship}
+Three tests check that the relationship holds across the pre-window. A distance-correlation
+test \citep{szekely2007} splits each pre-window into thirds and reports the largest change in
+the donor-Brent distance correlation across them, read as a narrative flag rather than an
+exclusion. Bai--Perron break dating \citep{baiperron1998,baiperron2003} searches the
+full-history return relationship for break dates by globally minimising segment sum of
+squares, with the number of breaks set by BIC. Most donor breaks predate both pre-windows,
+clustering at the post-crisis normalisation and the 2020 COVID crash, and the COVID break
+falls just before the Russia pre-window start, which vindicates that start date. Inside the
+pre-windows the dating flags two Russia donors, Wheat, which the audit already excludes, and
+the VIX on 2022-01-07 about seven weeks before the invasion, and three Hormuz donors, Silver,
+Platinum, and EM equities, on a common September 2024 precious-metals move with none near the
+cutoff. A break inside the pre-window is informative rather than disqualifying, so no donor is
+removed by this test and the VIX is retained.
+
+Because the relationship specification regresses on Brent, a break dated at the cutoff itself
+is ambiguous, since Brent is treated there too. The Harvey--Leybourne--Taylor trend-break test
+\citep{harvey2009} resolves this by testing each donor's own log-level trend with a statistic
+whose size is the same whether the series is stationary or integrated, weighting a
+stationary-optimal and an integrated-optimal statistic by KPSS stationarity weights
+\citep{kpss1992}. All 32 donors classify as integrated, so the test avoids the spurious trend
+breaks a naive levels regression would find, and no donor's own trend breaks within eight
+weeks of either cutoff. No retained donor was itself trend-treated by either event.

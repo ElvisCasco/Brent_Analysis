@@ -1,31 +1,35 @@
 % Donor selection funnel (Section Donor Selection).
-% Requires in the preamble: \usepackage{tikz}  \usetikzlibrary{arrows.meta}
-\begin{tikzpicture}[font=\footnotesize,>=Latex,
-   num/.style={anchor=west,inner sep=0pt},
-   lbl/.style={anchor=west,align=left,inner sep=1pt},
-   drp/.style={anchor=west,align=left,inner sep=1pt,text=red!55!black,text width=4.8cm}]
-  % funnel: top width 6 (x 0..6), bottom width 3 (x 1.5..4.5), height 6, 4 bands of 1.5
-  \fill[blue!12] (0,6) -- (6,6) -- (4.5,0) -- (1.5,0) -- cycle;
-  \draw[line width=1pt] (0,6) -- (6,6) -- (4.5,0) -- (1.5,0) -- cycle;
-  % band dividers, half-width hw(y)=1.5+0.25y
-  \draw (0.375,4.5) -- (5.625,4.5);
-  \draw (0.75,3.0)  -- (5.25,3.0);
-  \draw (1.125,1.5) -- (4.875,1.5);
+% Requires in the preamble: \usepackage{tikz}  \usepackage{xcolor}
+\definecolor{funfill}{HTML}{6E8CAE}
+\begin{tikzpicture}[scale=0.8,transform shape,font=\footnotesize,
+   bar/.style={anchor=west,align=left,text width=7.0cm,inner sep=0pt}]
+  \def\cx{12}
+  % inverted funnel, taper slope ~0.76; apex (cx,0.5), bands 1.2 tall with 0.25 gaps
 
-  % band centres y = 5.25, 3.75, 2.25, 0.75
-  \node[align=center,font=\bfseries] at (3,5.25) {Global Categories};
-  \node[num,font=\fontsize{15}{15}\bfseries] at (1.55,3.75) {32};
-  \node[lbl,text width=2.4cm] at (2.5,3.75) {candidate series spanning five factors};
-  \node[num,font=\fontsize{15}{15}\bfseries] at (1.65,2.25) {26};
-  \node[lbl,text width=2.1cm] at (2.6,2.25) {after direct exposures removed};
-  \node[num,font=\fontsize{15}{15}\bfseries] at (1.8,0.75) {19};
-  \node[lbl,text width=1.9cm] at (2.75,0.75) {shared clean pool, valid for both events};
+  % ---- stage 0 : global categories (label only, the donor universe) ----
+  \fill[funfill] (\cx-4.2,6.05) -- (\cx+4.2,6.05) -- (\cx+3.29,4.85) -- (\cx-3.29,4.85) -- cycle;
+  \node[white,font=\normalsize\bfseries] at (\cx,5.45) {Common Factors};
+  \node[bar] at (0.25,5.45) {{\normalsize Stage 0: Non-oil donor proxies spanning Brent's common factors}};
 
-  % exclusion steps, beside the band each one arrives at
-  \node[drp] at (6.3,3.75) {{\bfseries exclude by construction}\\
-     energy complex, petrocurrencies, unstable FX, energy-heavy indices, thin or redundant series};
-  \node[drp] at (6.3,2.25) {{\bfseries exclude direct exposure}\\
-     Wheat, Corn, Palladium, EUR, DXY, BTC};
-  \node[drp] at (6.3,0.75) {{\bfseries keep valid for both events}\\
-     Copper, IronOre, Soybeans, EM equities, GBP, US10Y, Cotton};
+  % ---- stage 1 : 32 ----
+  \fill[funfill] (\cx-3.1,4.6) -- (\cx+3.1,4.6) -- (\cx+2.19,3.4) -- (\cx-2.19,3.4) -- cycle;
+  \node[white,font=\normalsize\bfseries] at (\cx,4.0) {32};
+  \node[bar] at (0.25,4.0) {{\normalsize Stage 1: Exclude donors priced off oil or on its causal path}};
+
+  % ---- stage 2 : 26 ----
+  \fill[funfill] (\cx-2.0,3.15) -- (\cx+2.0,3.15) -- (\cx+1.1,1.95) -- (\cx-1.1,1.95) -- cycle;
+  \node[white,font=\normalsize\bfseries] at (\cx,2.55) {26};
+  \node[bar] at (0.25,2.55) {{\normalsize Stage 2: Exclude direct supply or demand channel to the event}};
+
+  % ---- stage 3 : 19 (apex) ----
+  \fill[funfill] (\cx-0.91,1.7) -- (\cx+0.91,1.7) -- (\cx,0.5) -- cycle;
+  \node[white,font=\normalsize\bfseries] at (\cx,1.1) {19};
+  \node[bar] at (0.25,1.1) {{\normalsize Stage 3: Keep valid for both events}};
+
+  % ---- note ----
+  \node[anchor=north west,align=left,text width=15.5cm,inner sep=0pt,font=\scriptsize]
+     at (0.25,0.15) {\textit{Notes.} The counts follow the Russia 2022 strict-clean audit,
+     the more demanding event. Stage 2 removes the six donors with direct exposure and Stage 3
+     the seven with secondary or terms-of-trade exposure, leaving 19 used as the shared pool
+     for both events. Stage 0 is the factor-defined universe and carries no count.};
 \end{tikzpicture}
