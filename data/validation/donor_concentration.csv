@@ -1,9 +1,0 @@
-,event,model,eff_donors,n_donors_share_gt_5pct
-0,russia,convex_scm,2.0966461581789018,2
-1,russia,ascm,11.127846759389813,7
-2,russia,elastic_net,8.62153058357408,9
-3,russia,xgboost,3.6657616544898612,5
-4,hormuz,convex_scm,2.8979171668502968,3
-5,hormuz,ascm,8.548485957744672,7
-6,hormuz,elastic_net,2.054283073886392,2
-7,hormuz,xgboost,2.488775251891238,5
