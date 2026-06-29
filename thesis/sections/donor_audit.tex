@@ -1,0 +1,101 @@
+% ===================================================================
+\section{Donor Audit}\label{sec:donoraudit}
+% ===================================================================
+This section applies the selection criteria of Section~\ref{sec:data} donor by donor.
+It reports which candidates are retained and which are dropped under each event's
+cleanliness audit, states the shared pool that results, gives the positive case for the
+families excluded by construction, and closes with the empirical donor-level tests that
+confirm the a-priori audit. The full per-event catalog of all 32 candidates, with each
+one's factor loading and Clean/Mild/Heavy status for both events, is
+Table~\ref{tab:donoraudit} in Appendix~\ref{app:donoraudit}; the discussion here is
+organised by audit tier and by the reason for exclusion.
+
+\subsection{The per-event cleanliness audit}
+Each candidate is scored against the focal event on a three-level scale: \textbf{Clean}
+(no direct supply or demand exposure to the event), \textbf{Mild} (a secondary or
+terms-of-trade channel, bias possible but small), and \textbf{Heavy} (direct exposure, a
+SUTVA violation). The two events stress the pool very differently. For \textbf{Russia
+2022}, 13 of the 32 candidates carry an identifiable channel to the war: 6 are Heavy and
+7 are Mild. The Heavy set is Wheat and Corn (Russia and Ukraine together supply roughly a
+third of world wheat exports and an eighth of corn), Palladium (Russia is around
+40\,\% of supply), the euro and the dollar basket (the European energy-crisis
+pass-through dominates both), and Bitcoin (the sanctions-evasion narrative of March
+2022). The Mild set is Copper, Iron Ore, Soybeans, and EM equities (terms-of-trade and
+EM-growth exposure), sterling (UK gas exposure), the US 10-year yield (the
+European-inflation channel), and Cotton (the indirect oil$\to$polyester substitution
+channel). For \textbf{Hormuz 2026} the audit is far cleaner: no candidate is physically
+routed through the Strait, and only Cotton is flagged Mild, again on the oil$\to$polyester
+channel rather than any Gulf-trade exposure.
+
+\subsection{The retained shared pool}
+The shared pool is the Russia strict-clean set, the 19 candidates rated Clean for the
+more demanding event (Table~\ref{tab:donors}). Retaining the Russia-clean set drops the
+13 Russia-flagged candidates (the 6 Heavy and 7 Mild above); because that set is a subset
+of the Hormuz-clean set, all 19 stay clean for both events. Cotton illustrates the logic:
+it is Mild for both events, so even though Hormuz alone would tolerate it under a
+permissive variant, it is excluded on the strength of the Russia audit and its indirect
+channel never enters the shared pool. One retained donor, VIX, is borderline. A
+full-history Bai--Perron test \citep{baiperron1998} dates a single break in its
+relationship with Brent on 2022-01-07, about seven weeks \emph{before} the invasion. We
+read that as a loading-stability signal rather than a SUTVA violation, because it does not
+recur when the test is run on the analysis window alone, and a sensitivity check shows
+that keeping or dropping VIX moves the ensemble premium by less than one percentage point.
+We therefore retain VIX, which keeps the volatility factor represented.
+
+\begin{table}[h]
+\centering
+\caption{The retained shared 19-donor pool, by factor category.}
+\label{tab:donors}
+\begin{threeparttable}
+\small
+\begin{tabular}{@{}lp{10.5cm}@{}}
+\toprule
+Category & Donors (shared pool) \\
+\midrule
+Metals (3) & Silver, Platinum, Gold \\
+Agriculturals (3) & Coffee, Sugar, Live Cattle \\
+Equities (2) & S\&P 500, Nikkei 225 \\
+Foreign exchange (8) & AUD, JPY, CHF, CNY, INR, KRW, ZAR, MXN \\
+Rates \& credit (2) & TLT (long Treasuries), HYG (high-yield credit) \\
+Volatility (1) & VIX (implied S\&P 500 volatility) \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes.} The full 32-candidate pool adds the Russia-contaminated series (Wheat, Corn, Palladium, EUR, DXY, BTC, Copper, Iron Ore, Soybeans, EM equities, GBP, US10Y, Cotton), used only as an appendix robustness pool and contamination diagnostic. Full per-event catalog: Table~\ref{tab:donoraudit}.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\subsection{Candidates excluded by construction}
+Several families never reach the per-event audit because criterion (ii) rules them out a
+priori. The \emph{energy complex} (WTI, Henry Hub natural gas, refined products, EIA
+ex-SPR inventories) has the highest pre-period correlation with Brent and would give the
+lowest pre-period RMSPE, yet every member is driven by the same oil-specific shock $o_t$
+we are trying to measure, so each would mechanically shrink the estimated premium toward
+zero. \emph{Petrocurrencies} (CAD, NOK, BRL, COP, MYR, and the suspended RUB) are
+excluded for the same reason in FX form: their value is partly set by oil through the
+exporter's terms of trade, which places them on the oil causal path. \emph{Unstable or
+idiosyncratic FX} (TRY, ARS, EGP) are dropped because their volatility is dominated by
+domestic crisis dynamics that add noise rather than shared-factor signal.
+\emph{Energy-heavy equity indices} (DAX, FTSE~100, TSX~60) carry direct energy-sector or
+European-energy-crisis exposure, and KOSPI and Hang Seng are redundant with the KRW and
+CNY factors. \emph{Thin or discontinuous commodities} (cocoa, orange juice, lean hogs,
+lumber) are too idiosyncratic or break contract continuity in the pre-period. Finally,
+MSCI World is dropped as redundant with the S\&P 500, with which it correlates above 0.95.
+Appendix~\ref{app:donoraudit} records each rejected family with its specific reason.
+
+\subsection{Empirical confirmation of the audit}
+The a-priori audit is the primary identification defence; the donor-level battery of
+Section~\ref{sec:methods} is its empirical check, and the two agree closely. For
+\textbf{Hormuz 2026}, 31 of the 32 candidates agree between the qualitative audit and the
+model-agnostic tests at $T_0$; only Cotton differs, and its Mild rating is an economic
+causal-channel call that the contemporaneous tests are not expected to reproduce for an
+indirect, lagged channel. For \textbf{Russia 2022} the tests confirm the broad picture
+and add a single flag on CNY, which is attributable to the concurrent China zero-COVID
+dynamics rather than to the war. The regime-stability tests behave consistently: the only
+within-pre-window relationship break the Bai--Perron procedure dates among retained
+donors is the VIX break of 2022-01-07 discussed above, which falls before $T_0$ and is
+treated as informative rather than exclusionary. The empirical battery therefore
+corroborates the cleanliness of the retained pool without overturning any audit call.
+

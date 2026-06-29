@@ -1,0 +1,19 @@
+% ===================================================================
+\section{Structural-break tests}\label{app:breaks}
+% ===================================================================
+Two break tests support donor screening. \emph{Bai--Perron}
+\citep{baiperron1998,baiperron2003} dates breaks in the donor--Brent weekly-return
+relationship $r^{\text{donor}}_t=\alpha_s+\beta_s r^{\text{Brent}}_t+\varepsilon_t$ by
+globally minimising segment SSR via dynamic programming, with the break count chosen by BIC.
+Only VIX shows a break strictly inside a pre-window (2022-01-07). We treat the break tests as
+informative rather than automatically disqualifying: the VIX break is a loading-stability
+signal, it does not reproduce on the analysis window alone, and the in/out sensitivity is
+below 1 pp, so VIX is retained (Section~\ref{sec:donoraudit}). The relationship specification is
+Brent-based, so a break \emph{at} $T_0$ is ambiguous; the
+complementary \citet{harvey2009} trend-break test resolves this by testing the donor's
+\emph{own} log-level trend with a statistic whose asymptotic size is invariant to whether the
+series is I(0) or I(1): it weights an I(0)-optimal and an I(1)-optimal sup-$t$ statistic by
+KPSS stationarity weights \citep{kpss1992}. Empirically all 32 donors are classified I(1)-like
+and none rejects a trend break within $\pm$8 weeks of either $T_0$, so no retained donor was
+itself trend-treated by either event.
+

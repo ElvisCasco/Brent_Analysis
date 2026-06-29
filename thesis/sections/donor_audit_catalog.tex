@@ -1,0 +1,73 @@
+% ===================================================================
+\section{Donor audit catalog}\label{app:donoraudit}
+% ===================================================================
+Table~\ref{tab:donoraudit} is the full per-event catalog underlying the audit of
+Section~\ref{sec:donoraudit}. Each of the 32 candidates is listed with the common factor
+it loads on with Brent and its Clean (C), Mild (M), or Heavy (H) status for each event;
+the final column marks membership in the retained shared 19-donor pool. Status follows
+the donor catalog maintained alongside the analysis code.
+
+\begin{table}[h]
+\centering
+\caption{Per-event donor audit catalog.}
+\label{tab:donoraudit}
+\begin{threeparttable}
+\footnotesize
+\begin{tabular}{@{}llccc@{}}
+\toprule
+Donor & Factor it loads on with Brent & RU 2022 & HZ 2026 & In 19 \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{Metals}}\\
+Copper      & Global industrial cycle (``Dr Copper'')        & M & C & \\
+Iron Ore    & China industrial demand                        & M & C & \\
+Silver      & Precious + industrial dual factor              & C & C & Yes \\
+Platinum    & Auto catalysts / South Africa PGM              & C & C & Yes \\
+Palladium   & Auto catalysts (Russia $\sim$40\,\% supply)    & H & C & \\
+Gold        & Real rates / safe-haven premium                & C & C & Yes \\
+\addlinespace
+\multicolumn{5}{@{}l}{\textit{Agriculturals}}\\
+Soybeans    & Global trade activity, China demand            & M & C & \\
+Wheat       & Russia+Ukraine $\sim$30\,\% world exports      & H & C & \\
+Corn        & Ukraine $\sim$13\,\% world corn exports        & H & C & \\
+Coffee      & Brazil/Vietnam concentrated; climate           & C & C & Yes \\
+Sugar       & Brazil/India concentrated                      & C & C & Yes \\
+Cotton      & Oil$\to$polyester substitution (indirect oil)  & M & M & \\
+Live Cattle & North-American livestock cycle                 & C & C & Yes \\
+\addlinespace
+\multicolumn{5}{@{}l}{\textit{Equities}}\\
+S\&P 500    & US growth / equity risk premium                & C & C & Yes \\
+Nikkei 225  & Japan growth / safe-haven equity               & C & C & Yes \\
+EM equities & Broad emerging markets (held Russia weight)    & M & C & \\
+\addlinespace
+\multicolumn{5}{@{}l}{\textit{Foreign exchange}}\\
+EUR         & Eurozone growth (EU energy crisis)             & H & C & \\
+GBP         & UK growth (UK gas exposure)                    & M & C & \\
+AUD         & Australia / China-demand commodity FX          & C & C & Yes \\
+JPY         & Safe-haven FX                                  & C & C & Yes \\
+CHF         & Safe-haven FX                                  & C & C & Yes \\
+CNY         & China managed currency                         & C & C & Yes \\
+INR         & India growth / EM                              & C & C & Yes \\
+KRW         & Korea manufacturing                            & C & C & Yes \\
+ZAR         & EM commodities (PGMs, gold)                    & C & C & Yes \\
+MXN         & EM / Mexico                                    & C & C & Yes \\
+DXY         & Trade-weighted dollar (EUR dominant)           & H & C & \\
+\addlinespace
+\multicolumn{5}{@{}l}{\textit{Rates \& credit}}\\
+US 10Y      & Real risk-free rate / growth (Europe inflation)& M & C & \\
+TLT         & Long-duration US Treasuries                    & C & C & Yes \\
+HYG         & US high-yield credit / risk premium            & C & C & Yes \\
+\addlinespace
+\multicolumn{5}{@{}l}{\textit{Volatility}}\\
+VIX         & Implied S\&P 500 volatility (inverse)          & C & C & Yes \\
+\addlinespace
+\multicolumn{5}{@{}l}{\textit{Crypto}}\\
+Bitcoin     & Digital risk-asset / liquidity (sanctions Mar 2022) & H & C & \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes.} C = Clean (retained for that event); M = Mild (secondary/terms-of-trade channel, excluded from the strict-clean pool); H = Heavy (direct exposure, SUTVA violation, excluded). The shared 19-donor pool is the Russia strict-clean set; ``Yes'' in the last column marks its members.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
