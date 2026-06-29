@@ -47,19 +47,44 @@ def synth_levels(event):
 
 # ---------- Figure 1: Brent timeline with both events ----------
 def fig_timeline():
+    from matplotlib.patches import Patch
     brent = load_brent()['Brent'].loc['2020-01-01':]
-    fig, ax = plt.subplots(figsize=(9, 3.6))
+    fig, ax = plt.subplots(figsize=(9.4, 3.9))
     ax.plot(brent.index, brent.values, color='black', lw=1.0, label='Brent spot (EIA RBRTEd)')
     trans = ax.get_xaxis_transform()  # x in data coords, y in axes fraction
-    for ev, col in [('russia', 'firebrick'), ('hormuz', 'navy')]:
-        ax.axvline(T0[ev], color=col, ls='--', lw=1.3)
-        ax.text(T0[ev], 1.02, EVTITLE[ev], transform=trans, color=col,
-                ha='center', va='bottom', fontsize=9)
+
+    # Shade each event's pre-window and post-window (preferred specification).
+    for k, ev in enumerate([('russia'), ('hormuz')]):
+        s, t0 = PRE_WINDOWS[ev]['preferred'][0], pd.Timestamp(T0[ev])
+        ax.axvspan(pd.Timestamp(s), t0, color='steelblue', alpha=0.10,
+                   label='Pre-window' if k == 0 else None)
+        ax.axvspan(t0, pd.Timestamp(POST_END[ev]), color='firebrick', alpha=0.10,
+                   label='Post-window' if k == 0 else None)
+
+    # All curated events in the plotted window get a letter marker (a, b, ...); the
+    # letter -> event key lives in the figure notes, not on the plot.
+    ev_csv = ROOT / 'data' / 'historical_events.csv'
+    focal_dates = {pd.Timestamp(T0['russia']), pd.Timestamp(T0['hormuz'])}
+    events = pd.read_csv(ev_csv, parse_dates=['date'])
+    events = events[(events['date'] >= brent.index.min()) &
+                    (events['date'] <= brent.index.max())].sort_values('date')
+    letters = 'abcdefghijklmnopqrstuvwxyz'
+    yrow = [0.93, 0.84]  # stagger letters so the spring-2020 cluster stays legible
+    for i, (_, r) in enumerate(events.iterrows()):
+        focal = r['date'] in focal_dates
+        col = 'firebrick' if r['date'] == pd.Timestamp(T0['russia']) else \
+              'navy' if r['date'] == pd.Timestamp(T0['hormuz']) else 'grey'
+        ax.axvline(r['date'], color=col, ls='--' if focal else ':',
+                   lw=1.4 if focal else 0.8, alpha=1.0 if focal else 0.7)
+        ax.text(r['date'], yrow[i % len(yrow)], letters[i], transform=trans,
+                ha='center', va='center', fontsize=8,
+                fontweight='bold' if focal else 'normal', color=col,
+                bbox=dict(boxstyle='circle,pad=0.15', fc='white', ec=col, lw=0.7))
     ax.set_xlabel('Date')
     ax.set_ylabel('Brent spot price (USD / barrel)')
     ax.set_ylim(0, brent.max() * 1.08)
-    ax.set_title('Brent crude and the two focal events, 2020–2026', pad=18)
-    ax.legend(loc='upper left', frameon=False)
+    ax.legend(loc='lower left', bbox_to_anchor=(0, 1.0, 1, 0.12), mode='expand',
+              ncol=3, frameon=False, fontsize=8)
     ax.xaxis.set_major_locator(mdates.YearLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
     fig.savefig(FIG / 'brent_timeline.png')
@@ -88,7 +113,6 @@ def fig_paths():
         ax.legend(loc='upper left', frameon=False, fontsize=8)
         for lab in ax.get_xticklabels():
             lab.set_rotation(30); lab.set_ha('right')
-    fig.suptitle('Observed vs. synthetic Brent (thin grey = the five ensemble models)', y=1.04, fontsize=10)
     fig.savefig(FIG / 'counterfactual_paths.png')
     plt.close(fig)
 
@@ -108,7 +132,6 @@ def fig_sensitivity():
     ax.axhline(0, color='grey', lw=0.8, ls=':')
     ax.set_xlabel('Post-event horizon')
     ax.set_ylabel('Ensemble-median gap (%)')
-    ax.set_title('Estimated premium by post-event horizon (shaded = IQR across models)')
     ax.legend(frameon=False)
     fig.savefig(FIG / 'postwindow_sensitivity.png')
     plt.close(fig)
@@ -127,7 +150,6 @@ def fig_placebo():
     ax.bar(range(len(df)), df['ratio'].values, color=colors)
     ax.set_xlabel('Placebo units (donors) and Brent, sorted by post/pre RMSPE ratio')
     ax.set_ylabel('Post/pre RMSPE ratio')
-    ax.set_title('In-space placebo, Hormuz (convex SCM): Brent (red) ranks first')
     ax.set_xticks([])
     fig.savefig(FIG / 'placebo_hormuz.png')
     plt.close(fig)
