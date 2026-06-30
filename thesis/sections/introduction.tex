@@ -2,110 +2,78 @@
 \section{Introduction}
 \label{sec:intro}
 
-The Strait of Hormuz is the narrowest binding constraint in the global oil system.
-Roughly one-fifth of world petroleum-liquids consumption transits the lane between
-Iran and Oman \citep{eia_hormuz2025}, carrying crude from Saudi Arabia, Iraq, the
-United Arab Emirates, Kuwait, Iran, and Qatar to seaborne markets. What makes the
-chokepoint so important is the absence of a redundant route: the Saudi East--West
-and UAE Habshan--Fujairah pipelines together divert only a small fraction of this
-volume overland (about 2.6~million barrels per day, b/d, of spare capacity against the
-roughly 20~million b/d that transits the strait \citep{eia_hormuz2025}), and no maritime
-bypass exists, so the majority of Gulf crude has nowhere else to go. This leaves Hormuz the single strongest bottleneck in the
-world's oil-transport network. The lane has seen periodic near-misses, among them the
-1980s tanker war, the 2019 Abqaiq strike, and recurring tensions through the mid-2020s,
-each producing a transient risk-premium spike but never an actual closure. The
-28~February 2026 disruption is the first realisation of that long-anticipated tail
-risk.
+Since 28~February 2026, shipping through the Strait of Hormuz has been largely halted amid
+the 2026 Iran war, the chokepoint sitting at the centre of the conflict
+\citep{worldbank2026}. The strait is the narrowest binding constraint in the global
+oil system, with roughly one-fifth of world petroleum-liquids consumption
+\citep{eia_hormuz2025} and about 27\% of global seaborne oil trade \citep{crs_hormuz2026}
+transiting the passage. What makes the
+chokepoint so important is the absence of a redundant route. Hormuz is a narrow sea lane
+between Iran and Oman with no maritime bypass, and the overland pipelines that skirt it
+carry only a small share of the flow \citep{eia_hormuz2025}, so most Gulf crude has nowhere
+else to go. Even
+through recent regional conflict, traffic had never been halted, so the 2026 disruption is
+the first time the strait has actually closed.
 
-Because crude oil is an input to almost every industry and a cost borne across nearly
-all economies, a disruption on this scale was always going to move prices, and Brent
-duly rose sharply in the days that followed. We study Brent rather than another
-benchmark for two reasons. First, although the major crude indices are highly correlated
-and the choice between them is largely immaterial, Brent is the reference price against
-which the majority of internationally traded crude is settled. Second, we use its spot
-quotation rather than a futures contract.
+Crude oil is an input to almost every industry and a cost borne across nearly all
+economies, so a disruption on this scale was always going to move prices. The shock
+registered in Brent, the benchmark against which most internationally traded crude is
+settled, which rose sharply once the lane was blocked and passed \$100 a barrel for the
+first time in four years. This is not without precedent. The 2022 Russian invasion of
+Ukraine drove Brent from about \$95 to \$130 within two weeks, the closest comparable
+oil-supply shock of the past decade and the benchmark against which we later validate the
+design.
 
-Yet the raw price jump is uninformative on its own, because it
-conflates the disruption with everything else moving markets at the same time, and it
-says nothing about how the effect evolves. For this reason, we pose a causal question:
+The size and persistence of the move are what policy turns on. Emergency
+strategic-reserve releases are sized against an implied price displacement, and the
+International Energy Agency (IEA) coordinated the drawdown of some 180~million barrels
+after the 2022 invasion \citep{iea2022release}. The monetary-policy choice to look through
+an oil shock or to tighten depends on how large and how lasting it is. Fiscal
+stabilisation in subsidising oil importers scales with the move. Sovereign hedging
+programmes price disruption scenarios against exactly such magnitudes, the largest being
+Mexico's annual Hacienda hedge \citep{jfi2023mexico}. The 2026 disruption has accordingly
+drawn rapid analysis from the Kiel Institute, the Oxford Institute for Energy Studies, the
+World Bank, and the IEA \citep{kiel2026,oies2026,worldbank2026,iea2026}.
+
+Yet that policy-relevant effect is not the raw price jump. The jump conflates the disruption
+with everything else moving markets at the same time, so its size is not the disruption's
+alone, and as a single figure it says nothing about how the effect evolves. We therefore
+pose a causal question.
 
 \begin{quote}
-\emph{What is the causal effect of the 2026 Strait of Hormuz disruption on the price
-of Brent crude over a policy-relevant post-event window?}
+What is the causal effect of the 2026 Strait of Hormuz disruption on the price of Brent
+crude over a policy-relevant post-event window?
 \end{quote}
 
-We deliberately target the total causal effect rather than any single
-transmission channel, and we estimate it as a path over the post-event window
-rather than a single number. The applications drive this choice. First, emergency
-strategic-reserve releases are sized against an implied price displacement (the
-International Energy Agency, IEA, coordinated the drawdown of some 180~million barrels
-after the 2022 invasion of Ukraine \citep{iea2022release}). Second, the monetary-policy
-decision to look through an oil shock or to tighten turns on its size and persistence.
-Third, fiscal stabilisation in subsidising oil importers scales with the move. Fourth,
-sovereign hedging programmes price disruption scenarios against exactly such magnitudes
-(Mexico's annual ``Hacienda hedge'' is the largest such programme in the world
-\citep{jfi2023mexico}). Each lever acts on the trajectory of the effect, not on a
-peak-day figure, so the object we need is the average gap between observed Brent and the
-price that would have prevailed absent the disruption, traced over the whole window.
-Recovering that counterfactual path, which has no directly observable analogue, is the
-methodological core of this paper.
+We target the total causal effect rather than any single transmission channel, and we
+estimate it as a path over the post-event window rather than a single number. Each policy
+lever above acts on the trajectory of the effect, not on a peak-day figure, so the object
+we need is the average gap between observed Brent and the price that would have prevailed
+absent the disruption, traced over the whole window. Recovering that counterfactual path,
+which has no directly observable analogue, is the methodological core of this paper.
 
-Standard observational designs cannot properly estimate the causal effect. Brent is a single, globally traded
-benchmark, which rules out difference-in-differences (no panel of comparable treated
-and control units), regression discontinuity (no running variable around a cutoff),
-and instrumental variables (no credible instrument for a one-off geopolitical event).
-We choose the \emph{synthetic control method} (SCM) \citep{abadie2010,abadie2021} because it is built for situations similar to the Hormuz disruption: it forms a weighted basket of donor series whose pre-event co-movement
-with the outcome is high and projects that basket forward as the counterfactual. With this, it
-yields a full counterfactual path rather than a point estimate, makes its identifying
-assumptions auditable through the donor pool, and requires no structural stance on
-whether the move is supply, risk premium, or expectations, since its estimand is a
-reduced-form total effect.
+Standard observational designs are ill-suited to it. Brent is a single, globally traded
+benchmark, so difference-in-differences has no untreated control sharing its trend, and
+instrumental variables has no credible instrument for a one-off geopolitical event. We use the synthetic control method (SCM) \citep{abadie2010,abadie2021}, which
+forms a weighted basket of donor series whose pre-event co-movement with the outcome is
+high and projects that basket forward as the counterfactual. SCM yields a full
+counterfactual path, makes its identifying assumptions auditable through the donor pool,
+and takes no structural stance on whether the move is supply, risk premium, or
+expectations, since its estimand is a reduced-form total effect. Those institutions reach
+a price path by the opposite route, imposing an assumed barrel shortfall and propagating it
+through a structural model. Ours reads the effect from the market and assumes no shortfall,
+providing a complementary perspective.
 
-The tools most commonly used to analyse such price shocks include event studies,
-structural vector autoregressions (VARs), and institutional scenario models, though
-these tend to address narrower or different questions. Event studies measure abnormal returns in a short
-window around the event but yield no multi-month path and miss persistence. Structural
-VARs \citep{kilian2009,baumeisterhamilton2019} decompose prices into supply, demand,
-and inventory shocks but produce no counterfactual path and rely on identification
-restrictions with no settled precedent for a chokepoint event. And institutional
-scenario models propagate an assumed barrel shortfall through a supply--demand model,
-so their counterfactual is imposed rather than read from observed prices. Given this situation, we see these
-as complements rather than competitors to our methodology. Our cross-asset, data-driven estimate and a
-structural scenario estimate answer different questions, the price gap implied by
-observed co-movement versus the price implied by an assumed shortfall, so their
-agreement is itself informative, and in practice the two can be used side by side.
-
-Methodologically, our closest neighbour is the SCM-on-price design of
-\citet{becker2021}. That work studies a regulated retail-fuel market with
-cross-country donor units, but neither is available here, since Brent is a global crude
-benchmark and no untreated country or market can serve as a donor. We therefore replace
-geographic donors with cross-asset donors, including metals, agriculturals, equities,
-foreign exchange, rates, and volatility, and apply the design under an exogenous
-geopolitical treatment. To our knowledge this combination has not been used for any
-previous oil shock, so the contribution is as much about establishing whether such a
-design is valid in this setting as about the number it produces.
-
-A single estimate, however, cannot be told apart from an artefact of the donor pool,
-pre-window, model class, and regularisation. We therefore benchmark the design on the
-nearest comparable historical oil-supply shock, the 2022 Russian invasion of Ukraine
-(Brent \$95$\to$\$130 within two weeks \citep{eia_brent}), and check that the same machinery recovers
-that documented magnitude before estimating the Hormuz effect afresh on its own
-pre-window. We do not transfer the Russia fit to Hormuz. The two events sit in very
-different market regimes, and we estimate each one independently. We instead look for a
-common pattern. Because both are fit on a common 19-series donor pool, we can compare the
-donor weights across regimes as a check on the stability of the factor structure that
-SCM relies on.
-
-To prevent any single modelling choice from driving the result, the synthetic is formed
-as the median of an ensemble of five estimators with different inductive biases: convex
-SCM, augmented SCM, elastic net, gradient-boosted trees, and Bayesian ridge. The substantive work of
-this paper is the validation that challenges the donor pool and the no-interference
-assumption it rests on, namely placebo-based inference, leave-one-donor-out checks,
-structural-break tests, a signed contamination-bias analysis, and a comparison against
-naive univariate counterfactuals. Our contribution is thus twofold: a data-driven
-Brent-price average treatment effect on the treated (ATT) for the Hormuz disruption that complements structural
-estimates, and a transparent template for validating cross-asset synthetic control
-under a single-unit geopolitical treatment.
+This combination, SCM on a crude benchmark with cross-asset donors, has no direct
+precedent. The closest price application uses cross-country donors for a regulated retail
+market \citep{becker2021}, neither of which is available here. Because a single estimate
+could be an artefact of the donor pool or the modelling choices, we set the Hormuz estimate
+beside the 2022 Russian invasion, whose price move is already documented. Russia runs on the
+same machinery but is estimated independently on its own pre-window, and the design
+recovering its known move is what lends the Hormuz number its credibility. Thus, our contribution is twofold, a
+data-driven average treatment effect on the treated (ATT) for the Hormuz disruption, and a
+transparent template for validating cross-asset synthetic control under a single-unit
+geopolitical treatment.
 
 The remainder of the paper reviews the relevant literature (Section~\ref{sec:lit}),
 sets out the factor model, estimand, and identifying assumptions
@@ -113,5 +81,3 @@ sets out the factor model, estimand, and identifying assumptions
 battery (Section~\ref{sec:data}), audits the donor pool donor by donor
 (Section~\ref{sec:donoraudit}), and reports results for both events
 (Section~\ref{sec:results}) before concluding (Section~\ref{sec:conclusion}).
-
-

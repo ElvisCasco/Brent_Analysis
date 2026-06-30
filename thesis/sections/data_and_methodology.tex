@@ -14,6 +14,10 @@ chosen.
 The target is the daily Europe Brent Spot Price FOB (EIA series RBRTEd), quoted in USD
 per barrel and downloaded directly from the U.S.\ Energy Information Administration (EIA)
 \citep{eia_brent}. The latest available data is as of 22~June~2026, a one-week publication lag.
+We use Brent because it is the reference price against which most internationally traded
+crude is settled, and the spot quotation rather than a futures contract so the outcome
+carries no roll or term-structure mechanics extraneous to the event. The major crude
+indices are highly correlated, so the choice between them is largely immaterial.
 
 Figure~\ref{fig:timeline} plots the Brent path from 2020 to 2026 against a curated
 timeline of candidate shocks. Brent roughly doubled after both focal shocks from a similar base near \$75, but reached each along a different trajectory, a steep 2020--22
