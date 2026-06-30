@@ -68,10 +68,11 @@ Our setting makes inference non-standard, and the recent literature counsels res
 Permutation and placebo tests \citep{abadie2010,abadie2015} are the field standard, with
 validity resting on an approximate-symmetry assumption \citep{canay2017}. \citet{hahnshi2017}
 show that for convex SCM this effectively requires Gaussian errors, which bounds how far
-placebo $p$-values can be pushed for our nonlinear ensemble members, and \citet{chenyan2023}
-formalise the in-time placebo into a mixed test with a permutation $p$-value. Because each
-donor contributes its own placebo $p$-value, multiple testing across them is controlled by
-Benjamini--Hochberg \citep{benjaminihochberg1995}.
+placebo $p$-values can be pushed for our nonlinear ensemble members. An in-time placebo would
+formalise inference further \citep{chenyan2023}, but re-running at a fake earlier $T_0$ shortens
+an already brief pre-window beyond what the ensemble's complex members can be fit on, so we
+forgo it. Because each donor contributes its own placebo $p$-value, multiple testing across
+them is controlled by Benjamini--Hochberg \citep{benjaminihochberg1995}.
 
 The same restraint applies to pretesting. \citet{roth2022} shows that pre-trend tests have
 low power at applied sample sizes and can manufacture false confidence, and
