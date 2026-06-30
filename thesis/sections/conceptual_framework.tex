@@ -22,11 +22,19 @@ $F_t$ collects the five drivers that move Brent in normal times, namely the glob
 industrial cycle, the US dollar, real interest rates, global risk appetite, and China
 demand, each proxied by non-oil assets. The oil-specific term $o_t$ is the object of
 interest, the supply and chokepoint component a Hormuz disruption shifts. Each donor $j$
-admits its own factor representation $X_{jt}=\gamma_j'F_t+u_{jt}$ with, by construction,
-zero loading on $o_t$, so a clean donor is exposed to the same global factors as
-Brent but is not physically routed through oil supply. A synthetic control is then a
-weighted donor basket $\hat p_t=\sum_j w_j X_{jt}$, and the logic of the method follows
-directly from \eqref{eq:factor}. 
+admits its own factor representation,
+\begin{equation}
+X_{jt}=\gamma_j'F_t+u_{jt},
+\label{eq:donor}
+\end{equation}
+with, by construction, zero loading on $o_t$, so a clean donor is exposed to the same global
+factors as Brent but is not physically routed through oil supply. A synthetic control is then
+a weighted donor basket,
+\begin{equation}
+\hat p_t=\sum_j w_j X_{jt},
+\label{eq:synth}
+\end{equation}
+and the logic of the method follows directly from \eqref{eq:factor}.
 
 If the weights reproduce Brent's factor loadings,
 $\sum_j w_j\gamma_j\approx\lambda$, the basket tracks Brent through the pre-window, where
@@ -46,7 +54,10 @@ at \T{}. The treated-unit effect is $\tau_t=Y_t^I-Y_t^N$ for $t\ge$\T{}. With on
 treated unit, $Y_t^N$ is never observed after \T{}. The synthetic supplies the missing
 term, $\hat Y_t^N=\sum_j w_j X_{jt}$, and the estimated effect is the gap
 $\hat\tau_t=Y_t^I-\hat Y_t^N$, reported in percent as
-$\text{gap}_t=100\,[\exp(Y_t^I-\hat Y_t^N)-1]$. 
+\begin{equation}
+\text{gap}_t=100\,[\exp(Y_t^I-\hat Y_t^N)-1].
+\label{eq:gap}
+\end{equation}
 
 We summarise the post-window by the
 \emph{average treatment effect on the treated},
@@ -63,15 +74,15 @@ Because the synthetic stands in for an unobserved counterfactual, the estimate i
 credible as the assumptions that license it, and the factor model makes each one
 explicit and checkable.
 \begin{enumerate}
-\item \textbf{Common-factor spanning (pre-period fit).} The donor basket must reproduce
+\item \emph{Common-factor spanning (pre-period fit).} The donor basket must reproduce
 Brent's factor loadings, so that good pre-event tracking reflects shared $F_t$ rather
 than coincidence. This is checked using the pre-period root-mean-square prediction error (RMSPE),
 walk-forward cross-validation, and moment matching.
-\item \textbf{Donor cleanliness (SUTVA / no interference).} No donor may carry the
+\item \emph{Donor cleanliness (SUTVA / no interference).} No donor may carry the
 treatment, so the loading $\gamma_j$ must not load on $o_t$, and donor $j$ must not be hit
 through a channel specific to the focal event. We used an a-priori audit and
 confirmed results with model-agnostic break tests at \T{}.
-\item \textbf{Regime stability.} The loadings $\lambda,\gamma_j$ must hold across the
+\item \emph{Regime stability.} The loadings $\lambda,\gamma_j$ must hold across the
 pre-window and the projection window, so that a basket which tracked Brent before \T{}
 remains a valid counterfactual after it. This is checked by distance-correlation and
 structural-break diagnostics, and, across events, by comparing donor weights between
