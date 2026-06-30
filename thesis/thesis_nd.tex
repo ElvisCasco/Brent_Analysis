@@ -85,6 +85,9 @@ synthetic control under a single-unit geopolitical treatment.
 \newpage
 \input{sections/conclusion}
 \newpage
+\clearpage
+\phantomsection
+\addcontentsline{toc}{section}{References}
 \bibliography{references}
 
 \clearpage
@@ -96,6 +99,7 @@ synthetic control under a single-unit geopolitical treatment.
 
 % ===== Appendices divider page (carries its own contents list) =====
 \thispagestyle{empty}
+\phantomsection
 \addcontentsline{toc}{section}{Appendices}
 % Hide the individual appendices from the main ToC. tocdepth is read while the ToC is
 % rendered, so we inject the change into the .toc stream right after the Appendices line.
