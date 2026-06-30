@@ -1,13 +1,10 @@
 % ===================================================================
 \section{Related Literature}\label{sec:lit}
 % ===================================================================
-We organise the review around problems rather than individual papers, because our
-contribution sits at the intersection of three otherwise separate strands: how causal
-counterfactuals are built for a single aggregate unit, how the oil-price effect of
-geopolitical shocks is conventionally measured, and how inference is conducted with one
-treated unit and a short post-period. Tools borrowed from machine learning and time
-series are introduced where they are used (Section~\ref{sec:methods} and the
-appendices). Here we position the causal design.
+Pricing the Hormuz disruption off the observed Brent path sits at the meeting point of
+three literatures that have largely developed apart. One builds causal counterfactuals for a
+single aggregate unit, a second measures the oil-price effect of geopolitical shocks, and a
+third governs inference when a single treated unit is observed over a short post-period.
 
 \subsection{Building counterfactuals for a single aggregate unit}
 The problem of constructing a counterfactual for one treated unit is what synthetic
@@ -19,22 +16,20 @@ politics, and \citet{abadie2021} codifies the practical requirements we adopt: a
 shock-free pre-window, donors clean of the treatment (the SCM analogue of Stable Unit Treatment Value Assumption, SUTVA), and a
 good pre-treatment fit as a precondition for credibility. 
 
-A subsequent literature
-relaxes the convex-hull restriction. The augmented SCM of \citet{benmichael2021} adds a
-ridge bias-correction permitting limited extrapolation when the treated unit lies
-outside the donor hull, \citet{doudchenko2016} embed SCM, difference-in-differences, and
-regression in a common regularised-regression family that allows unconstrained weights,
-and \citet{athey2021mc} recast the problem as matrix completion. 
+The original estimator confines the synthetic to a convex combination of donors and so
+cannot reach a treated unit outside their hull, a limit later work relaxed in several ways.
+The augmented SCM of \citet{benmichael2021} adds a ridge bias-correction permitting limited
+extrapolation, \citet{doudchenko2016} embed SCM, difference-in-differences, and regression
+in a common regularised-regression family that allows unconstrained weights, and
+\citet{athey2021mc} recast the problem as matrix completion.
 
-A caution runs through
-all of it. Convex SCM weights are non-unique when donors are correlated
-\citep{abadielhour2021}, so many weight vectors yield near-identical fit and individual
-weights should not be over-interpreted. We use this entire toolbox by running an
-ensemble that spans the convex, augmented, and regularised-regression cases, and we read
-cross-model weight dispersion through the non-uniqueness result rather than as
+Across these methods the weights themselves resist clean interpretation. Convex SCM weights
+are non-unique when donors are correlated \citep{abadielhour2021}, so many weight vectors
+yield near-identical fit and no single one should be over-read. We therefore use the whole
+toolbox, running an ensemble that spans the convex, augmented, and regularised-regression
+cases, and read cross-model weight dispersion through that non-uniqueness rather than as
 instability.
 
-\subsection{Where SCM has been applied, and the gap we occupy}
 Despite this methodological maturity, SCM has rarely been applied to a daily market
 price. Most peer-reviewed applications estimate effects on non-price aggregates
 such as GDP, trade, and employment, including under discrete geopolitical shocks.
@@ -46,19 +41,12 @@ mechanical precedent to a price application is \citet{becker2021}, who apply SCM
 Austrian retail fuel prices with other European countries as donors. However, that design differs
 from ours in three ways that matter, as its treatment is an endogenous regulation rather
 than an exogenous shock, its outcome an administered retail price rather than a traded
-benchmark, and its donors cross-country rather than cross-asset. Also, \citet{juarez2024} use
-an oil-price shock as the treatment but on regional GDP, not on a price. 
+benchmark, and its donors cross-country rather than cross-asset. \citet{juarez2024} come
+closer on the treatment side, using an oil-price shock as the trigger, but like
+\citet{gharehgozli2017} and \citet{mancini2024} they measure its effect on regional GDP
+rather than on a price.
 
-The
-intersection we occupy, which is SCM on a crude-benchmark price under an exogenous
-geopolitical disruption with cross-asset donors, has no direct precedent, and
-that is the gap this thesis addresses. In terms of existing analysis, because the Hormuz event is recent, the only
-existing approach until now is institutional \citep{kiel2026,oies2026,worldbank2026,iea2026,
-dallasfed2026}; they share the same structure, assuming a barrels-per-day shortfall,
-propagate it through a structural model, and output a price path, and none applies
-synthetic control to the observed price.
-
-\subsection{Oil prices and geopolitical risk: the incumbent methods}
+\subsection{Measuring the oil-price effect of geopolitical shocks}
 The methods conventionally used for oil-price effects answer narrower or different
 questions than ours. The dominant approach is the structural VAR with identified supply,
 demand, and inventory shocks \citep{kilian2009,baumeisterhamilton2019}, with
@@ -76,25 +64,36 @@ can serve neither as our estimand nor as a clean donor. Short-window event studi
 multi-month path policy requires.
 
 \subsection{Inference with one treated unit and a short post-period}
-Our setting makes inference non-standard, and the recent literature counsels restraint
-in two places. The first is inference itself. Permutation and placebo tests
-\citep{abadie2010,abadie2015} are the field standard, with validity resting on an
-approximate-symmetry assumption \citep{canay2017}. \citet{hahnshi2017} show that for
-convex SCM this effectively requires Gaussian errors, which bounds how far placebo
-$p$-values can be pushed for our nonlinear ensemble members, and \citet{chenyan2023}
-formalise the in-time placebo into a mixed test with a permutation $p$-value. 
-
-The second
-is pretesting. \citet{roth2022} shows that pre-trend tests have low power at applied
-sample sizes and can manufacture false confidence, and \citet{rambachanroth2023} propose
-bounding rather than testing such violations, so we accordingly adopt a
-report-and-interpret stance toward pre-period diagnostics rather than imposing pass/fail
-thresholds. 
-
-In our case, the value of a donor depends on how reliably it tracks the common
-factor. A literature on matching reliability before differencing shows that a good
-pre-period fit can mask rather than remove contamination, and this is the logic we use to
-split donors by pre-window factor $R^2$ when signing the contamination bias
-(Section~\ref{sec:results}). Multiple testing across donors is controlled by
+Our setting makes inference non-standard, and the recent literature counsels restraint.
+Permutation and placebo tests \citep{abadie2010,abadie2015} are the field standard, with
+validity resting on an approximate-symmetry assumption \citep{canay2017}. \citet{hahnshi2017}
+show that for convex SCM this effectively requires Gaussian errors, which bounds how far
+placebo $p$-values can be pushed for our nonlinear ensemble members, and \citet{chenyan2023}
+formalise the in-time placebo into a mixed test with a permutation $p$-value. Because each
+donor contributes its own placebo $p$-value, multiple testing across them is controlled by
 Benjamini--Hochberg \citep{benjaminihochberg1995}.
+
+The same restraint applies to pretesting. \citet{roth2022} shows that pre-trend tests have
+low power at applied sample sizes and can manufacture false confidence, and
+\citet{rambachanroth2023} propose bounding rather than testing such violations, so we
+accordingly adopt a report-and-interpret stance toward pre-period diagnostics rather than
+imposing pass/fail thresholds.
+
+Pre-period fit also bears on donor selection. The value of a donor depends on how reliably
+it tracks the common factor, and \citet{hammiratrix2024} show that matching on pre-period
+outcomes before differencing can mask rather than remove contamination when parallel trends
+fails, a caution we carry into the contamination-bias analysis.
+
+\subsection{Where this study sits}
+Each strand speaks to part of the problem of pricing the Hormuz disruption. Synthetic
+control has been taken to GDP, trade, and employment but
+almost never to a daily traded price, and never to a crude benchmark under an exogenous
+geopolitical disruption with cross-asset donors. The incumbent oil-price methods that might fill that space ask a
+different question, decomposing structural shocks or pooling geopolitical risk
+rather than tracing one disruption's counterfactual path. Inference with a single treated
+unit over a short post-period calls for the restraint this literature counsels. For the
+Hormuz event the only analysis so far is institutional
+\citep{kiel2026,oies2026,worldbank2026,iea2026,dallasfed2026}, each assuming a barrels-per-day
+shortfall and propagating it through a structural model, none reading the effect off the
+observed price. This thesis occupies that intersection.
 

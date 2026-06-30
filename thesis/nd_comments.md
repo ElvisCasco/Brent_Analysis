@@ -208,11 +208,12 @@ These items are still open and need to be done:
    AI-generated, but a few odd or overly fancy words are probably still in there and we
    could swap them for something more natural. There are not many left, though, so even
    if we skip this I do not think a reader would really notice.
-4. **`hammiratrix2024` citation.** Claude flagged this one: it could not verify the
-   citation and thinks it may be garbled. It currently supports the donor-reliability
-   ($R^2$ split) argument. We should either confirm it actually exists and get the exact
-   reference, or just leave that sentence without a citation (it reads fine either way).
-   We should not submit with an unverifiable citation on a point we lean on.
+4. **`hammiratrix2024` citation. RESOLVED.** The citation was verified as a real, published
+   paper: Ham and Miratrix (2024), "Benefits and costs of matching prior to a difference in
+   differences analysis when parallel trends does not hold," Annals of Applied Statistics
+   18(3), 2096--2122, DOI 10.1214/24-AOAS1872. The bib entry was upgraded from arXiv preprint
+   to the published reference, and the sentence supporting the donor-reliability ($R^2$ split)
+   argument now carries the inline `\citep`. No longer an open issue.
 
 My thoughts on each section after my edits:
 
