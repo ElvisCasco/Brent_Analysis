@@ -182,68 +182,70 @@ the difference between observed and synthetic log Brent. At every $t$ the headli
 cross-model median gap across the five, and the interquartile range is the
 model-uncertainty band. The details of the models and hyperparameters tuning results are in Appendix~\ref{app:ensemble}.
 
-\subsection{Validation battery and its logic}
-A credible SCM estimate must clear three levels \citep{abadie2021}, pre-event fit, donor
-identification, and inference. We run every test per model and per event, itemised by
-level below.
+\subsection{Validation}
+Validation works through the three levels \citet{abadie2021} sets out for a credible SCM
+estimate, pre-event fit, donor identification, and inference, run per model and per event.
+Each level is anchored by one test drawn from the literature and backed by further checks
+specific to our design.
 
-\paragraph{Fit.} One out-of-sample metric.
+Fit is judged out of sample, by one test that anchors the level.
 \begin{itemize}
-\item \textbf{Walk-forward RMSE.} The expanding-window walk-forward cross-validation of
-Section~\ref{sec:methods} \citep{hyndman2018,bergmeir2012} doubles as the fit check. A
-synthetic whose out-of-sample pre-period tracking matches its in-sample tracking is
-reproducing a stable donor--Brent relationship rather than memorising the pre-window,
-which is the empirical content of common-factor spanning. It never selects among the five
-estimators, all of which are retained.
+\item \textit{Walk-forward RMSE.} The expanding-window walk-forward cross-validation of
+Section~\ref{sec:methods} \citep{hyndman2018,bergmeir2012} doubles as the fit check, read
+through the ratio of the pooled validation RMSE to the in-sample training RMSE. A synthetic
+whose out-of-sample pre-period tracking matches its in-sample tracking holds that ratio near
+one, which says it is reproducing a stable donor--Brent relationship rather than memorising
+the pre-window, the empirical content of common-factor spanning. A ratio well above one is
+the opposite signature, and we treat a value above two as a heuristic overfit flag rather
+than an exclusion rule. The flag never selects among the five estimators, all of which are
+retained, and only marks which synthetics to read with more caution.
 \end{itemize}
 
-\paragraph{Identification.} This defends the no-interference (SUTVA) assumption and the
-regime-stability assumption, across donor- and model-level diagnostics.
+Identification defends the no-interference (SUTVA) and regime-stability assumptions. Its
+anchor is the donor-level cleanliness battery, with three design-specific diagnostics
+supporting it.
 \begin{itemize}
-\item \textbf{Donor-level cleanliness battery.} Before any model is fit, each donor's own
-return series is tested for a mean shift at $T_0$ with a permutation form of the
-known-break test of \citet{chow1960} (the date is known, so not the unknown-break test of
+\item \textit{Donor-level cleanliness battery.} Before any model is fit, each donor's own
+return series is tested for a mean shift at $T_0$ with a permutation form of the known-break
+test of \citet{chow1960} (the date is known, so not the unknown-break test of
 \citet{andrews1993}) and a Wilcoxon event-window test \citep{brownwarner1985}, a donor
 flagged if either rejects under Benjamini--Hochberg false-discovery-rate (FDR) control
-\citep{benjaminihochberg1995}. Loading stability is checked with distance correlation
-across pre-period thirds \citep{szekely2007}, Bai--Perron break dating
+\citep{benjaminihochberg1995}. Loading stability is checked with distance correlation across
+pre-period thirds \citep{szekely2007}, Bai--Perron break dating
 \citep{baiperron1998,baiperron2003}, and an I(0)/I(1)-robust trend-break test
-\citep{harvey2009,kpss1992}. These operate on the individual donor, so their outcomes are
-reported with the donor audit (Section~\ref{sec:donoraudit}).
-\item \textbf{Model-level contamination bias.} For the synthetic as a whole, the signed
-diagnostic of equation~\eqref{eq:bias} gives the direction in which any residual donor
-contamination would move the estimate, so a surviving gap can be read as conservative or
-not.
-\item \textbf{Post-window horizon sensitivity.} Re-summarising the gap at 1/2/3/6-month and
-full horizons traces how any delayed contamination accrues over the projection, since
-a gap that declines with horizon is its signature (Section~\ref{sec:results}).
-\item \textbf{Cross-event weight transfer.} Applying each model's Russia weights to Hormuz
-probes regime stability, the third identifying assumption. We read it as an exploratory
-probe rather than a pass/fail test (Section~\ref{sec:results}).
+\citep{harvey2009,kpss1992}. 
+\item \textit{Model-level contamination bias.} The signed diagnostic of
+equation~\eqref{eq:bias} gives the direction in which any residual donor contamination would
+move the estimate, so a surviving gap can be read as conservative or not.
+\item \textit{Post-window horizon sensitivity.} Re-summarising the gap at 1/2/3/6-month and
+full horizons traces how any delayed contamination accrues over the projection, since a gap
+that declines with horizon is its signature (Section~\ref{sec:results}).
+\item \textit{Cross-event weight transfer.} Applying each model's Russia weights to Hormuz
+probes regime stability, the third identifying assumption, read as an exploratory probe
+rather than a pass/fail test (Section~\ref{sec:results}).
 \end{itemize}
 
-\paragraph{Inference.} Several tests on the treated unit.
+Inference centres on the in-space placebo, with one supporting check.
 \begin{itemize}
-\item \textbf{In-space placebo.} Refit each donor as a placebo treated unit and rank
-Brent's post/pre RMSPE ratio against the resulting distribution \citep{abadie2010},
-reading the permutation $p$-value with the symmetry caveat of \citet{hahnshi2017}.
-\item \textbf{In-time placebo.} Re-run at a fake $T_0$ six months early, formalised as the
-mixed placebo test of \citet{chenyan2023}.
-\item \textbf{Leave-one-donor-out.} Drop each donor in turn to confirm no single donor
-drives the gap.
+\item \textit{In-space placebo.} Each donor is refit as a placebo treated unit and Brent's
+post/pre RMSPE ratio is ranked against the resulting distribution \citep{abadie2010}, reading
+the permutation $p$-value with the symmetry caveat of \citet{hahnshi2017}.
+\item \textit{Leave-one-donor-out.} Drop each donor in turn to confirm no single donor drives
+the gap.
 \end{itemize}
 
-\paragraph{Corroboration and baselines.} Two checks sit outside the three levels.
+Two further checks come from outside the SCM machinery. Both test the estimate against
+benchmarks built with no donors at all, so a result that holds up across them is not an
+artefact of the donor design.
 \begin{itemize}
-\item \textbf{External (Russia).} The ensemble-median Russia counterfactual is compared
+\item \textit{External (Russia).} The ensemble-median Russia counterfactual is compared
 against the EIA's last pre-invasion Short-Term Energy Outlook forecasts, an independent
 structural counterfactual that shares no information path with the SCM
 (Section~\ref{sec:results}).
-\item \textbf{Naive floor.} A deliberately contaminated set of donor-free univariate
-counterfactuals (random walk, drift, linear trend, and an autoregressive integrated
-moving average, ARIMA, model selected by the Akaike information criterion, AIC, that
-reduces to a driftless random walk in both events), a lower bound the donor machinery
-should beat (Section~\ref{sec:results}).
+\item \textit{Naive floor.} A set of donor-free univariate counterfactuals, a random walk, a
+drift, a linear trend, and an autoregressive integrated moving average (ARIMA) model selected
+by the Akaike information criterion (AIC) that reduces to a driftless random walk in both
+events, sets a lower bound the donor machinery should beat (Section~\ref{sec:results}).
 \end{itemize}
 
 Following \citet{roth2022,rambachanroth2023}, we report and interpret these diagnostics

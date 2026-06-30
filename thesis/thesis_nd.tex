@@ -49,14 +49,14 @@ global oil prices. Measuring that effect is not straightforward. Because Brent c
 unique global benchmark, no untreated control unit exists from which a counterfactual
 price can be inferred directly. We construct that missing counterfactual with the
 \emph{synthetic control method} (SCM), replacing the geographic donors of conventional
-applications with a pool of 19 macro-financial series (metals, agriculturals, equities,
-foreign exchange, rates and credit, and volatility) chosen to share Brent's exposure to
+applications with a pool of 19 macro-financial series chosen to share Brent's exposure to
 common global factors while staying off the oil-supply causal path. To keep the result
 from hinging on any single modelling choice, the synthetic is the median of an ensemble
-of five estimators with different inductive biases. We first benchmark the design on the
+of five estimators with different inductive biases. We validate the design on the
 Russian invasion of Ukraine of 24 February 2022, the closest comparable historical
-oil-supply shock, and confirm that the same machinery recovers the documented price move.
-Applied to Hormuz over the window to late June 2026, it yields an average Brent premium of
+oil-supply shock, where the same machinery recovers the documented price move, and estimate
+the Hormuz effect on its own pre-window. Over the window to late June 2026 it yields an
+average Brent premium of
 roughly \SI{53}{\percent} (ensemble median, interquartile range \SIrange{48}{53}{\percent})
 that is robust to placebo-based inference and a battery of robustness and contamination
 checks, the latter indicating that any residual bias is conservative. The result is a
@@ -66,7 +66,8 @@ synthetic control under a single-unit geopolitical treatment.
 \end{abstract}
 
 \newpage
-\pagenumbering{roman} 
+\pagenumbering{roman}
+\setcounter{tocdepth}{2} % number subsubsections but keep them out of the main ToC
 \tableofcontents
 \clearpage
 \pagenumbering{arabic}   % body restarts at page 1 from the Introduction
