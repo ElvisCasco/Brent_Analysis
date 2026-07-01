@@ -1,0 +1,64 @@
+/*-- scss:defaults --*/
+
+// Uniform dark background (matches the original "situation" slide) with light text.
+$backgroundColor: #1a1a2e;
+$mainColor: #eaeaf2;
+$headingColor: #ffffff;
+$linkColor: #7ab8ff;
+$linkColorHover: #a9d1ff;
+$selectionBackgroundColor: #3a3a5e;
+
+/*-- scss:rules --*/
+
+// Blockquotes and table borders need light-on-dark treatment.
+.reveal blockquote {
+  background: rgba(255, 255, 255, 0.06);
+  color: $mainColor;
+  box-shadow: none;
+}
+
+.reveal table,
+.reveal table th,
+.reveal table td {
+  border-color: rgba(255, 255, 255, 0.25);
+  color: $mainColor;
+}
+
+.reveal .footer {
+  color: rgba(234, 234, 242, 0.7);
+}
+
+// Safety net: keep slide content within the 720px frame, and vertically
+// center it. The forced height defeats reveal's own `center:true` offset
+// (a full-height section reports zero slack, so content pins to the top),
+// so we do the centering here with flexbox instead.
+.reveal .slides section {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+// Quarto's default revealjs stylesheet forces a white background + grey
+// border on slide images and loads after this file, so we need !important
+// to strip the frame.
+.reveal .slides section img {
+  max-height: 60vh;
+  width: auto;
+  object-fit: contain;
+  border: none !important;
+  box-shadow: none !important;
+  background: none !important;
+}
+
+// Tighten default vertical rhythm so bullet lists under figures fit.
+.reveal p,
+.reveal ul,
+.reveal ol {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+.reveal table {
+  margin: 0.3em auto;
+}

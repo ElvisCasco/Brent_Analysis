@@ -1,0 +1,149 @@
+---
+title: "Pricing a Chokepoint"
+subtitle: "A Synthetic-Control Estimate of the Brent Crude Premium from the 2026 Strait of Hormuz Disruption"
+author:
+  - "Cherryl Chico, Elvis Casco, Nikoloz Darsalia"
+institute:
+  - "Master Project — Data Science for Decision Making, Barcelona School of Economics"
+date: 2026-07-03
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    slide-number: true
+    center: true
+    incremental: false
+    transition: fade
+    width: 1280
+    height: 720
+    fig-align: center
+    center-title-slide: true
+    embed-resources: true
+    html-math-method: mathml
+    include-in-header:
+      text: |
+        <style>
+        /* Strip Quarto's default white background + grey frame from slide images.
+           In <head> so it wins over the quarto-revealjs stylesheet. */
+        .reveal .slides section img {
+          border: none !important;
+          box-shadow: none !important;
+          background: none !important;
+        }
+        /* Ensemble slide: table fills its wrapper so the note below matches its width. */
+        .reveal .ens-block table { width: 100%; }
+        </style>
+    title-slide-attributes:
+      data-background-image: "images/title_bg.jpg"
+      data-background-size: "cover"
+      data-background-position: "center"
+      data-background-opacity: "0.45"
+      data-background-color: "#0d1117"
+---
+
+## A parallel worth isolating
+
+![](images/brent_timeline_minimal.png){fig-align="center" height="470"}
+
+::: {.fragment style="text-align:center; font-size:0.8em; color:#ffd166; margin-top:0.3em;"}
+the **2022 Russian invasion** sets the stage for the **Strait of Hormuz disruption** we price today.
+:::
+
+## The causal question {.center background-image="images/Strait_of_Hormuz_satellite_labeled.png" background-size="cover" background-position="center" background-opacity="0.30" background-color="#0d1117"}
+
+::: { style="text-align:center; font-size:1.35em; font-weight:700; color:#ffd166; margin:3em auto 0; line-height:1.3; width:75%;"}
+What is the causal effect of the Hormuz disruption on Brent over a policy-relevant post-event window?
+:::
+
+
+## Why standard tools fail — and what we do instead {.center}
+
+::: {style="font-size: 0.85em;"}
+- **No DiD, no IV** — one global benchmark, no untreated control, no instrument for a one-off shock.
+- **Synthetic control instead** — a weighted basket of donors that tracks Brent pre-event, projected forward as the counterfactual. A full path, an auditable assumption.
+:::
+
+::: {.fragment style="text-align:center; font-size:1.15em; font-weight:700; color:#ffd166; margin:0.8em 0; line-height:1.35;"}
+Cross-asset SCM on a daily traded price under a geopolitical shock — the gap this paper fills.
+:::
+
+
+## Hormuz added roughly half of Brent's price
+
+![](images/counterfactual_paths_minimal.png){fig-align="center" height="410"}
+
+::: {style="font-size: 0.68em; margin-top:0.1em;"}
+- Hormuz added a [**≈ 53%**]{style="color:#ffd166;"} premium over its no-event counterfactual (Russia [**≈ 22%**]{style="color:#ffd166;"}).
+- **Tight:** the red band is narrow — the models agree.
+- **Conservative:** any donor contamination biases the premium *down*.
+:::
+
+::: {.fragment style="text-align:center; font-size:0.85em; color:#ffd166; margin-top:0.2em;"}
+Brent trades roughly half above where the market alone would put it.
+:::
+
+## Donor selection *is* identification
+
+::: {style="text-align:center; font-size:0.62em; color:#9aa0b5; margin-bottom:0.1em;"}
+**Common factors:** global growth / industrial cycle · US dollar · real rates · risk appetite · China demand
+:::
+
+![](images/donor_funnel.png){fig-align="center" height="400"}
+
+::: {.fragment style="text-align:center; font-size: 1.05em; font-weight:700; color:#ffd166;"}
+Good donors track Brent normally but sit off the oil shock — so their gap reveals the premium.
+:::
+
+## No single model — an ensemble
+
+::: {style="text-align:center; font-size:0.62em; color:#9aa0b5; margin-bottom:0.1em;"}
+**Five estimators whose biases bracket the cases.** Headline = cross-model **median**; **IQR** = model-uncertainty band.
+:::
+
+::: {.ens-block style="width: 640px; max-width: 90%; margin: 0 auto;"}
+::: {style="font-size: 0.6em;"}
+| Estimator | Russia 2022 (%) | Hormuz 2026 (%) |
+|---|:---:|:---:|
+| Convex SCM | 33.6 | 53.1 |
+| Augmented SCM | 10.9 | 53.7 |
+| Elastic net | 22.0 | 53.4 |
+| XGBoost | 30.8 | 48.3 |
+| Bayesian ridge | −9.0 | 40.4 |
+| **Ensemble median** | **22.0** | **53.1** |
+| **IQR** | **[10.9, 30.8]** | **[48.3, 53.4]** |
+:::
+
+::: {style="font-size:0.5em; font-style:italic; color:#9aa0b5; margin-top:0.35em;"}
+Each value is that estimator's average Brent premium (ATT) over the post-event window, in %. Median and IQR are taken across the five models.
+:::
+:::
+
+## What builds the premium — donor by donor {data-menu-title="What builds the premium"}
+
+::: {style="text-align:center; font-size:0.62em; color:#9aa0b5; margin-bottom:0.1em;"}
+Decomposition shown for the **elastic-net** estimator — the ensemble-**median** model.
+:::
+
+![](images/donor_contrib_elasticnet.png){fig-align="center" height="420"}
+
+::: {.fragment style="text-align:center; font-size:0.9em; font-weight:700; color:#ffd166; margin-top:0.15em;"}
+The donor basket explains away most of Russia's jump but almost none of Hormuz's — same-size shock, opposite verdict.
+:::
+
+## add here 2-3 slides on validation
+
+## Close (to review)
+
+::: {style="font-size: 0.72em;"}
+**The number:** the 2026 Hormuz disruption added a large, robust premium to Brent — on the order of **half its no-event price** — stable across estimators, conservative if anything, driven by no single donor or model.
+
+**The two-part contribution:**
+
+1. a data-driven ATT for Hormuz that **complements** the institutional scenario estimates;
+2. a transparent, auditable **template** for cross-asset synthetic control under a single-unit geopolitical shock.
+
+**Honest limits:** reduced-form total effect (not decomposed into supply/risk/expectations); validation is internal, calibrated by analogy to Russia; the factor structure is regime-bound.
+
+::: {.fragment style="margin-top: 0.8em; text-align:center; font-size: 1.15em;"}
+*The market's own co-movement says Hormuz added roughly half of Brent's price — and the design that recovers it is itself the deliverable.*
+:::
+:::
