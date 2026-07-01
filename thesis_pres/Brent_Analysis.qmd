@@ -77,7 +77,7 @@ Cross-asset SCM on a daily traded price under a geopolitical shock — the gap t
 - **Conservative:** any donor contamination biases the premium *down*.
 :::
 
-::: {.fragment style="text-align:center; font-size:0.85em; color:#ffd166; margin-top:0.2em;"}
+::: {style="text-align:center; font-size:0.85em; color:#ffd166; margin-top:0.2em;"}
 Brent trades roughly half above where the market alone would put it.
 :::
 
@@ -117,6 +117,10 @@ Each value is that estimator's average Brent premium (ATT) over the post-event w
 :::
 :::
 
+::: {.fragment style="text-align:center; font-size:1.0em; font-weight:700; color:#ffd166; margin-top:0.4em;"}
+Hormuz's tighter IQR means the models agree far more than on Russia's volatile pre-period.
+:::
+
 ## What builds the premium — donor by donor {data-menu-title="What builds the premium"}
 
 ::: {style="text-align:center; font-size:0.62em; color:#9aa0b5; margin-bottom:0.1em;"}
@@ -129,21 +133,24 @@ Decomposition shown for the **elastic-net** estimator — the ensemble-**median*
 The donor basket explains away most of Russia's jump but almost none of Hormuz's — same-size shock, opposite verdict.
 :::
 
-## add here 2-3 slides on validation
+## add here 3 slides on validation
 
-## Close (to review)
+##  Conclusion (for review)
 
 ::: {style="font-size: 0.72em;"}
-**The number:** the 2026 Hormuz disruption added a large, robust premium to Brent — on the order of **half its no-event price** — stable across estimators, conservative if anything, driven by no single donor or model.
+[Headline]{style="color:#ffd166;"}
 
-**The two-part contribution:**
+- Hormuz added a premium of ~[half]{style="color:#ffd166;"} Brent's no-event price. Positive under every estimator, conservative if anything, no single donor or model.
 
-1. a data-driven ATT for Hormuz that **complements** the institutional scenario estimates;
-2. a transparent, auditable **template** for cross-asset synthetic control under a single-unit geopolitical shock.
+[Contributions]{style="color:#ffd166;"}
 
-**Honest limits:** reduced-form total effect (not decomposed into supply/risk/expectations); validation is internal, calibrated by analogy to Russia; the factor structure is regime-bound.
+- A data-driven premium that [complements]{style="color:#ffd166;"} — not competes with — institutional scenario estimates.
+- An [auditable template]{style="color:#ffd166;"} for cross-asset SCM under a single-unit geopolitical shock.
 
-::: {.fragment style="margin-top: 0.8em; text-align:center; font-size: 1.15em;"}
-*The market's own co-movement says Hormuz added roughly half of Brent's price — and the design that recovers it is itself the deliverable.*
-:::
+[Limits]{style="color:#ffd166;"}
+
+- Reduced-form total effect — not split into supply / risk / expectations.
+- Low-power inference — the placebo's [0.050]{style="color:#ffd166;"} is the floor, not a rejection.
+- Validation internal & regime-bound — calibrated by analogy to Russia.
+
 :::
