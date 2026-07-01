@@ -133,24 +133,160 @@ Decomposition shown for the **elastic-net** estimator — the ensemble-**median*
 The donor basket explains away most of Russia's jump but almost none of Hormuz's — same-size shock, opposite verdict.
 :::
 
-## add here 3 slides on validation
+## Validations:
+### No-donor baselines and external validation {data-menu-title="Validation — external"}
 
-##  Conclusion (for review)
+:::: {.columns}
+::: {.column width="58%"}
+![](images/naive_paths_minimal.png){fig-align="center" height="245"}
+:::
+::: {.column width="42%"}
+::: {style="font-size:0.6em; margin-top:2.2em;"}
+- **The naive lines cannot see the shock.** A flat random walk or an extrapolated trend just carries Brent's own past forward, so it drifts off with whatever slope the pre-window happened to have.
+- **The trend even points the wrong way.** For Russia it climbs into the price spike, and for Hormuz it slides down while Brent jumps, so it flips sign between events. The SCM stays anchored to the market in both.
+:::
+:::
+::::
+
+:::: {.columns}
+::: {.column width="58%"}
+::: {style="font-size:0.5em;"}
+| Russia counterfactual | Mean (\$/bbl) |
+|---|:---:|
+| SCM synthetic (ours) | 88.6 |
+| EIA STEO, Feb 2022 forecast | 84.9 |
+| Actual Brent | 108.5 |
+:::
+:::
+::: {.column width="42%"}
+::: {style="font-size:0.6em; margin-top:0.6em;"}
+**External check on Russia.** Our synthetic lands within [**\$3.6**]{style="color:#ffd166;"} of the EIA's pre-invasion forecast. Two methods that share no information reach almost the same counterfactual, so Russia's magnitude is pinned down from outside the SCM.
+:::
+:::
+::::
+
+## Validations:
+### Leave-one-out and horizon sensitivity {data-menu-title="Validation — internal"}
+
+::: {style="text-align:center; font-size:0.58em; color:#9aa0b5; margin-bottom:0.15em;"}
+The premium survives dropping any single donor, and the horizon diagnostic runs in opposite directions on the two events.
+:::
+
+:::: {.columns}
+::: {.column width="52%"}
+::: {style="font-size:0.5em; margin-top:0.4em;"}
+| Hormuz premium, drop one donor | Range (%) |
+|---|:---:|
+| Convex SCM | 48 to 56 |
+| Augmented SCM | 52 to 57 |
+| Elastic net | 52 to 59 |
+| XGBoost | 49 to 55 |
+:::
+:::
+::: {.column width="48%"}
+::: {style="font-size:0.6em; margin-top:0.9em;"}
+**No single donor drives it.** Dropping each weighted donor in turn moves the Hormuz premium only within a few points of its baseline, so the result rests on the basket as a whole rather than on one lucky series.
+:::
+:::
+::::
+
+:::: {.columns}
+::: {.column width="52%"}
+![](images/postwindow_sensitivity_minimal.png){fig-align="center" height="230"}
+:::
+::: {.column width="48%"}
+::: {style="font-size:0.6em; margin-top:0.6em;"}
+**The horizon tells them apart.** Hormuz builds in and holds while Russia fades as the window grows. A mechanical artefact would move the same way on both events, so the two running opposite is the sign that the Hormuz premium is real.
+:::
+:::
+::::
+
+## Validations:
+### Placebo and the direction of any bias {data-menu-title="Validation — placebo & bias"}
+
+::: {style="text-align:center; font-size:0.58em; color:#9aa0b5; margin-bottom:0.15em;"}
+The placebo shows the effect is real, and the contamination check shows which way any leftover bias would run.
+:::
+
+:::: {.columns}
+::: {.column width="55%"}
+![](images/placebo_hormuz_minimal.png){fig-align="center" height="235"}
+:::
+::: {.column width="45%"}
+::: {style="font-size:0.6em; margin-top:1.0em;"}
+**Brent stands alone.** Refit every donor as if it were treated and rank Brent against them. Brent's post-event divergence is [**the largest of all units**]{style="color:#ffd166;"}, with the permutation *p* at the attainable floor of [**0.050**]{style="color:#ffd166;"}.
+:::
+:::
+::::
+
+:::: {.columns}
+::: {.column width="55%"}
+::: {style="font-size:0.5em; margin-top:0.3em;"}
+| If donors are contaminated | Bias on the premium |
+|---|:---:|
+| **Hormuz** | [**−1 to −8%**]{style="color:#ffd166;"} (conservative) |
+| **Russia** | +13 to +21% (inflates) |
+:::
+
+::: {style="font-size:0.5em; font-style:italic; color:#9aa0b5; margin-top:0.2em;"}
+A naive, directional check. It signs the likely bias, it does not prove the donors clean.
+:::
+:::
+::: {.column width="45%"}
+::: {style="font-size:0.6em; margin-top:0.5em;"}
+**Any leftover bias runs in our favour.** For Hormuz the sign is negative, so if the estimate is off at all it is [**too low**]{style="color:#ffd166;"}, and the true premium is likely larger. Russia inflates instead, which is why its full-window number is read with care.
+:::
+:::
+::::
+
+
+##  Conclusion {data-menu-title="Conclusion"}
 
 ::: {style="font-size: 0.72em;"}
+
 [Headline]{style="color:#ffd166;"}
 
-- Hormuz added a premium of ~[half]{style="color:#ffd166;"} Brent's no-event price. Positive under every estimator, conservative if anything, no single donor or model.
+- Hormuz added a premium of about [**53%**]{style="color:#ffd166;"} over Brent's no-event price. Positive under every estimator, driven by no single donor or model, and if biased at all it is biased downward, so the true effect is likely larger.
 
 [Contributions]{style="color:#ffd166;"}
 
-- A data-driven premium that [complements]{style="color:#ffd166;"} — not competes with — institutional scenario estimates.
+- A data-driven premium that [complements]{style="color:#ffd166;"} the institutional scenario estimates rather than competing with them.
 - An [auditable template]{style="color:#ffd166;"} for cross-asset SCM under a single-unit geopolitical shock.
 
 [Limits]{style="color:#ffd166;"}
 
-- Reduced-form total effect — not split into supply / risk / expectations.
-- Low-power inference — the placebo's [0.050]{style="color:#ffd166;"} is the floor, not a rejection.
-- Validation internal & regime-bound — calibrated by analogy to Russia.
+- A reduced-form total effect, not split into supply, risk, and expectations.
+- Inference has little power at one treated unit, so the placebo's [0.050]{style="color:#ffd166;"} is the best the test can reach, with Brent still ranking first.
+- Validation is internal and regime-bound, checked against the documented Russia 2022 shock.
 
+:::
+
+## 
+
+**Thank You!**
+
+## Appendix — how we sign the contamination bias {data-menu-title="Appendix: contamination bias"}
+
+::: {style="text-align:center; font-size:0.58em; color:#9aa0b5; margin-bottom:0.2em;"}
+A naive, directional check. It asks which way any leftover contamination would move the premium, not whether the donors are clean.
+:::
+
+::: {style="font-size:0.62em;"}
+
+[The identity]{style="color:#ffd166;"}
+
+- The premium is the gap between Brent and the donor basket, so if a donor is nudged by the event, that nudge leaks into the basket. Writing the event-induced part of donor $j$ as $\delta_j$, the bias in the premium is exactly $-\sum_j w_j\,\delta_j$, the model's weight on each donor times how far that donor was pushed.
+
+[Measuring the push, Brent-free]{style="color:#ffd166;"}
+
+- We cannot see $\delta_j$ directly, so we build each donor a reference from the [**other donors only**]{style="color:#ffd166;"}, never Brent. We fit the donor to that reference before the event, then read how far it drifts from it afterward. That drift is our estimate of $\delta_j$.
+
+[Reading the sign]{style="color:#ffd166;"}
+
+- A donor pushed [**up**]{style="color:#ffd166;"} lifts the basket and shrinks the premium, so the estimate is conservative. A donor pushed [**down**]{style="color:#ffd166;"} sinks the basket and inflates it. We weight each donor's drift by the model's weight and sum, which gives the net direction.
+
+:::
+
+::: {style="text-align:center; font-size:0.5em; font-style:italic; color:#9aa0b5; margin-top:0.25em;"}
+Limits: the reference is the rest of the pool, so a shock hitting every donor equally is invisible here, and low-reliability donors add noise. Directional, not a correction.
 :::
