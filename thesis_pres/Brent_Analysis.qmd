@@ -95,7 +95,6 @@ Comparable pre-samples, so each synthetic is fit on similar data.
 ::: {style="font-size: 0.68em; margin-top:0.1em;"}
 - Hormuz added a [**≈ 53%**]{style="color:#ffd166;"} premium over its no-event counterfactual (Russia [**≈ 22%**]{style="color:#ffd166;"}).
 - **Tight:** the red band is narrow — the models agree.
-- **Conservative:** any donor contamination biases the premium *down*.
 :::
 
 ::: {style="text-align:center; font-size:0.85em; color:#ffd166; margin-top:0.2em;"}
@@ -283,4 +282,108 @@ A naive, directional check. It asks which way any leftover contamination would m
 
 ::: {style="text-align:center; font-size:0.5em; font-style:italic; color:#9aa0b5; margin-top:0.25em;"}
 Limits: the reference is the rest of the pool, so a shock hitting every donor equally is invisible here, and low-reliability donors add noise. Directional, not a correction.
+:::
+
+## Appendix — the retained 19-donor pool {data-menu-title="Appendix: 19-donor pool"}
+
+::: {style="text-align:center; font-size:0.6em; color:#9aa0b5; margin-bottom:0.3em;"}
+The shared pool held fixed across both events. Spans all five common factors with non-oil assets, and excludes the energy complex by design.
+:::
+
+::: {style="width: 780px; max-width: 92%; margin: 0 auto;"}
+::: {style="font-size: 0.6em;"}
+| Category | Donors (shared pool) |
+|---|---|
+| Metals (3) | Silver, Platinum, Gold |
+| Agriculturals (3) | Coffee, Sugar, Live Cattle |
+| Equities (2) | S&P 500, Nikkei 225 |
+| Foreign exchange (8) | AUD, JPY, CHF, CNY, INR, KRW, ZAR, MXN |
+| Rates & credit (2) | TLT (long Treasuries), HYG (high-yield credit) |
+| Volatility (1) | VIX (implied S&P 500 volatility) |
+:::
+:::
+
+## Appendix — empirical confirmation of the audit {data-menu-title="Appendix: empirical confirmation"}
+
+::: {style="text-align:center; font-size:0.6em; color:#9aa0b5; margin-bottom:0.3em;"}
+A donor-level battery (Chow-type break tests, Wilcoxon event-window tests, Bai–Perron dating) run **before any model is fit**. The economics and the statistics agree.
+:::
+
+::: {style="font-size: 0.68em;"}
+- **Hormuz 2026:** [31 of the 32 candidates]{style="color:#ffd166;"} agree with the audit at the cutoff. Only Cotton differs, and its exclusion is an indirect, lagged causal-channel call the contemporaneous tests are not expected to reproduce.
+- **Russia 2022:** the tests add a single flag on CNY, attributable to the concurrent China zero-COVID dynamics rather than the war.
+- **Only one within-pre-window break** among retained donors, a single VIX break on 2022-01-07, seven weeks before the cutoff. Read as informative, not exclusionary — it does not recur on the analysis window alone, and dropping VIX moves the estimate by [less than one point]{style="color:#ffd166;"}.
+:::
+
+## Appendix — donor weights by model and event {data-menu-title="Appendix: donor weights"}
+
+![](images/donor_importance_heatmap.png){fig-align="center" height="420"}
+
+::: {style="text-align:center; font-size:0.52em; color:#9aa0b5; margin-top:0.15em;"}
+Each cell is a donor's weight in one model, in absolute value and normalised to sum to one within that model. Darker is larger, grey is unused. Rows are the 19-donor pool by category, columns are the five estimators. The full decomposition behind the contribution figure. The Bayesian ridge is shown for completeness but excluded from the consensus weight, its coefficients not being comparable selection weights.
+:::
+
+## Appendix — donor audit catalog (1/2) {data-menu-title="Appendix: audit catalog 1"}
+
+::: {style="text-align:center; font-size:0.55em; color:#9aa0b5; margin-bottom:0.2em;"}
+All 32 candidates. **C** clean (retained) · **M** mild, secondary/terms-of-trade channel (excluded) · **H** heavy, direct exposure / SUTVA violation (excluded). Metals, agriculturals, equities.
+:::
+
+::: {style="width: 900px; max-width: 96%; margin: 0 auto;"}
+::: {style="font-size: 0.42em;"}
+| Donor | Loads on (with Brent) | RU 2022 | HZ 2026 | In 19 |
+|---|---|:---:|:---:|:---:|
+| **Metals** | | | | |
+| Copper | Global industrial cycle ("Dr Copper") | M | C | |
+| Iron Ore | China industrial demand | M | C | |
+| Silver | Precious + industrial dual factor | C | C | Yes |
+| Platinum | Auto catalysts / South Africa PGM | C | C | Yes |
+| Palladium | Auto catalysts (Russia ~40% supply) | H | C | |
+| Gold | Real rates / safe-haven premium | C | C | Yes |
+| **Agriculturals** | | | | |
+| Soybeans | Global trade activity, China demand | M | C | |
+| Wheat | Russia+Ukraine ~30% world exports | H | C | |
+| Corn | Ukraine ~13% world corn exports | H | C | |
+| Coffee | Brazil/Vietnam concentrated, climate | C | C | Yes |
+| Sugar | Brazil/India concentrated | C | C | Yes |
+| Cotton | Oil→polyester substitution (indirect) | M | M | |
+| Live Cattle | North-American livestock cycle | C | C | Yes |
+| **Equities** | | | | |
+| S&P 500 | US growth / equity risk premium | C | C | Yes |
+| Nikkei 225 | Japan growth / safe-haven equity | C | C | Yes |
+| EM equities | Broad emerging markets | M | C | |
+:::
+:::
+
+## Appendix — donor audit catalog (2/2) {data-menu-title="Appendix: audit catalog 2"}
+
+::: {style="text-align:center; font-size:0.55em; color:#9aa0b5; margin-bottom:0.2em;"}
+All 32 candidates, continued. **C** clean (retained) · **M** mild (excluded) · **H** heavy, SUTVA violation (excluded). FX, rates & credit, volatility, crypto.
+:::
+
+::: {style="width: 900px; max-width: 96%; margin: 0 auto;"}
+::: {style="font-size: 0.42em;"}
+| Donor | Loads on (with Brent) | RU 2022 | HZ 2026 | In 19 |
+|---|---|:---:|:---:|:---:|
+| **Foreign exchange** | | | | |
+| EUR | Eurozone growth (EU energy crisis) | H | C | |
+| GBP | UK growth (UK gas exposure) | M | C | |
+| AUD | Australia / China-demand commodity FX | C | C | Yes |
+| JPY | Safe-haven FX | C | C | Yes |
+| CHF | Safe-haven FX | C | C | Yes |
+| CNY | China managed currency | C | C | Yes |
+| INR | India growth / EM | C | C | Yes |
+| KRW | Korea manufacturing | C | C | Yes |
+| ZAR | EM commodities (PGMs, gold) | C | C | Yes |
+| MXN | EM / Mexico | C | C | Yes |
+| DXY | Trade-weighted dollar (EUR dominant) | H | C | |
+| **Rates & credit** | | | | |
+| US 10Y | Real risk-free rate / growth | M | C | |
+| TLT | Long-duration US Treasuries | C | C | Yes |
+| HYG | US high-yield credit / risk premium | C | C | Yes |
+| **Volatility** | | | | |
+| VIX | Implied S&P 500 volatility (inverse) | C | C | Yes |
+| **Crypto** | | | | |
+| Bitcoin | Digital risk-asset / liquidity (sanctions Mar 2022) | H | C | |
+:::
 :::
