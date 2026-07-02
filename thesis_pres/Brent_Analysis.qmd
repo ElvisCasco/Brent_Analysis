@@ -325,7 +325,7 @@ Brent stands alone at the [**0.050**]{style="color:#ffd166;"} floor, the models 
   <ul style="margin-top: 0.1em; margin-bottom: 0;">
     <li>A reduced-form total effect, not split into supply, risk, and expectations.</li>
     <li>Inference has little power at one treated unit, so the placebo's [0.050]{style="color:#ffd166;"} is the best the test can reach, with Brent still ranking first.</li>
-    <li>Validation is internal and regime-bound, our methodology is not directly appliable to the other shocks.</li>
+    <li>Validation is internal and regime-bound, our methodology is not directly appliable to the other oil shocks.</li>
   </ul>
 :::
 
