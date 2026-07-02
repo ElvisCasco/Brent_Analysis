@@ -55,15 +55,36 @@ What is the causal effect of the Hormuz disruption on Brent over a policy-releva
 :::
 
 
-## Why standard tools fail — and what we do instead {.center}
+## Where this sits and why SCM {.center data-menu-title="Positioning"}
 
-::: {style="font-size: 0.85em;"}
-- **No DiD, no IV** — one global benchmark, no untreated control, no instrument for a one-off shock.
-- **Synthetic control instead** — a weighted basket of donors that tracks Brent pre-event, projected forward as the counterfactual. A full path, an auditable assumption.
+::: {.positioning style="font-size: 0.8em;"}
+- [No DiD, no IV.]{style="font-size:1.25em; font-style:italic;"} the usual designs have nothing to lean on.
+- [So we build the control.]{style="font-size:1.25em; font-style:italic;"} following synthetic control [(Abadie 2010, 2021)]{style="color:#9aa0b5;"}
+- [No direct precedent.]{style="font-size:1.25em; font-style:italic;"} the closest price application [(Becker 2021)]{style="color:#9aa0b5;"} leans on cross-country donors and a regulated market.
+- [The institutional route runs the other way.]{style="font-size:1.25em; font-style:italic;"} [(Kiel, OIES, World Bank, IEA)]{style="color:#9aa0b5;"} assume a barrel shortfall and model its price impact forward.
 :::
 
-::: {.fragment style="text-align:center; font-size:1.15em; font-weight:700; color:#ffd166; margin:0.8em 0; line-height:1.35;"}
-Cross-asset SCM on a daily traded price under a geopolitical shock — the gap this paper fills.
+::: {.fragment style="text-align:center; font-size:1.1em; font-weight:700; color:#ffd166; margin:0.6em 0; line-height:1.35;"}
+Cross-asset SCM on a daily traded price under a geopolitical shock.
+:::
+
+## Data and windows {data-menu-title="Data and windows"}
+
+::: {style="font-size: 0.78em;"}
+- **Target:** daily Europe Brent spot (EIA series RBRTEd), USD per barrel, through 22 Jun 2026 — a spot quote, so no futures roll or term-structure mechanics.
+:::
+
+::: {style="width: 720px; max-width: 92%; margin: 0.3em auto 0;"}
+::: {style="font-size: 0.58em;"}
+| Event | Pre-window | Post-window | Pre $n$ / Post $n$ (days) | Post mean (\$/bbl) |
+|---|---|---|:---:|:---:|
+| Russia 2022 | 2020-07-01 → 24 Feb | to 2022-09-30 | 421 / 151 | 108.5 |
+| Hormuz 2026 | 2024-06-01 → 28 Feb | to 2026-06-22 (open) | 443 / 77 | 105.1 |
+:::
+:::
+
+::: {.fragment style="text-align:center; font-size:0.9em; font-weight:700; color:#ffd166; margin-top:0.4em;"}
+Comparable pre-samples, so each synthetic is fit on similar data. 
 :::
 
 
