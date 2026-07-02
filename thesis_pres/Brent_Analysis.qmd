@@ -154,109 +154,195 @@ The donor basket explains away most of Russia's jump but almost none of Hormuz's
 :::
 
 
-## Validations:
-### No-donor baselines and external validation {data-menu-title="Validation — external"}
+## Validation Framework: Three Layers of Rigor {data-menu-title="Validation Framework"}
+
+::: {style="text-align:center; font-size:0.65em; color:#9aa0b5; margin-bottom:2.0em;"}
+Stress-testing the synthetic counterfactual through fit, time-stability, and donor-cleanliness checks.
+:::
+
+::: {style="font-size: 0.72em; line-height: 1.5;"}
+
+<div style="margin-bottom: 1.5em;">
+  <span style="color:#ffd166; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">1. Model Fit & Bias-Variance</span>
+  <ul style="margin-top: 0.2em; margin-bottom: 0;">
+    <li>Evaluating out-of-sample RMSE to ensure causal estimates reflect a **genuine fit** rather than model over-specification or overmodeling.</li>
+  </ul>
+</div>
+
+<div class="fragment" style="margin-bottom: 1.5em;">
+  <span style="color:#ffd166; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">2. Horizon Stability</span>
+  <ul style="margin-top: 0.2em; margin-bottom: 0;">
+    <li>Stress-testing results across various timeframes to confirm the premium is **robust to the window choice** and free from delayed donor contamination.</li>
+  </ul>
+</div>
+
+<div class="fragment">
+  <span style="color:#ffd166; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">3. Contamination & Bias Bounding</span>
+  <ul style="margin-top: 0.2em; margin-bottom: 0;">
+    <li>Utilizing **placebos and leave-one-out checks** to isolate outlier influence, and evaluating potential contamination to determine if we **over- or underestimate**.</li>
+  </ul>
+</div>
+
+:::
+
+## Models' Bias / Variance Evaluation {data-menu-title="Validation — fit"}
 
 ::: {style="text-align:center; font-size:0.6em; color:#9aa0b5; margin-bottom:0.2em;"}
-Checks that use **no donors at all**.
+Walk-forward validation. Low **and** close train/val RMSE means a good fit that holds out of sample.
+:::
+
+::: {style="width: 760px; max-width: 94%; margin: 0 auto; font-size: 0.56em;"}
+| Model | Train RMSE | Val RMSE | Val/Train | Russia Val/Train |
+|---|:---:|:---:|:---:|:---:|
+| Convex SCM | 0.060 | 0.083 | 1.40 | 1.25 |
+| Augmented SCM | 0.049 | 0.075 | 1.54 | 2.06 |
+| Elastic net | 0.052 | 0.079 | 1.51 | 1.99 |
+| XGBoost | 0.044 | 0.082 | 1.84 | 3.24 |
+| Bayesian ridge | 0.034 | 0.078 | 2.28 | 3.09 |
+:::
+
+::: {style="text-align:center; font-size:0.5em; font-style:italic; color:#9aa0b5; margin-top:0.3em;"}
+RMSE in log units (first three columns Hormuz). Russia's higher ratios track its volatile pre-period.
+:::
+
+::: {.fragment style="text-align:center; font-size:0.95em; font-weight:700; color:#ffd166; margin-top:0.3em;"}
+Validation errors scale up expectedly but remain well within bounds. The ensemble median optimizes the bias-variance trade-off.
+:::
+
+
+## Is the Estimate Sensitive to Horizons? {data-menu-title="Validation — internal"}
+
+::: {style="text-align:center; font-size:0.6em; color:#9aa0b5; margin-bottom:1.0em;"}
+Evaluating median effects and IQRs across varying post-event windows.
 :::
 
 :::: {.columns}
-::: {.column width="66%"}
-![](images/naive_paths_minimal.png){fig-align="center" height="330"}
+::: {.column width="100%"}
+![](images/postwindow_sensitivity_minimal.png){fig-align="center" height="400"}
 :::
-::: {.column width="34%"}
-::: {style="font-size:0.52em; margin-top:2.2em;"}
-| Russia counterfactual | \$/bbl |
-|---|:---:|
-| SCM synthetic | 88.6 |
-| EIA STEO forecast | 84.9 |
-| Actual Brent | 108.5 |
+::::
+
+::: {.fragment style="text-align:center; font-size:0.9em; font-weight:700; color:#ffd166; margin-top:1.0em;"}
+The horizon effects diverge by event. The Hormuz premium remains stably high over time.
+:::
+
+
+## Contamination Bias Analysis {data-menu-title="Validation — placebo & bias"}
+
+::: {style="text-align:center; font-size:0.6em; color:#9aa0b5; margin-bottom:0.5em;"}
+Refit every donor as if it were the treated unit; leave-one-out and train the model to measure sensitivity on a single variable; measuring the direction of the possible contamination bias.
+:::
+
+:::: {.columns}
+::: {.column width="62%"}
+![](images/placebo_hormuz_minimal.png){fig-align="center" height="420"}
+:::
+
+::: {.column width="38%"}
+::: {style="font-size:0.50em; margin-top:0.2em; font-family: inherit;"}
+
+::: {.fragment}
+<div style="font-weight: 700; color: #ffd166; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4em;">Sensitivity: Drop one donor</div>
+<table style="width: 100%; border-collapse: collapse; margin-bottom: 1.8em; background: rgba(255,255,255,0.02); border-radius: 4px;">
+  <thead>
+    <tr style="border-bottom: 2px solid #ffd166; background: rgba(255, 209, 102, 0.08);">
+      <th style="padding: 8px 12px; text-align: left; font-weight: 600; color: #fff;">Model / Spec</th>
+      <th style="padding: 8px 12px; text-align: center; font-weight: 600; color: #fff; width: 35%;">Hormuz (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 7px 12px; color: #9aa0b5;">Convex SCM</td>
+      <td style="padding: 7px 12px; text-align: center; font-weight: 600; color: #fff;">48–56</td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 7px 12px; color: #9aa0b5;">Augmented SCM</td>
+      <td style="padding: 7px 12px; text-align: center; font-weight: 600; color: #fff;">52–57</td>
+    </tr>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 7px 12px; color: #9aa0b5;">Elastic net</td>
+      <td style="padding: 7px 12px; text-align: center; font-weight: 600; color: #fff;">52–59</td>
+    </tr>
+    <tr>
+      <td style="padding: 7px 12px; color: #9aa0b5;">XGBoost</td>
+      <td style="padding: 7px 12px; text-align: center; font-weight: 600; color: #fff;">49–55</td>
+    </tr>
+  </tbody>
+</table>
+:::
+
+::: {.fragment}
+<div style="font-weight: 700; color: #ffd166; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4em;">Bias if contaminated</div>
+<table style="width: 100%; border-collapse: collapse; background: rgba(255,255,255,0.02); border-radius: 4px;">
+  <thead>
+    <tr style="border-bottom: 2px solid #ffd166; background: rgba(255, 209, 102, 0.08);">
+      <th style="padding: 8px 12px; text-align: left; font-weight: 600; color: #fff;">Region</th>
+      <th style="padding: 8px 12px; text-align: center; font-weight: 600; color: #fff; width: 35%;">Bias</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <td style="padding: 8px 12px; color: #fff; font-weight: 600;">Hormuz</td>
+      <td style="padding: 8px 12px; text-align: center; color: #ff6b6b; font-weight: 600;">−1 to −8%</td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 12px; color: #fff; font-weight: 600;">Russia</td>
+      <td style="padding: 8px 12px; text-align: center; color: #4eed94; font-weight: 600;">+13 to +21%</td>
+    </tr>
+  </tbody>
+</table>
+:::
+
 :::
 :::
 ::::
 
-::: {.fragment style="text-align:center; font-size:0.9em; font-weight:700; color:#ffd166; margin-top:0.2em;"}
-The naive trend even points the wrong way, and on Russia our synthetic lands within [**\$3.6**]{style="color:#ffd166;"} of the EIA's forecast.
+::: {.fragment style="text-align:center; font-size:0.9em; font-weight:700; color:#ffd166; margin-top:0.4em;"}
+Brent stands alone at the [**0.050**]{style="color:#ffd166;"} floor, the models are robust and not sensitive to a single variable. Any leftover bias on Hormuz is more likely to be [**negative**]{style="color:#ffd166;"}.
+:::
+
+## Conclusion {data-menu-title="Conclusion"}
+
+::: {style="font-size: 0.65em; line-height: 1.25;"}
+
+<div style="margin-bottom: 0.4em;">
+  <span style="color:#ffd166; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Headline</span>
+  <ul style="margin-top: 0.1em; margin-bottom: 0.2em;">
+    <li>Hormuz added a premium of about [**53%**]{style="color:#ffd166;"} over Brent's no-event price. Positive under every estimator, driven by no single donor or model, and if biased at all it is biased downward, so the true effect is likely larger.</li>
+  </ul>
+</div>
+
+::: {.fragment style="margin-bottom: 0.4em;"}
+  <span style="color:#ffd166; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Contributions</span>
+  <ul style="margin-top: 0.1em; margin-bottom: 0.2em;">
+    <li>A data-driven premium that [complements]{style="color:#ffd166;"} the institutional scenario estimates rather than competing with them.</li>
+    <li>An [auditable template]{style="color:#ffd166;"} for cross-asset SCM under a single-unit geopolitical shock.</li>
+  </ul>
+:::
+
+::: {.fragment}
+  <span style="color:#ffd166; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Limits</span>
+  <ul style="margin-top: 0.1em; margin-bottom: 0;">
+    <li>A reduced-form total effect, not split into supply, risk, and expectations.</li>
+    <li>Inference has little power at one treated unit, so the placebo's [0.050]{style="color:#ffd166;"} is the best the test can reach, with Brent still ranking first.</li>
+    <li>Validation is internal and regime-bound, checked against the documented Russia 2022 shock.</li>
+  </ul>
+:::
+
+:::
+## {background-image="images/title_bg.jpg" background-size="cover" background-position="center" background-opacity="0.45" background-color="#0d1117" data-menu-title="Thank You"}
+
+::: {style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; margin-top: 15%;"}
+
+[**Thank You!**]{style="font-size: 3.6em; color: white; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;"}
+
+<div style="width: 100px; height: 2px; background: #ffd166; margin: 20px auto;"></div>
+
+[**Q&A**]{style="font-size: 1.8em; color: white; font-weight: 300; letter-spacing: 0.1em; opacity: 0.8;"}
+
 :::
 
 
-## Validations:
-### Leave-one-out and horizon sensitivity {data-menu-title="Validation — internal"}
-
-::: {style="text-align:center; font-size:0.6em; color:#9aa0b5; margin-bottom:0.2em;"}
-Drop any single donor, and stretch the window.
-:::
-
-:::: {.columns}
-::: {.column width="66%"}
-![](images/postwindow_sensitivity_minimal.png){fig-align="center" height="330"}
-:::
-::: {.column width="34%"}
-::: {style="font-size:0.52em; margin-top:1.6em;"}
-| Drop one donor | Hormuz (%) |
-|---|:---:|
-| Convex SCM | 48–56 |
-| Augmented SCM | 52–57 |
-| Elastic net | 52–59 |
-| XGBoost | 49–55 |
-:::
-:::
-::::
-
-::: {.fragment style="text-align:center; font-size:0.9em; font-weight:700; color:#ffd166; margin-top:0.2em;"}
-No single donor drives it, and the horizon runs opposite on the two events.
-:::
-
-## Validations:
-### Placebo and the direction of any bias {data-menu-title="Validation — placebo & bias"}
-
-::: {style="text-align:center; font-size:0.6em; color:#9aa0b5; margin-bottom:0.2em;"}
-Refit every donor as if it were the treated unit.
-:::
-
-:::: {.columns}
-::: {.column width="66%"}
-![](images/placebo_hormuz_minimal.png){fig-align="center" height="330"}
-:::
-::: {.column width="34%"}
-::: {style="font-size:0.52em; margin-top:2.2em;"}
-| If contaminated | Bias |
-|---|:---:|
-| **Hormuz** | −1 to −8% |
-| **Russia** | +13 to +21% |
-:::
-:::
-::::
-
-::: {.fragment style="text-align:center; font-size:0.9em; font-weight:700; color:#ffd166; margin-top:0.2em;"}
-Brent stands alone at the [**0.050**]{style="color:#ffd166;"} floor, and any leftover bias on Hormuz is more likely to be [**negative**]{style="color:#ffd166;"}.
-:::
-
-##  Conclusion {data-menu-title="Conclusion"}
-
-::: {style="font-size: 0.72em;"}
-
-[Headline]{style="color:#ffd166;"}
-
-- Hormuz added a premium of about [**53%**]{style="color:#ffd166;"} over Brent's no-event price. Positive under every estimator, driven by no single donor or model, and if biased at all it is biased downward, so the true effect is likely larger.
-
-[Contributions]{style="color:#ffd166;"}
-
-- A data-driven premium that [complements]{style="color:#ffd166;"} the institutional scenario estimates rather than competing with them.
-- An [auditable template]{style="color:#ffd166;"} for cross-asset SCM under a single-unit geopolitical shock.
-
-[Limits]{style="color:#ffd166;"}
-
-- A reduced-form total effect, not split into supply, risk, and expectations.
-- Inference has little power at one treated unit, so the placebo's [0.050]{style="color:#ffd166;"} is the best the test can reach, with Brent still ranking first.
-- Validation is internal and regime-bound, checked against the documented Russia 2022 shock.
-
-:::
-
-## 
-
-**Thank You!**
 
 ## Appendix — how we sign the contamination bias {data-menu-title="Appendix: contamination bias"}
 
@@ -283,6 +369,33 @@ A naive, directional check. It asks which way any leftover contamination would m
 ::: {style="text-align:center; font-size:0.5em; font-style:italic; color:#9aa0b5; margin-top:0.25em;"}
 Limits: the reference is the rest of the pool, so a shock hitting every donor equally is invisible here, and low-reliability donors add noise. Directional, not a correction.
 :::
+
+
+## Appendix — No-donor baselines and external validation {data-menu-title="Validation — external"}
+
+::: {style="text-align:center; font-size:0.6em; color:#9aa0b5; margin-bottom:0.2em;"}
+Checks that use **no donors at all**.
+:::
+
+:::: {.columns}
+::: {.column width="66%"}
+![](images/naive_paths_minimal.png){fig-align="center" height="330"}
+:::
+::: {.column width="34%"}
+::: {style="font-size:0.52em; margin-top:2.2em;"}
+| Russia counterfactual | \$/bbl |
+|---|:---:|
+| SCM synthetic | 88.6 |
+| EIA STEO forecast | 84.9 |
+| Actual Brent | 108.5 |
+:::
+:::
+::::
+
+::: {.fragment style="text-align:center; font-size:0.9em; font-weight:700; color:#ffd166; margin-top:0.2em;"}
+The naive trend even points the wrong way, and on Russia our synthetic lands within [**\$3.6**]{style="color:#ffd166;"} of the EIA's forecast.
+:::
+
 
 ## Appendix — the retained 19-donor pool {data-menu-title="Appendix: 19-donor pool"}
 

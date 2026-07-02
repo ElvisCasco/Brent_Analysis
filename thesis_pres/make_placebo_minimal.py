@@ -1,5 +1,6 @@
 """Minimalist in-space placebo figure for the presentation (dark slide).
-Hormuz, convex SCM: each donor's post/pre RMSPE ratio, Brent highlighted.
+Hormuz, convex SCM: each donor's post/pre RMSPE ratio, Brent highlighted,
+with the top few placebo units labelled horizontally below their bars.
 Reads data/validation/inference_inspace_hormuz_convex_scm.csv.
 
 Run with the project venv:
@@ -25,6 +26,7 @@ BRENT = "#ffdf5e"  # Brent — bright gold (the winner)
 DONOR = "#5a6b8c"  # placebo donors — muted slate
 TEXT = "#f0f0f5"
 MUTE = "#9aa0b5"
+N_LABEL = 4  # how many of the highest-ratio units to name
 
 # Unit name is the (unnamed) index; the post/pre ratio is the 'ratio' column.
 df = pd.read_csv(VAL / "inference_inspace_hormuz_convex_scm.csv", index_col=0)
@@ -48,26 +50,22 @@ ax.patch.set_alpha(0)
 
 xpos = np.arange(len(ratios))
 ax.bar(xpos, ratios, color=colors, width=0.72, zorder=3)
+ax.set_ylim(0, ratios.max() * 1.10)
 
-# Label Brent's bar.
-if is_brent.any():
-    bi = int(np.where(is_brent)[0][0])
-    ax.text(
-        bi,
-        ratios[bi] + 0.15,
-        "Brent",
-        ha="center",
-        va="bottom",
-        color=BRENT,
-        fontsize=13,
-        fontweight="bold",
-    )
+# Horizontal labels BELOW the top-ranked bars, as x-axis ticks.
+top_positions = sorted(np.argsort(ratios)[-N_LABEL:])
+ax.set_xticks(top_positions)
+ax.set_xticklabels([names[i] for i in top_positions])
+for tick, i in zip(ax.get_xticklabels(), top_positions):
+    is_b = is_brent[i]
+    tick.set_color(BRENT if is_b else MUTE)
+    tick.set_fontsize(12 if is_b else 10)
+    tick.set_fontweight("bold" if is_b else "normal")
 
 ax.set_title(
     "In-space placebo — Hormuz", color=TEXT, fontsize=15, fontweight="bold", pad=10
 )
 ax.set_ylabel("Post / pre RMSPE ratio", color=TEXT, fontsize=11)
-ax.set_xticks([])
 ax.set_xlabel(
     "Placebo units (each donor refit as treated), sorted by ratio",
     color=MUTE,
