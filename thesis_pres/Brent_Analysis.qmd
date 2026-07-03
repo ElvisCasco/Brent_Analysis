@@ -1,11 +1,11 @@
 ---
 title: "Pricing a Chokepoint"
-subtitle: "A Synthetic-Control Estimate of the Brent Crude Premium from the 2026 Strait of Hormuz Disruption"
+subtitle: "A Synthetic-Control Estimate of the Brent Crude Premium<br> from the 2026 Strait of Hormuz Disruption"
 author:
   - "Cherryl Chico, Elvis Casco, Nikoloz Darsalia"
 institute:
-  - "Master Project — Data Science for Decision Making, Barcelona School of Economics"
-date: 2026-07-03
+  - "Master Project — Data Science for Decision Making<br> Barcelona School of Economics<br>2026-07-03"
+# date: 2026-07-03
 format:
   revealjs:
     theme: [default, custom.scss]
@@ -33,14 +33,14 @@ format:
         .reveal .ens-block table { width: 100%; }
         </style>
     title-slide-attributes:
-      data-background-image: "images/title_bg.jpg"
+      data-background-image: "images/Strait_of_Hormuz_satellite_labeled.png"
       data-background-size: "cover"
       data-background-position: "center"
       data-background-opacity: "0.45"
       data-background-color: "#0d1117"
 ---
 
-## A parallel worth isolating
+## A historical parallel to test the machinery 
 
 ![](images/brent_timeline_minimal.png){fig-align="center" height="470"}
 
@@ -48,7 +48,7 @@ format:
 the **2022 Russian invasion** sets the stage for the **Strait of Hormuz disruption** we price today.
 :::
 
-## The causal question {.center background-image="images/Strait_of_Hormuz_satellite_labeled.png" background-size="cover" background-position="center" background-opacity="0.30" background-color="#0d1117"}
+## {.center background-image="images/title_bg.jpg" background-size="cover" background-position="center" background-opacity="0.30" background-color="#0d1117"}
 
 ::: { style="text-align:center; font-size:1.35em; font-weight:700; color:#ffd166; margin:3em auto 0; line-height:1.3; width:75%;"}
 What is the causal effect of the Hormuz disruption on Brent over a policy-relevant post-event window?
@@ -61,7 +61,7 @@ What is the causal effect of the Hormuz disruption on Brent over a policy-releva
 - [No DiD, no IV.]{style="font-size:1.25em; font-style:italic;"} the usual designs have nothing to lean on.
 - [So we build the control.]{style="font-size:1.25em; font-style:italic;"} following synthetic control [(Abadie 2010, 2021)]{style="color:#9aa0b5;"}
 - [No direct precedent.]{style="font-size:1.25em; font-style:italic;"} the closest price application [(Becker 2021)]{style="color:#9aa0b5;"} leans on cross-country donors and a regulated market.
-- [The institutional route runs the other way.]{style="font-size:1.25em; font-style:italic;"} [(Kiel, OIES, World Bank, IEA)]{style="color:#9aa0b5;"} assume a barrel shortfall and model its price impact forward.
+- [The institutional route runs the other way.]{style="font-size:1.25em; font-style:italic;"} [(World Bank, IEA)]{style="color:#9aa0b5;"} assume a barrel shortfall and model its price impact forward.
 :::
 
 ::: {.fragment style="text-align:center; font-size:1.1em; font-weight:700; color:#ffd166; margin:0.6em 0; line-height:1.35;"}
@@ -332,11 +332,11 @@ Brent stands alone at the [**0.050**]{style="color:#ffd166;"} floor, the models 
 :::
 ## {background-image="images/title_bg.jpg" background-size="cover" background-position="center" background-opacity="0.45" background-color="#0d1117" data-menu-title="Thank You"}
 
-::: {style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; margin-top: 15%;"}
+::: {style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center;"}
 
 [**Thank You!**]{style="font-size: 3.6em; color: white; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;"}
 
-<div style="width: 100px; height: 2px; background: #ffd166; margin: 20px auto;"></div>
+<div style="width: 100px; height: 2px; background: #ffd166; margin: 6px auto;"></div>
 
 [**Q&A**]{style="font-size: 1.8em; color: white; font-weight: 300; letter-spacing: 0.1em; opacity: 0.8;"}
 
